@@ -20,9 +20,8 @@ public class EventoController {
 
     @PostMapping
     public Evento crearEvento(@RequestBody EventoDTO dto) {
-        Evento evento = new Evento(dto.titulo, dto.descripcion, dto.fechaHoraInicio,
-                dto.duracionMinutos, dto.ubicacion, dto.cupoMaximo,
-                dto.precio, dto.categoria);
+        Evento evento = new Evento(dto.titulo, dto.descripcion, dto.fechaHoraInicio, dto.duracionMinutos, dto.ubicacion,
+                dto.cupoMaximo, dto.precio, dto.categoria);
         return eventoService.crearEvento(evento);
     }
 

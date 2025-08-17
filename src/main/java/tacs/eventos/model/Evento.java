@@ -23,9 +23,8 @@ public class Evento {
     private List<String> participantes;
     private Queue<String> waitlist;
 
-    public Evento(String titulo, String descripcion, LocalDateTime fechaHoraInicio,
-                  int duracionMinutos, String ubicacion, int cupoMaximo,
-                  double precio, String categoria) {
+    public Evento(String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
+            String ubicacion, int cupoMaximo, double precio, String categoria) {
 
         this.id = UUID.randomUUID().toString();
         this.titulo = titulo;
@@ -42,22 +41,61 @@ public class Evento {
         this.waitlist = new LinkedList<>();
     }
 
-    public String getId() { return id; }
-    public String getTitulo() { return titulo; }
-    public String getDescripcion() { return descripcion; }
-    public LocalDateTime getFechaHoraInicio() { return fechaHoraInicio; }
-    public int getDuracionMinutos() { return duracionMinutos; }
-    public String getUbicacion() { return ubicacion; }
-    public int getCupoMaximo() { return cupoMaximo; }
-    public int getInscritos() { return inscritos; }
-    public double getPrecio() { return precio; }
-    public String getCategoria() { return categoria; }
-    public boolean isAbierto() { return abierto; }
-    public List<String> getParticipantes() { return participantes; }
-    public Queue<String> getWaitlist() { return waitlist; }
+    public String getId() {
+        return id;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public LocalDateTime getFechaHoraInicio() {
+        return fechaHoraInicio;
+    }
+
+    public int getDuracionMinutos() {
+        return duracionMinutos;
+    }
+
+    public String getUbicacion() {
+        return ubicacion;
+    }
+
+    public int getCupoMaximo() {
+        return cupoMaximo;
+    }
+
+    public int getInscritos() {
+        return inscritos;
+    }
+
+    public double getPrecio() {
+        return precio;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public boolean isAbierto() {
+        return abierto;
+    }
+
+    public List<String> getParticipantes() {
+        return participantes;
+    }
+
+    public Queue<String> getWaitlist() {
+        return waitlist;
+    }
 
     public boolean agregarParticipante(String usuarioId) {
-        if (!abierto) return false;
+        if (!abierto)
+            return false;
         if (inscritos < cupoMaximo) {
             participantes.add(usuarioId);
             inscritos++;
