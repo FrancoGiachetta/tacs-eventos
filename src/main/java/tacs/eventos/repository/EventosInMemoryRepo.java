@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Repository("inMemoryRepo")
+@Repository("eventosInMemoryRepo")
 public class EventosInMemoryRepo implements EventosRepository {
     private List<Evento> eventos;
 

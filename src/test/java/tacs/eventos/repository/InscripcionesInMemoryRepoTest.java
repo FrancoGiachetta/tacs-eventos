@@ -23,6 +23,9 @@ class InscripcionesInMemoryRepoTest {
         this.i1 = new InscripcionEvento("1", this.e);
         this.i2 = new InscripcionEvento("2", this.e);
         this.i3 = new InscripcionEvento("3", this.e);
+        this.repo.guardarInscripcion(this.i1);
+        this.repo.guardarInscripcion(this.i2);
+        this.repo.guardarInscripcion(this.i3);
     }
 
     @Test
@@ -58,6 +61,7 @@ class InscripcionesInMemoryRepoTest {
     @Test
     void guardarInscripcion() {
         var i4 = new InscripcionEvento("4", this.e);
+        this.repo.guardarInscripcion(i4);
         var i = this.repo.getInscripcion("4", this.e);
         assertTrue(i.isPresent());
         assertEquals(i.get(), i4);

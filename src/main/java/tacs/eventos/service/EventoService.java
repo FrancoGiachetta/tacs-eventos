@@ -19,8 +19,8 @@ public class EventoService {
     private final List<Evento> eventos = new ArrayList<>();
 
     public EventoService(
-        @Qualifier("inMemoryRepo") EventosRepository eventosRepository,
-        @Qualifier("inMemoryRepo") InscripcionesRepository inscripcionesRepository
+        @Qualifier("eventosInMemoryRepo") EventosRepository eventosRepository,
+        @Qualifier("inscripcionesInMemoryRepo") InscripcionesRepository inscripcionesRepository
     ) {
         this.eventosRepository = eventosRepository;
         this.inscripcionesRepository = inscripcionesRepository;
