@@ -1,15 +1,22 @@
 package tacs.eventos.repository;
 
+import org.springframework.stereotype.Repository;
 import tacs.eventos.model.Evento;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Repository("inMemoryRepo")
 public class EventosInMemoryRepo implements EventosRepository {
   private List<Evento> eventos;
 
   public EventosInMemoryRepo() {
     this.eventos = new ArrayList<>();
+  }
+
+  @Override
+  public List<Evento> todos() {
+    return this.eventos;
   }
 
   @Override
@@ -31,7 +38,9 @@ public class EventosInMemoryRepo implements EventosRepository {
 
   @Override
   public void guardarEvento(Evento evento) {
-    this.eventos.add(evento);
+    if (!this.eventos.contains(evento)) {
+      this.eventos.add(evento);
+    }
   }
 
   @Override

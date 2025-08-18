@@ -1,17 +1,25 @@
 package tacs.eventos.repository;
 
+import org.springframework.stereotype.Repository;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.InscripcionEvento;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Repository("inMemoryRepo")
 public class InscripcionesInMemoryRepo implements InscripcionesRepository{
   private List<InscripcionEvento> inscripciones;
 
   public InscripcionesInMemoryRepo() {
     this.inscripciones = new ArrayList<>();
   }
+
+  @Override
+  public List<InscripcionEvento> todos() {
+    return this.inscripciones;
+  }
+
   @Override
   public Optional<InscripcionEvento> getInscripcion(String participanteId, Evento evento) {
     return this.inscripciones
@@ -35,7 +43,9 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository{
 
   @Override
   public void guardarInscripcion(InscripcionEvento inscripcion) {
-    this.inscripciones.add(inscripcion);
+    if (!this.inscripciones.contains(inscripcion)) {
+      this.inscripciones.add(inscripcion);
+    }
   }
 
   @Override
