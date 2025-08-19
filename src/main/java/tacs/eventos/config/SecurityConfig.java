@@ -23,8 +23,9 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/auth/**", "/swagger")
-                                .permitAll().anyRequest().authenticated())
+                        auth -> auth
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/auth/**", "/swagger").permitAll()
+                                .anyRequest().authenticated())
                 .addFilterBefore(sessionFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

@@ -26,7 +26,8 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Registra un usuario")
-    public ResponseEntity<SessionResponse> register(@Valid @RequestBody RegistroRequest req) {
+    public ResponseEntity<SessionResponse> register(@Valid @RequestBody RegistroRequest req)
+    {
         usuarios.registrar(req.email(), req.password());
         return sesiones.login(req.email(), req.password())
                 .map(s -> ResponseEntity.ok(new SessionResponse(s.getToken(), s.getExpiresAt())))
@@ -35,7 +36,8 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "Login que devuelve token de sesión y expiración")
-    public ResponseEntity<SessionResponse> login(@Valid @RequestBody LoginRequest req) {
+    public ResponseEntity<SessionResponse> login(@Valid @RequestBody LoginRequest req)
+    {
         return sesiones.login(req.email(), req.password())
                 .map(s -> ResponseEntity.ok(new SessionResponse(s.getToken(), s.getExpiresAt())))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
@@ -44,7 +46,8 @@ public class AuthController {
     @PostMapping("/logout")
     @Operation(summary = "Invalidar el token de sesión actual (enviar por header o body)")
     public ResponseEntity<Void> logout(@RequestHeader(value = "X-Session-Token", required = false) String token,
-            @RequestBody(required = false) SessionResponse body) {
+            @RequestBody(required = false) SessionResponse body)
+    {
         String t = token != null ? token : (body != null ? body.token() : null);
         if (t != null)
             sesiones.logout(t);

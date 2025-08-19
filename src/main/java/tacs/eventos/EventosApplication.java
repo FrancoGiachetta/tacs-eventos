@@ -32,7 +32,7 @@ public class EventosApplication {
     CommandLineRunner seedAdmin(UsuarioInMemoryRepository users, PasswordEncoder pe) {
         return args -> {
             users.obtenerPorEmail("admin@events.local").orElseGet(() -> {
-                Usuario u = new Usuario("admin@events.local", pe.encode("Admin1234!cambialo"),
+                Usuario u = new Usuario("admin@events.local", pe.encode("Admin1234"),
                         Set.of(RolUsuario.ADMIN));
                 users.guardar(u);
                 return u;

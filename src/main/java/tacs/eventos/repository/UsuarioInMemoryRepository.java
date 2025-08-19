@@ -29,7 +29,12 @@ public class UsuarioInMemoryRepository implements UsuarioRepository {
 
     @Override
     public Optional<Usuario> obtenerPorId(String id) {
-        return Optional.empty();
+        if (id == null) {
+            return Optional.empty();
+        }
+        return usuarios.values().stream()
+                .filter(usuario -> usuario.getId() != null && usuario.getId().equals(id))
+                .findFirst();
     }
 
     @Override
