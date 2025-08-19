@@ -22,23 +22,18 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
 
     @Override
     public Optional<InscripcionEvento> getInscripcion(String participanteId, Evento evento) {
-        return this.inscripciones
-            .stream().filter(i -> i.getEvento().equals(evento) && i.getParticipanteId().equals(participanteId))
-            .findFirst();
+        return this.inscripciones.stream()
+                .filter(i -> i.getEvento().equals(evento) && i.getParticipanteId().equals(participanteId)).findFirst();
     }
 
     @Override
     public List<InscripcionEvento> getInscripcionesPorParticipante(String participanteId) {
-        return this.inscripciones
-            .stream().filter(i -> i.getParticipanteId().equals(participanteId))
-            .toList();
+        return this.inscripciones.stream().filter(i -> i.getParticipanteId().equals(participanteId)).toList();
     }
 
     @Override
     public List<InscripcionEvento> getInscripcionesPorEvento(Evento evento) {
-        return this.inscripciones
-            .stream().filter(i -> i.getEvento().equals(evento))
-            .toList();
+        return this.inscripciones.stream().filter(i -> i.getEvento().equals(evento)).toList();
     }
 
     @Override

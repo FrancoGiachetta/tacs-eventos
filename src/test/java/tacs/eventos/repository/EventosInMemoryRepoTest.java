@@ -17,15 +17,9 @@ class EventosInMemoryRepoTest {
     @BeforeEach
     void setUp() {
         this.repo = new EventosInMemoryRepo();
-        this.e1 = new Evento(
-            "Evento 1", "", null, 1, "", 0, 0, "Deporte"
-        );
-        this.e2 = new Evento(
-            "Evento 2", "", null, 1, "", 0, 0, "Moda"
-        );
-        this.e3 = new Evento(
-            "Evento 3", "", null, 1, "", 0, 0, "Deporte"
-        );
+        this.e1 = new Evento("Evento 1", "", null, 1, "", 0, 0, "Deporte");
+        this.e2 = new Evento("Evento 2", "", null, 1, "", 0, 0, "Moda");
+        this.e3 = new Evento("Evento 3", "", null, 1, "", 0, 0, "Deporte");
         this.repo.guardarEvento(e1);
         this.repo.guardarEvento(e2);
         this.repo.guardarEvento(e3);
@@ -65,9 +59,7 @@ class EventosInMemoryRepoTest {
 
     @Test
     void guardarEvento() {
-        var e4 = new Evento(
-            "Evento 4", "", null, 1, "", 0, 0, "Deporte"
-        );
+        var e4 = new Evento("Evento 4", "", null, 1, "", 0, 0, "Deporte");
         var e4Id = e4.getId();
 
         this.repo.guardarEvento(e4);

@@ -17,9 +17,7 @@ class InscripcionesInMemoryRepoTest {
     @BeforeEach
     void setUp() {
         this.repo = new InscripcionesInMemoryRepo();
-        this.e = new Evento(
-            "Evento", "", null, 1, "", 0, 0, "Deporte"
-        );
+        this.e = new Evento("Evento", "", null, 1, "", 0, 0, "Deporte");
         this.i1 = new InscripcionEvento("1", this.e);
         this.i2 = new InscripcionEvento("2", this.e);
         this.i3 = new InscripcionEvento("3", this.e);

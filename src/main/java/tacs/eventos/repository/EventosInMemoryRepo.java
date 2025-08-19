@@ -27,13 +27,12 @@ public class EventosInMemoryRepo implements EventosRepository {
     @Override
     public List<Evento> getEventosPorOrganizador(String organizadorId) {
         return this.eventos.stream().filter(e -> true) // TODO: Completar luego cuando este el organizador en el evento
-            .toList();
+                .toList();
     }
 
     @Override
     public List<Evento> getEventosPorCategoria(String categoria) {
-        return this.eventos.stream().filter(e -> e.getCategoria().equals(categoria))
-            .toList();
+        return this.eventos.stream().filter(e -> e.getCategoria().equals(categoria)).toList();
     }
 
     @Override
