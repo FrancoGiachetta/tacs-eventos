@@ -8,9 +8,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
-import tacs.eventos.repository.RepositorioUsuarios;
+import tacs.eventos.repository.UsuariosInMemoryRepo;
 
-import java.time.Instant;
 import java.util.Set;
 
 import static java.util.Set.of;
@@ -23,15 +22,19 @@ public class EventosApplication {
     }
 
     @Bean
-        PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(12); }
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(12);
+    }
 
     // seeder: crea admin si no existe
     @Bean
-    CommandLineRunner seedAdmin(RepositorioUsuarios users, PasswordEncoder pe) {
+    CommandLineRunner seedAdmin(UsuariosInMemoryRepo users, PasswordEncoder pe) {
         return args -> {
-            users.findByEmailIgnoreCase("admin@events.local").orElseGet(() -> {
-                Usuario u = new Usuario("admin@events.local", pe.encode("Admin1234!cambialo"), Set.of(RolUsuario.ADMIN));
-                return users.save(u);
+            users.obtenerPorEmail("admin@events.local").orElseGet(() -> {
+                Usuario u = new Usuario("admin@events.local", pe.encode("Admin1234!cambialo"),
+                        Set.of(RolUsuario.ADMIN));
+                users.guardar(u);
+                return u;
             });
         };
     }
