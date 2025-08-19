@@ -32,8 +32,7 @@ public class UsuarioInMemoryRepository implements UsuarioRepository {
         if (id == null) {
             return Optional.empty();
         }
-        return usuarios.values().stream()
-                .filter(usuario -> usuario.getId() != null && usuario.getId().equals(id))
+        return usuarios.values().stream().filter(usuario -> usuario.getId() != null && usuario.getId().equals(id))
                 .findFirst();
     }
 
