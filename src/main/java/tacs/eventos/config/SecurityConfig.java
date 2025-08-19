@@ -24,8 +24,10 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/auth/**", "/swagger").permitAll()
-                                .anyRequest().authenticated())
+                                .anyRequest().permitAll()
+                                /*.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/auth/**", "/swagger").permitAll()
+                                .anyRequest().authenticated()*/ //todo: activar cuando termine el desarrollo de la API
+                )
                 .addFilterBefore(sessionFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
