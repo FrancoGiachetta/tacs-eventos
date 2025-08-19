@@ -8,13 +8,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
-import tacs.eventos.repository.UsuariosInMemoryRepo;
+import tacs.eventos.repository.UsuarioInMemoryRepository;
 
 import java.util.Set;
 
 import static java.util.Set.of;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+        org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration.class })
 public class EventosApplication {
 
     public static void main(String[] args) {
@@ -28,7 +29,7 @@ public class EventosApplication {
 
     // seeder: crea admin si no existe
     @Bean
-    CommandLineRunner seedAdmin(UsuariosInMemoryRepo users, PasswordEncoder pe) {
+    CommandLineRunner seedAdmin(UsuarioInMemoryRepository users, PasswordEncoder pe) {
         return args -> {
             users.obtenerPorEmail("admin@events.local").orElseGet(() -> {
                 Usuario u = new Usuario("admin@events.local", pe.encode("Admin1234!cambialo"),
