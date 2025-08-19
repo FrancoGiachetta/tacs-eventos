@@ -24,7 +24,7 @@ public class AuthController {
         this.sesiones = sesiones;
     }
 
-    @GetMapping("/register")
+    @PostMapping("/register")
     @Operation(summary = "Registra un usuario")
     public ResponseEntity<SessionResponse> register(@Valid @RequestBody RegistroRequest req) {
         usuarios.registrar(req.email(), req.password());
