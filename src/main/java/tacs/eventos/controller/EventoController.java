@@ -32,13 +32,13 @@ public class EventoController {
 
     @PostMapping("/{eventoId}/inscripcion")
     public String inscribirUsuario(@PathVariable String eventoId, @RequestBody InscripcionDTO dto) {
-        boolean confirmado = eventoService.inscribirUsuario(eventoId, dto.usuarioId);
+        boolean confirmado = eventoService.inscribirUsuario(eventoId, dto.usuarioId());
         return confirmado ? "Usuario inscrito correctamente" : "Usuario agregado a waitlist";
     }
 
     @PostMapping("/{eventoId}/cancelar")
     public String cancelarInscripcion(@PathVariable String eventoId, @RequestBody InscripcionDTO dto) {
-        boolean exito = eventoService.cancelarInscripcion(eventoId, dto.usuarioId);
+        boolean exito = eventoService.cancelarInscripcion(eventoId, dto.usuarioId());
         return exito ? "Cancelación realizada" : "Usuario no encontrado";
     }
 }
