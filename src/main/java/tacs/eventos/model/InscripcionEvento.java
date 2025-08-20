@@ -1,18 +1,25 @@
 package tacs.eventos.model;
 
-import jdk.jfr.Event;
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class InscripcionEvento {
     // TODO: Cambiar por entidad Usuario si modelamos usuarios
+    @Getter
     private String participanteId;
+    @Getter
     private Evento evento;
     // TODO: agregar cuando este definido
     // private DatosDePago datosDePago;
+    @Getter
     private LocalDateTime fechaHoraInscripcion;
+    @Getter
     private Optional<LocalDateTime> fechahoraConfirmacion;
+    @Getter
     private Optional<LocalDateTime> fechaHoraCancelacion;
+    @Getter
     private Optional<String> errorDePago;
 
     public InscripcionEvento(String participanteId, Evento evento) {
@@ -22,30 +29,6 @@ public class InscripcionEvento {
         this.fechaHoraCancelacion = Optional.empty();
         this.fechahoraConfirmacion = Optional.empty();
         this.errorDePago = Optional.empty();
-    }
-
-    public String getParticipanteId() {
-        return participanteId;
-    }
-
-    public Evento getEvento() {
-        return evento;
-    }
-
-    public LocalDateTime getFechaHoraInscripcion() {
-        return fechaHoraInscripcion;
-    }
-
-    public Optional<LocalDateTime> getFechahoraConfirmacion() {
-        return fechahoraConfirmacion;
-    }
-
-    public Optional<LocalDateTime> getFechaHoraCancelacion() {
-        return fechaHoraCancelacion;
-    }
-
-    public Optional<String> getErrorDePago() {
-        return errorDePago;
     }
 
     public void setFechahoraConfirmacion(LocalDateTime fechaHoraConfirmacion) {

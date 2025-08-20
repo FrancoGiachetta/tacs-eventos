@@ -1,5 +1,6 @@
 package tacs.eventos.controller;
 
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import tacs.eventos.dto.EventoDTO;
 import tacs.eventos.dto.InscripcionDTO;
@@ -10,13 +11,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/eventos")
+@AllArgsConstructor
 public class EventoController {
 
     private final EventoService eventoService;
-
-    public EventoController(EventoService eventoService) {
-        this.eventoService = eventoService;
-    }
 
     @PostMapping
     public Evento crearEvento(@RequestBody EventoDTO dto) {
