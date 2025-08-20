@@ -2,6 +2,7 @@ package tacs.eventos.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.modelmapper.ModelMapper;
 import tacs.eventos.dto.EventoDTO;
 import tacs.eventos.dto.InscripcionDTO;
 import tacs.eventos.model.Evento;
@@ -16,10 +17,11 @@ public class EventoController {
 
     private final EventoService eventoService;
 
+    private final ModelMapper mapper;
+
     @PostMapping
     public Evento crearEvento(@RequestBody EventoDTO dto) {
-        Evento evento = new Evento(dto.titulo, dto.descripcion, dto.fechaHoraInicio, dto.duracionMinutos, dto.ubicacion,
-                dto.cupoMaximo, dto.precio, dto.categoria);
+        Evento evento = mapper.map(dto, Evento.class);
         return eventoService.crearEvento(evento);
     }
 
