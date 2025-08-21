@@ -39,10 +39,4 @@ public class EventosApplication {
             });
         };
     }
-
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }
-
 }
