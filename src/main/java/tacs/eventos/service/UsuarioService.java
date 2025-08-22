@@ -41,9 +41,6 @@ public class UsuarioService {
 
     public List<EventoDTO> obtenerInscripciones(String usuarioId) {
         List<InscripcionEvento> inscripciones = inscripcionesRepository.getInscripcionesPorParticipante(usuarioId);
-        return inscripciones.stream()
-                .map(InscripcionEvento::getEvento)
-                .map(EventoDTO::fromEntity)
-                .toList();
+        return inscripciones.stream().map(InscripcionEvento::getEvento).map(EventoDTO::fromEntity).toList();
     }
 }
