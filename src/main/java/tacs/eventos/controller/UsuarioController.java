@@ -1,6 +1,11 @@
 package tacs.eventos.controller;
 
-import org.springframework.web.bind.annotation.*;
+import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import tacs.eventos.dto.EventoDTO;
 import tacs.eventos.service.UsuarioService;
 
@@ -8,16 +13,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuarios")
+@AllArgsConstructor
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-
-    public UsuarioController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
-    }
+    private final ModelMapper modelMapper;
 
     @GetMapping("/mis-inscripciones/{userId}")
     public List<EventoDTO> getMisInscripciones(@PathVariable String userId) {
-        return usuarioService.obtenerInscripciones(userId);
+        return usuarioService.obtenerInscripciones(userId).stream().map(e -> modelMapper.map(e, EventoDTO.class))
+                .toList();
     }
 }
