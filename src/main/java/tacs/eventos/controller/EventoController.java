@@ -21,10 +21,9 @@ public class EventoController {
 
     @PostMapping
     public Evento crearEvento(@RequestBody EventoDTO dto) {
-        Evento evento = mapper.map(dto, Evento.class);
-        return eventoService.crearEvento(evento);
+            Evento evento = mapper.map(dto, Evento.class);
+            return eventoService.crearEvento(evento);
     }
-
     @GetMapping
     public List<Evento> listarEventos() {
         return eventoService.listarEventos();

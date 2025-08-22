@@ -26,6 +26,7 @@ public class EventoService {
 
     public Evento crearEvento(Evento evento) {
         eventos.add(evento);
+        eventosRepository.guardarEvento(evento);
         return evento;
     }
 
