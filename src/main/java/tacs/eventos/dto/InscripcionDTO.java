@@ -1,5 +1,6 @@
 package tacs.eventos.dto;
 
-public class InscripcionDTO {
-    public String usuarioId;
+import jakarta.validation.constraints.NotBlank;
+
+public record InscripcionDTO(@NotBlank String usuarioId) {
 }

@@ -1,5 +1,7 @@
 package tacs.eventos.model;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,20 +9,32 @@ import java.util.Queue;
 import java.util.UUID;
 
 public class Evento {
-
+    @Getter
     private String id;
+    @Getter
     private String titulo;
+    @Getter
     private String descripcion;
+    @Getter
     private LocalDateTime fechaHoraInicio;
+    @Getter
     private int duracionMinutos;
+    @Getter
     private String ubicacion;
+    @Getter
     private int cupoMaximo;
+    @Getter
     private int inscritos;
+    @Getter
     private double precio;
+    @Getter
     private String categoria;
+    @Getter
     private boolean abierto;
 
+    @Getter
     private List<String> participantes;
+    @Getter
     private Queue<String> waitlist;
 
     public Evento(String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
@@ -39,58 +53,6 @@ public class Evento {
         this.inscritos = 0;
         this.participantes = new LinkedList<>();
         this.waitlist = new LinkedList<>();
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getTitulo() {
-        return titulo;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public LocalDateTime getFechaHoraInicio() {
-        return fechaHoraInicio;
-    }
-
-    public int getDuracionMinutos() {
-        return duracionMinutos;
-    }
-
-    public String getUbicacion() {
-        return ubicacion;
-    }
-
-    public int getCupoMaximo() {
-        return cupoMaximo;
-    }
-
-    public int getInscritos() {
-        return inscritos;
-    }
-
-    public double getPrecio() {
-        return precio;
-    }
-
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public boolean isAbierto() {
-        return abierto;
-    }
-
-    public List<String> getParticipantes() {
-        return participantes;
-    }
-
-    public Queue<String> getWaitlist() {
-        return waitlist;
     }
 
     public boolean agregarParticipante(String usuarioId) {
