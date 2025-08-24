@@ -1,4 +1,4 @@
-package tacs.eventos.repository;
+package tacs.eventos.repository.usuario;
 
 import tacs.eventos.model.Usuario;
 

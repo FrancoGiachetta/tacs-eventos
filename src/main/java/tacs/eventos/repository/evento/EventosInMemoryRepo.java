@@ -1,4 +1,4 @@
-package tacs.eventos.repository;
+package tacs.eventos.repository.evento;
 
 import org.springframework.stereotype.Repository;
 import tacs.eventos.model.Evento;
@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository("eventosInMemoryRepo")
 public class EventosInMemoryRepo implements EventosRepository {
-    private List<Evento> eventos;
+    private final List<Evento> eventos;
 
     public EventosInMemoryRepo() {
         this.eventos = new ArrayList<>();
