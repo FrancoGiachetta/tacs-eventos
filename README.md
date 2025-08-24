@@ -27,6 +27,9 @@ O desde el IDE (ejecutar la clase principal tacs.eventos.EventosApplication).
 Por defecto la aplicación apunta a
 http://localhost:8080
 
+##Swagger
+http://localhost:8080/swagger
+
 ## Equipo
 Franco Giachetta
 Leonel Lucas Morsella

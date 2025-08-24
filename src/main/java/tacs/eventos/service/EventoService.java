@@ -1,14 +1,13 @@
 package tacs.eventos.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import tacs.eventos.model.Evento;
 import org.springframework.stereotype.Service;
+import tacs.eventos.model.Evento;
 import tacs.eventos.model.InscripcionEvento;
 import tacs.eventos.repository.evento.EventosRepository;
 import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.repository.InscripcionesRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +16,6 @@ public class EventoService {
 
     private final EventosRepository eventosRepository;
     private final InscripcionesRepository inscripcionesRepository;
-    private final List<Evento> eventos = new ArrayList<>();
 
     public EventoService(@Qualifier("eventosInMemoryRepo") EventosRepository eventosRepository,
             @Qualifier("inscripcionesInMemoryRepo") InscripcionesRepository inscripcionesRepository) {
@@ -26,7 +24,6 @@ public class EventoService {
     }
 
     public Evento crearEvento(Evento evento) {
-        eventos.add(evento);
         eventosRepository.guardarEvento(evento);
         return evento;
     }
