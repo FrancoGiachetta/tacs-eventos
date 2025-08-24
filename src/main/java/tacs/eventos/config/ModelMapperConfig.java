@@ -17,6 +17,12 @@ public class ModelMapperConfig {
             return new Evento(dto.titulo(), dto.descripcion(), dto.fechaHoraInicio(), dto.duracionMinutos(),
                     dto.ubicacion(), dto.cupoMaximo(), dto.precio(), dto.categoria());
         });
+        mapper.createTypeMap(Evento.class, EventoDTO.class).setProvider(request -> {
+            Evento evento = (Evento) request.getSource(); // casteo a Evento
+            return new EventoDTO(evento.getTitulo(), evento.getDescripcion(), evento.getFechaHoraInicio(),
+                    evento.getDuracionMinutos(), evento.getUbicacion(), evento.getCupoMaximo(), evento.getPrecio(),
+                    evento.getCategoria());
+        });
         return mapper;
     }
 }

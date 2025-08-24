@@ -2,7 +2,7 @@ package tacs.eventos.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import tacs.eventos.dto.EventoDTO;
+import tacs.eventos.model.Evento;
 import tacs.eventos.model.InscripcionEvento;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
@@ -38,8 +38,8 @@ public class UsuarioService {
         return repo.obtenerPorEmail(email);
     }
 
-    public List<EventoDTO> obtenerInscripciones(String usuarioId) {
+    public List<Evento> obtenerInscripciones(String usuarioId) {
         List<InscripcionEvento> inscripciones = inscripcionesRepository.getInscripcionesPorParticipante(usuarioId);
-        return inscripciones.stream().map(InscripcionEvento::getEvento).map(EventoDTO::fromEntity).toList();
+        return inscripciones.stream().map(InscripcionEvento::getEvento).toList();
     }
 }

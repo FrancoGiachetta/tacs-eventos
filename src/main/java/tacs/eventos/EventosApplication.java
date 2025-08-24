@@ -12,8 +12,6 @@ import tacs.eventos.repository.usuario.UsuarioInMemoryRepository;
 
 import java.util.Set;
 
-import static java.util.Set.of;
-
 @SpringBootApplication(exclude = {
         org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration.class })
 public class EventosApplication {
@@ -30,12 +28,10 @@ public class EventosApplication {
     // seeder: crea admin si no existe
     @Bean
     CommandLineRunner seedAdmin(UsuarioInMemoryRepository users, PasswordEncoder pe) {
-        return args -> {
-            users.obtenerPorEmail("admin@events.local").orElseGet(() -> {
-                Usuario u = new Usuario("admin@events.local", pe.encode("Admin1234"), Set.of(RolUsuario.ADMIN));
-                users.guardar(u);
-                return u;
-            });
-        };
+        return args -> users.obtenerPorEmail("admin@events.local").orElseGet(() -> {
+            Usuario u = new Usuario("admin@events.local", pe.encode("Admin1234"), Set.of(RolUsuario.ADMIN));
+            users.guardar(u);
+            return u;
+        });
     }
 }

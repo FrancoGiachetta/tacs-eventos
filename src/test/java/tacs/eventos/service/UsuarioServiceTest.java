@@ -3,7 +3,6 @@ package tacs.eventos.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import tacs.eventos.dto.EventoDTO;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.InscripcionEvento;
 import tacs.eventos.model.RolUsuario;
@@ -59,9 +58,8 @@ class UsuarioServiceTest {
         when(usuarioRepository.obtenerPorEmail(email))
                 .thenReturn(Optional.of(new Usuario(email, password, Set.of(RolUsuario.USUARIO))));
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            usuarioService.registrar(email, password);
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.registrar(email, password));
 
         assertEquals("Email ya registrado", exception.getMessage());
     }
@@ -90,10 +88,11 @@ class UsuarioServiceTest {
 
         when(inscripcionesRepository.getInscripcionesPorParticipante(usuarioId)).thenReturn(inscripciones);
 
-        List<EventoDTO> result = usuarioService.obtenerInscripciones(usuarioId);
+        List<Evento> result = usuarioService.obtenerInscripciones(usuarioId);
 
         assertEquals(2, result.size());
-        assertEquals("Evento 1", result.get(0).titulo());
-        assertEquals("Evento 2", result.get(1).titulo());
+        assertEquals("Evento 1", result.get(0).getTitulo());
+        assertEquals("Evento 2", result.get(1).getTitulo());
+
     }
 }
