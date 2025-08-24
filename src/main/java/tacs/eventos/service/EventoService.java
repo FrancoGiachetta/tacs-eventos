@@ -4,7 +4,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import tacs.eventos.model.Evento;
 import org.springframework.stereotype.Service;
 import tacs.eventos.model.InscripcionEvento;
-import tacs.eventos.repository.EventosRepository;
+import tacs.eventos.repository.evento.EventosRepository;
+import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.repository.InscripcionesRepository;
 
 import java.util.ArrayList;
@@ -36,6 +37,10 @@ public class EventoService {
 
     public Optional<Evento> buscarEventoPorId(String id) {
         return this.eventosRepository.getEvento(id);
+    }
+
+    public List<Evento> filtrarEventos(List<FiltroBusqueda<Evento>> filtros) {
+        return this.eventosRepository.filtrarEventos(filtros);
     }
 
     public boolean inscribirUsuario(String eventoId, String usuarioId) {

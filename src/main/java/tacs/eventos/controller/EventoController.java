@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.modelmapper.ModelMapper;
 import tacs.eventos.dto.EventoDTO;
+import tacs.eventos.dto.FiltrosEventoDTO;
 import tacs.eventos.dto.InscripcionDTO;
 import tacs.eventos.model.Evento;
+import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.service.EventoService;
 
 import java.util.List;
@@ -21,12 +23,19 @@ public class EventoController {
 
     @PostMapping
     public Evento crearEvento(@RequestBody EventoDTO dto) {
-            Evento evento = mapper.map(dto, Evento.class);
-            return eventoService.crearEvento(evento);
+        Evento evento = mapper.map(dto, Evento.class);
+        return eventoService.crearEvento(evento);
     }
+
     @GetMapping
     public List<Evento> listarEventos() {
         return eventoService.listarEventos();
+    }
+
+    public List<Evento> filtrarEventos(@RequestParam FiltrosEventoDTO filtroParams) {
+        List<FiltroBusqueda<Evento>> filtros = filtroParams.toListFiltroBusqueda();
+
+        return eventoService.filtrarEventos(filtros);
     }
 
     @PostMapping("/{eventoId}/inscripcion")
@@ -38,6 +47,6 @@ public class EventoController {
     @PostMapping("/{eventoId}/cancelar")
     public String cancelarInscripcion(@PathVariable String eventoId, @RequestBody InscripcionDTO dto) {
         boolean exito = eventoService.cancelarInscripcion(eventoId, dto.usuarioId());
-        return exito ? "Cancelación realizada" : "Usuario no encontrado";
+        return exito ? "CancelaciÃ³n realizada" : "Usuario no encontrado";
     }
 }
