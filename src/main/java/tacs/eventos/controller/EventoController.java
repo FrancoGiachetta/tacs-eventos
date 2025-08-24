@@ -11,6 +11,7 @@ import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.service.EventoService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/eventos")
@@ -28,14 +29,14 @@ public class EventoController {
     }
 
     @GetMapping
-    public List<Evento> listarEventos() {
-        return eventoService.listarEventos();
-    }
+    public List<Evento> listarEventos(@RequestParam Optional<FiltrosEventoDTO> filtroParams) {
+        if (filtroParams.isPresent()) {
+            List<FiltroBusqueda<Evento>> filtros = filtroParams.get().toListFiltroBusqueda();
 
-    public List<Evento> filtrarEventos(@RequestParam FiltrosEventoDTO filtroParams) {
-        List<FiltroBusqueda<Evento>> filtros = filtroParams.toListFiltroBusqueda();
-
-        return eventoService.filtrarEventos(filtros);
+            return eventoService.filtrarEventos(filtros);
+        } else {
+            return eventoService.listarEventos();
+        }
     }
 
     @PostMapping("/{eventoId}/inscripcion")

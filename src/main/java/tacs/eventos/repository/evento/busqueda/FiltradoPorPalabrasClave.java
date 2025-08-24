@@ -15,8 +15,9 @@ public class FiltradoPorPalabrasClave implements FiltroBusqueda<Evento> {
     @Override
     public Boolean aplicarCondicionfiltrado(Evento evento) {
         String palabrasClaveString = String.join(" ", palabrasClave);
-        double ratio = FuzzySearch.tokenSetRatio(evento.getDescripcion(), palabrasClaveString);
+        double ratioDescripcion = FuzzySearch.tokenSetPartialRatio(evento.getDescripcion(), palabrasClaveString);
+        double ratioTitulo = FuzzySearch.tokenSetPartialRatio(evento.getTitulo(), palabrasClaveString);
 
-        return ratio >= ratioMinimo;
+        return (ratioDescripcion >= ratioMinimo) || (ratioTitulo >= ratioMinimo);
     }
 }

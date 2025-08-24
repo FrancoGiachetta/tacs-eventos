@@ -14,7 +14,7 @@ public class FiltradoPorFechaInicio implements FiltroBusqueda<Evento> {
     @Override
     public Boolean aplicarCondicionfiltrado(Evento evento) {
         LocalDate fechaInicio = LocalDate.from(evento.getFechaHoraInicio());
-        // Chequea que fecha de inicio > fecha minima y la fecha maxima > fecha de inicio.
+        // Chequea que fecha de inicio >= fecha minima y la fecha maxima >= fecha de inicio.
         return (fechaInicio.compareTo(fechaMinima) * fechaMaxima.compareTo(fechaInicio)) >= 0;
     }
 }
