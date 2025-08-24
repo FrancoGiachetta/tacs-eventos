@@ -16,11 +16,10 @@ import java.util.List;
 import java.util.Optional;
 
 public record FiltrosEventoDTO(@FutureOrPresent Optional<LocalDate> fechaMinimaOpt,
-                               @Future Optional<LocalDate> fechaMaximaOpt, Optional<String> categoriaOpt,
-                               // TODO: Ahora la ubicacion de un Evento es un String. Esto deberia ser una clase.
-                               // Ubicacion ubicacion
-                               Optional<Double> precioMaximoPesosOpt, Optional<Double> precioMinimoPesosOpt,
-                               List<String> palabrasClave) {
+        @Future Optional<LocalDate> fechaMaximaOpt, Optional<String> categoriaOpt,
+        // TODO: Ahora la ubicacion de un Evento es un String. Esto deberia ser una clase.
+        // Ubicacion ubicacion
+        Optional<Double> precioMaximoPesosOpt, Optional<Double> precioMinimoPesosOpt, List<String> palabrasClave) {
 
     public List<FiltroBusqueda<Evento>> toListFiltroBusqueda() {
         List<FiltroBusqueda<Evento>> filtros = new ArrayList<>();

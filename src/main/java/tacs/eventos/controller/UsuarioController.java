@@ -17,8 +17,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/mis-inscripciones/{userId}")
-    public List<EventoDTO> getMisInscripciones(
-            @PathVariable String userId) {
+    public List<EventoDTO> getMisInscripciones(@PathVariable String userId) {
         return usuarioService.obtenerInscripciones(userId);
     }
 }
