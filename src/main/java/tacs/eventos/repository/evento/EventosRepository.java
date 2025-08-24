@@ -1,4 +1,4 @@
-package tacs.eventos.repository;
+package tacs.eventos.repository.evento;
 
 import tacs.eventos.model.Evento;
 import java.util.List;

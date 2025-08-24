@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.InscripcionEvento;
+import tacs.eventos.repository.inscripcion.InscripcionesInMemoryRepo;
 
 class InscripcionesInMemoryRepoTest {
     private InscripcionesInMemoryRepo repo;

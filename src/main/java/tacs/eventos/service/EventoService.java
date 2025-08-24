@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import tacs.eventos.model.Evento;
 import org.springframework.stereotype.Service;
 import tacs.eventos.model.InscripcionEvento;
-import tacs.eventos.repository.EventosRepository;
-import tacs.eventos.repository.InscripcionesRepository;
+import tacs.eventos.repository.evento.EventosRepository;
+import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 
 import java.util.ArrayList;
 import java.util.List;
