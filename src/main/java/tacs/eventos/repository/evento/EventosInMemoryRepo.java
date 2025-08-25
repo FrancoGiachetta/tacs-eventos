@@ -1,7 +1,9 @@
-package tacs.eventos.repository;
+package tacs.eventos.repository.evento;
 
 import org.springframework.stereotype.Repository;
 import tacs.eventos.model.Evento;
+import tacs.eventos.repository.FiltroBusqueda;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,16 @@ public class EventosInMemoryRepo implements EventosRepository {
     @Override
     public List<Evento> todos() {
         return this.eventos;
+    }
+
+    @Override
+    public List<Evento> filtrarEventos(List<FiltroBusqueda<Evento>> filtrosBusqueda) {
+        if (filtrosBusqueda.isEmpty()) {
+            return this.eventos;
+        } else {
+            return this.eventos.stream()
+                    .filter(e -> filtrosBusqueda.stream().allMatch(f -> f.aplicarCondicionfiltrado(e))).toList();
+        }
     }
 
     @Override
