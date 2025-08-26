@@ -27,11 +27,9 @@ public class EstadisticaService {
         return this.inscripcionesRepository.totalInscripciones();
     }
 
-
     public int cantidadEventos() {
         return this.eventosRepository.cantidaEventos();
     }
-
 
     public int calcularTasaConversionWL(String id) {
         Optional<Evento> evento = this.eventosRepository.getEvento(id);
