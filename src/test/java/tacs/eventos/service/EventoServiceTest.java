@@ -33,11 +33,11 @@ public class EventoServiceTest {
     @BeforeEach
     void setUp() {
         this.e1 = new Evento("Evento Tennis", "Evento de comida, deporte y pasion",
-                LocalDateTime.of(2001, 10, 10, 0, 0, 0), 1, "", 0, 1000, "Deporte");
-        this.e2 = new Evento("Evento Ropa", "Evento de moda, desfile", LocalDateTime.of(2001, 11, 23, 0, 0, 0), 1, "",
+                LocalDateTime.of(2025, 10, 10, 0, 0, 0), 1, "", 0, 1000, "Deporte");
+        this.e2 = new Evento("Evento Ropa", "Evento de moda, desfile", LocalDateTime.of(2025, 11, 23, 0, 0, 0), 1, "",
                 0, 100, "Moda");
         this.e3 = new Evento("Evento Computacion", "Evento de educacion, tecnica y aprensizaje",
-                LocalDateTime.of(2001, 10, 23, 0, 0, 0), 1, "", 0, 10, "Educacion");
+                LocalDateTime.of(2025, 10, 23, 0, 0, 0), 1, "", 0, 10, "Educacion");
 
         eventoService.crearEvento(this.e1);
         eventoService.crearEvento(this.e2);
@@ -105,7 +105,7 @@ public class EventoServiceTest {
 
         List<FiltroBusqueda<Evento>> filtroBusqueda = new ArrayList<>();
 
-        filtroBusqueda.add(new FiltradoPorFechaInicio(LocalDate.of(2001, 10, 10), LocalDate.of(2001, 10, 31)));
+        filtroBusqueda.add(new FiltradoPorFechaInicio(LocalDate.of(2025, 10, 10), LocalDate.of(2025, 10, 31)));
 
         List<Evento> eventosEsperados = new ArrayList<>();
 
