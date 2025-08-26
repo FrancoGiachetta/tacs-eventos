@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.InscripcionEvento;
-import tacs.eventos.repository.EventosRepository;
-import tacs.eventos.repository.InscripcionesRepository;
+import tacs.eventos.repository.evento.EventosRepository;
+import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,9 +49,7 @@ public class EventoService {
     public boolean cancelarInscripcion(String eventoId, String usuarioId) {
         Optional<Evento> evt = this.eventosRepository.getEvento(eventoId);
         var cancelado = evt.map(evento -> evento.cancelarParticipante(usuarioId)).orElse(false);
-        if (evt.isPresent()) {
-            this.eventosRepository.guardarEvento(evt.get());
-        }
+        evt.ifPresent(this.eventosRepository::guardarEvento);
         return cancelado;
     }
 }
