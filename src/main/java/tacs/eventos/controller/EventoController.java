@@ -1,11 +1,9 @@
 package tacs.eventos.controller;
 
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.modelmapper.ModelMapper;
 import tacs.eventos.dto.EventoDTO;
-import tacs.eventos.dto.FiltrosEventoDTO;
 import tacs.eventos.dto.InscripcionDTO;
 import tacs.eventos.model.Evento;
 import tacs.eventos.repository.FiltroBusqueda;
@@ -18,7 +16,6 @@ import tacs.eventos.service.EventoService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/eventos")
