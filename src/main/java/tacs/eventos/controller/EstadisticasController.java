@@ -28,6 +28,7 @@ public int cantidadEventos() {
 }
 
 
+
 @GetMapping("/cantidad-inscripciones")
 @Operation(summary = "Devuelve la cantidad de de inscripciones registrados en todo sistema")
 
