@@ -33,15 +33,14 @@ public class EventoController {
     }
 
     @GetMapping
-    public List<Evento> listarEventos(
-            @RequestParam(required = false) Double precioMinimoParam,
+    public List<Evento> listarEventos(@RequestParam(required = false) Double precioMinimoParam,
             @RequestParam(required = false) Double precioMaximoParam,
             @RequestParam(required = false) LocalDate fechaMinParam,
             @RequestParam(required = false) LocalDate fechaMaxParam,
             @RequestParam(required = false) String categoriaParam,
-            @RequestParam(required = false) List<String> palabrasClaveParam
-    ) {
-        if (precioMinimoParam == null && precioMaximoParam == null && fechaMinParam == null && fechaMaxParam == null && categoriaParam == null && palabrasClaveParam == null) {
+            @RequestParam(required = false) List<String> palabrasClaveParam) {
+        if (precioMinimoParam == null && precioMaximoParam == null && fechaMinParam == null && fechaMaxParam == null
+                && categoriaParam == null && palabrasClaveParam == null) {
             return eventoService.listarEventos();
         } else {
             LocalDate fechaMinima = fechaMinParam != null ? fechaMinParam : LocalDate.now();
@@ -62,7 +61,7 @@ public class EventoController {
                 filtros.add(new FiltradoPorPalabrasClave(palabrasClaveParam));
             }
 
-            return  eventoService.filtrarEventos(filtros);
+            return eventoService.filtrarEventos(filtros);
         }
     }
 
