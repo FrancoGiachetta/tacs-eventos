@@ -18,7 +18,7 @@ public class EstadisticaService {
     private final List<Evento> eventos = new ArrayList<>();
 
     public EstadisticaService(@Qualifier("eventosInMemoryRepo") EventosRepository eventosRepository,
-                              @Qualifier("inscripcionesInMemoryRepo") InscripcionesRepository inscripcionesRepository) {
+            @Qualifier("inscripcionesInMemoryRepo") InscripcionesRepository inscripcionesRepository) {
         this.eventosRepository = eventosRepository;
         this.inscripcionesRepository = inscripcionesRepository;
     }
@@ -36,14 +36,14 @@ public class EstadisticaService {
     public int calcularTasaConversionWL(String id) {
         Optional<Evento> evento = this.eventosRepository.getEvento(id);
 
-        int calculoTasa=0;
+        int calculoTasa = 0;
 
         int totalInscriptos;
         int totalEnWaitList;
-        if (evento.isPresent()){
-             totalInscriptos = evento.get().getInscritos();
-             totalEnWaitList = evento.get().getWaitlist().size();
-            calculoTasa=(totalInscriptos / totalEnWaitList) *100;
+        if (evento.isPresent()) {
+            totalInscriptos = evento.get().getInscritos();
+            totalEnWaitList = evento.get().getWaitlist().size();
+            calculoTasa = (totalInscriptos / totalEnWaitList) * 100;
 
         }
 
