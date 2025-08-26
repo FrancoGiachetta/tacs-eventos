@@ -20,4 +20,6 @@ public interface InscripcionesRepository {
 
     void eliminarInscripcion(InscripcionEvento inscripcion);
 
+    int totalInscripciones();
+
 }

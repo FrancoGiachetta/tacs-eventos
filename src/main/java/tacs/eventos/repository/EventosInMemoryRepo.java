@@ -46,4 +46,9 @@ public class EventosInMemoryRepo implements EventosRepository {
     public void eliminarEvento(Evento evento) {
         this.eventos.remove(evento);
     }
+
+    @Override
+    public int cantidaEventos() {
+        return this.eventos.size();
+    }
 }

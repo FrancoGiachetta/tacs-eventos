@@ -17,4 +17,7 @@ public interface EventosRepository {
     void guardarEvento(Evento evento);
 
     void eliminarEvento(Evento evento);
+
+    int cantidaEventos();
+
 }

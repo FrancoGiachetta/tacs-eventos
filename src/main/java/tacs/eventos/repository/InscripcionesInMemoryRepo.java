@@ -47,4 +47,9 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
     public void eliminarInscripcion(InscripcionEvento inscripcion) {
         this.inscripciones.remove(inscripcion);
     }
+
+    @Override
+    public int totalInscripciones() {
+        return this.inscripciones.size();
+    }
 }
