@@ -1,4 +1,4 @@
-package tacs.eventos.repository;
+package tacs.eventos.repository.sesion;
 
 import tacs.eventos.model.Session;
 

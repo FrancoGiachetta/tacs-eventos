@@ -6,8 +6,8 @@ import tacs.eventos.model.Evento;
 import tacs.eventos.model.InscripcionEvento;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
-import tacs.eventos.repository.InscripcionesRepository;
-import tacs.eventos.repository.UsuarioRepository;
+import tacs.eventos.repository.inscripcion.InscripcionesRepository;
+import tacs.eventos.repository.usuario.UsuarioRepository;
 
 import java.util.List;
 import java.util.Optional;

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository("eventosInMemoryRepo")
 public class EventosInMemoryRepo implements EventosRepository {
-    private List<Evento> eventos;
+    private final List<Evento> eventos;
 
     public EventosInMemoryRepo() {
         this.eventos = new ArrayList<>();
