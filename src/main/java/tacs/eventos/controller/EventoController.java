@@ -33,12 +33,13 @@ public class EventoController {
     }
 
     @GetMapping
-    public List<Evento> listarEventos(@RequestParam(required = false) Double precioMinimoParam,
-            @RequestParam(required = false) Double precioMaximoParam,
-            @RequestParam(required = false) LocalDate fechaMinParam,
-            @RequestParam(required = false) LocalDate fechaMaxParam,
-            @RequestParam(required = false) String categoriaParam,
-            @RequestParam(required = false) List<String> palabrasClaveParam) {
+    public List<Evento> listarEventos(
+            @RequestParam(value = "precioPesosMin", required = false) Double precioMinimoParam,
+            @RequestParam(value = "precioPesosMax", required = false) Double precioMaximoParam,
+            @RequestParam(value = "fechaInicioMin", required = false) LocalDate fechaMinParam,
+            @RequestParam(value = "fechaInicioMax", required = false) LocalDate fechaMaxParam,
+            @RequestParam(value = "categoria", required = false) String categoriaParam,
+            @RequestParam(value = "palabrasClave", required = false) List<String> palabrasClaveParam) {
         if (precioMinimoParam == null && precioMaximoParam == null && fechaMinParam == null && fechaMaxParam == null
                 && categoriaParam == null && palabrasClaveParam == null) {
             return eventoService.listarEventos();
