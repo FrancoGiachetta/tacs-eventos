@@ -1,25 +1,31 @@
 package tacs.eventos.repository.inscripcion;
 
 import tacs.eventos.model.Evento;
-import tacs.eventos.model.InscripcionEvento;
+import tacs.eventos.model.Usuario;
+import tacs.eventos.model.inscripcion.InscripcionEvento;
+
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Guarda las inscripciones confirmadas o canceladas.
+ */
 public interface InscripcionesRepository {
 
     List<InscripcionEvento> todos();
 
-    // TODO: si terminamos modelando usuarios, cambiar participanteId por la entidad Usuario
-    Optional<InscripcionEvento> getInscripcion(String participanteId, Evento evento);
+    Optional<InscripcionEvento> getInscripcion(Usuario participante, Evento evento);
 
-    List<InscripcionEvento> getInscripcionesPorParticipante(String participanteId);
+    List<InscripcionEvento> getInscripcionesPorParticipante(Usuario participante);
 
     List<InscripcionEvento> getInscripcionesPorEvento(Evento evento);
 
+    /**
+     * Guarda una inscripcion si esta todavía no existe. NO USAR DIRECTAMENTE, USAR InscripcionService.
+     */
     void guardarInscripcion(InscripcionEvento inscripcion);
 
     void eliminarInscripcion(InscripcionEvento inscripcion);
 
-    int totalInscripciones();
-
+    int cantidadInscriptos(Evento evento);
 }

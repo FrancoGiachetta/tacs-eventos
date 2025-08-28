@@ -23,8 +23,9 @@ public class EstadisticaService {
         this.inscripcionesRepository = inscripcionesRepository;
     }
 
+    // TODO: la query deberia ir a la base count sobre inscripciones para tener una mejor performance
     public int cantidadInscribiciones() {
-        return this.inscripcionesRepository.totalInscripciones();
+        return this.inscripcionesRepository.todos().size();
     }
 
     public int cantidadEventos() {
@@ -34,17 +35,7 @@ public class EstadisticaService {
     public int calcularTasaConversionWL(String id) {
         Optional<Evento> evento = this.eventosRepository.getEvento(id);
 
-        int calculoTasa = 0;
-
-        int totalInscriptos;
-        int totalEnWaitList;
-        if (evento.isPresent()) {
-            totalInscriptos = evento.get().getInscritos();
-            totalEnWaitList = evento.get().getWaitlist().size();
-            calculoTasa = (totalInscriptos / (totalEnWaitList + totalEnWaitList)) * 100;
-
-        }
-
-        return calculoTasa;
+        // todo:desarrollar metodo
+        return 1;
     }
 }
