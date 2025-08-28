@@ -45,15 +45,13 @@ public class UsuarioService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         List<InscripcionEvento> inscripciones = inscripcionesRepository.getInscripcionesPorParticipante(usuario);
         List<InscripcionEventoDTO> inscripcionDTOs = inscripciones.stream()
-                .map(insc -> new InscripcionEventoDTO(insc.getEvento(), insc.getEstado()))
-                .collect(Collectors.toList());
+                .map(insc -> new InscripcionEventoDTO(insc.getEvento(), insc.getEstado())).collect(Collectors.toList());
 
         List<Evento> eventosEnWaitlist = waitlistRepository.eventosEnCuyasWaitlistEsta(usuario);
         List<InscripcionEventoDTO> waitlistDTOs = eventosEnWaitlist.stream()
                 .map(evento -> new InscripcionEventoDTO(evento, EstadoInscripcion.valueOf("WAITLIST")))
                 .collect(Collectors.toList());
 
-        return Stream.concat(inscripcionDTOs.stream(), waitlistDTOs.stream())
-                .collect(Collectors.toList());
+        return Stream.concat(inscripcionDTOs.stream(), waitlistDTOs.stream()).collect(Collectors.toList());
     }
 }

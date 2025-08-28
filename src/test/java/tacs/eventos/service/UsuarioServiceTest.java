@@ -101,11 +101,9 @@ class UsuarioServiceTest {
 
         var result = usuarioService.obtenerInscripciones(usuario.getId());
 
-        var esperado = Set.of(
-                new InscripcionEventoDTO(evento1, EstadoInscripcion.CONFIRMADA),
+        var esperado = Set.of(new InscripcionEventoDTO(evento1, EstadoInscripcion.CONFIRMADA),
                 new InscripcionEventoDTO(evento2, EstadoInscripcion.CONFIRMADA),
-                new InscripcionEventoDTO(evento3, EstadoInscripcion.WAITLIST)
-        );
+                new InscripcionEventoDTO(evento3, EstadoInscripcion.WAITLIST));
         assertEquals(esperado, result.stream().collect(Collectors.toSet()));
     }
 }

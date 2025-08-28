@@ -22,10 +22,10 @@ public class UsuarioController {
     private final ModelMapper modelMapper;
 
     @GetMapping("/usuarios/{email}")
-    public Optional<Usuario> getUsuario(@PathVariable String email)
-    {
+    public Optional<Usuario> getUsuario(@PathVariable String email) {
         return usuarioService.buscarPorEmail(email);
     }
+
     @GetMapping("/mis-inscripciones/{userId}")
     public List<InscripcionEventoDTO> getMisInscripciones(@PathVariable String userId) {
         return usuarioService.obtenerInscripciones(userId);
