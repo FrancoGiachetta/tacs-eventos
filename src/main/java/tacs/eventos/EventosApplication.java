@@ -9,7 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
-import tacs.eventos.repository.UsuarioRepository;
+import tacs.eventos.repository.usuario.UsuarioRepository;
 
 import java.util.Set;
 

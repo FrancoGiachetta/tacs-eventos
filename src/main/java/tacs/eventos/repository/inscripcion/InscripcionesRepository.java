@@ -1,4 +1,4 @@
-package tacs.eventos.repository;
+package tacs.eventos.repository.inscripcion;
 
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;

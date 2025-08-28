@@ -1,8 +1,11 @@
 package tacs.eventos.repository;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tacs.eventos.model.Evento;
+import tacs.eventos.repository.inscripcion.InscripcionesInMemoryRepo;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;

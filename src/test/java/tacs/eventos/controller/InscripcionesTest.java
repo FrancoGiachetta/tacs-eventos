@@ -19,10 +19,10 @@ import tacs.eventos.model.Waitlist;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
-import tacs.eventos.repository.EventosRepository;
-import tacs.eventos.repository.InscripcionesRepository;
-import tacs.eventos.repository.UsuarioRepository;
 import tacs.eventos.repository.WaitlistRepository;
+import tacs.eventos.repository.evento.EventosRepository;
+import tacs.eventos.repository.inscripcion.InscripcionesRepository;
+import tacs.eventos.repository.usuario.UsuarioRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;

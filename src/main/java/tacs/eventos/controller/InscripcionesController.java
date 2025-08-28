@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import tacs.eventos.dto.InscripcionRequest;
 import tacs.eventos.dto.InscripcionResponse;
-import tacs.eventos.repository.EventosRepository;
-import tacs.eventos.repository.UsuarioRepository;
+import tacs.eventos.repository.evento.EventosRepository;
+import tacs.eventos.repository.usuario.UsuarioRepository;
 import tacs.eventos.service.InscripcionesService;
 
 @RestController
