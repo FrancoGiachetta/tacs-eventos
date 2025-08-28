@@ -7,7 +7,7 @@ import tacs.eventos.service.EstadisticaService;
 import tacs.eventos.service.EventoService;
 
 @RestController
-@RequestMapping("v1/api/estadisticas")
+@RequestMapping("/api/v1/estadisticas")
 @AllArgsConstructor
 public class EstadisticasController {
 
