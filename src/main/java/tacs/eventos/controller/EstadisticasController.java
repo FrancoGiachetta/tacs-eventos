@@ -7,7 +7,7 @@ import tacs.eventos.service.EstadisticaService;
 import tacs.eventos.service.EventoService;
 
 @RestController
-@RequestMapping("/api/estadisticas")
+@RequestMapping("v1/api/estadisticas")
 @AllArgsConstructor
 public class EstadisticasController {
 
@@ -16,14 +16,14 @@ public class EstadisticasController {
     private final EstadisticaService estadisticaService;
 
     // TODO: priorizar performance
-    @GetMapping("/eventos/cantidad")
+    @GetMapping("/eventos/total")
     @Operation(summary = "Devuelve la cantidad de eventos registrados en el sistema")
 
     public int cantidadEventos() {
         return estadisticaService.cantidadEventos();
     }
 
-    @GetMapping("/inscripciones/cantidad")
+    @GetMapping("/inscripciones/total")
     @Operation(summary = "Devuelve la cantidad de de inscripciones registrados en todo sistema")
 
     public int cantidadInscripciones() {
