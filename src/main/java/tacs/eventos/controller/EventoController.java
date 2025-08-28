@@ -1,10 +1,9 @@
 package tacs.eventos.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 import org.modelmapper.ModelMapper;
+import org.springframework.web.bind.annotation.*;
 import tacs.eventos.dto.EventoDTO;
-import tacs.eventos.dto.InscripcionDTO;
 import tacs.eventos.model.Evento;
 import tacs.eventos.service.EventoService;
 
@@ -28,17 +27,5 @@ public class EventoController {
     @GetMapping
     public List<Evento> listarEventos() {
         return eventoService.listarEventos();
-    }
-
-    @PostMapping("/{eventoId}/inscripcion")
-    public String inscribirUsuario(@PathVariable String eventoId, @RequestBody InscripcionDTO dto) {
-        boolean confirmado = eventoService.inscribirUsuario(eventoId, dto.usuarioId());
-        return confirmado ? "Usuario inscrito correctamente" : "Usuario agregado a waitlist";
-    }
-
-    @PostMapping("/{eventoId}/cancelar")
-    public String cancelarInscripcion(@PathVariable String eventoId, @RequestBody InscripcionDTO dto) {
-        boolean exito = eventoService.cancelarInscripcion(eventoId, dto.usuarioId());
-        return exito ? "Cancelación realizada" : "Usuario no encontrado";
     }
 }

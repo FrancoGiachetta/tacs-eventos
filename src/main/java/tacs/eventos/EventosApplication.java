@@ -1,22 +1,21 @@
 package tacs.eventos;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
-import tacs.eventos.repository.UsuarioInMemoryRepository;
+import tacs.eventos.repository.UsuarioRepository;
 
 import java.util.Set;
 
-import static java.util.Set.of;
-
 @SpringBootApplication(exclude = {
         org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration.class })
+@EnableAsync
 public class EventosApplication {
 
     public static void main(String[] args) {
@@ -30,7 +29,7 @@ public class EventosApplication {
 
     // seeder: crea admin si no existe
     @Bean
-    CommandLineRunner seedAdmin(UsuarioInMemoryRepository users, PasswordEncoder pe) {
+    CommandLineRunner seedAdmin(UsuarioRepository users, PasswordEncoder pe) {
         return args -> {
             users.obtenerPorEmail("admin@events.local").orElseGet(() -> {
                 Usuario u = new Usuario("admin@events.local", pe.encode("Admin1234"), Set.of(RolUsuario.ADMIN));

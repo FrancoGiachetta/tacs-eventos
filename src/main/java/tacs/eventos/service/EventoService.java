@@ -1,9 +1,8 @@
 package tacs.eventos.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tacs.eventos.model.Evento;
-import tacs.eventos.model.InscripcionEvento;
 import tacs.eventos.repository.EventosRepository;
 import tacs.eventos.repository.InscripcionesRepository;
 
@@ -11,16 +10,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class EventoService {
-
     private final EventosRepository eventosRepository;
     private final InscripcionesRepository inscripcionesRepository;
-
-    public EventoService(@Qualifier("eventosInMemoryRepo") EventosRepository eventosRepository,
-            @Qualifier("inscripcionesInMemoryRepo") InscripcionesRepository inscripcionesRepository) {
-        this.eventosRepository = eventosRepository;
-        this.inscripcionesRepository = inscripcionesRepository;
-    }
 
     public Evento crearEvento(Evento evento) {
         eventosRepository.guardarEvento(evento);
@@ -35,23 +28,4 @@ public class EventoService {
         return this.eventosRepository.getEvento(id);
     }
 
-    public boolean inscribirUsuario(String eventoId, String usuarioId) {
-        Optional<Evento> evt = this.eventosRepository.getEvento(eventoId);
-        var inscripto = evt.map(evento -> evento.agregarParticipante(usuarioId)).orElse(false);
-        if (inscripto) {
-            var inscripcion = new InscripcionEvento(usuarioId, evt.get());
-            this.inscripcionesRepository.guardarInscripcion(inscripcion);
-            this.eventosRepository.guardarEvento(evt.get());
-        }
-        return inscripto;
-    }
-
-    public boolean cancelarInscripcion(String eventoId, String usuarioId) {
-        Optional<Evento> evt = this.eventosRepository.getEvento(eventoId);
-        var cancelado = evt.map(evento -> evento.cancelarParticipante(usuarioId)).orElse(false);
-        if (evt.isPresent()) {
-            this.eventosRepository.guardarEvento(evt.get());
-        }
-        return cancelado;
-    }
 }
