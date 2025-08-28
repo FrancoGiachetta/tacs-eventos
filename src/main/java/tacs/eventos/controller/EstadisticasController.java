@@ -16,21 +16,21 @@ public class EstadisticasController {
     private final EstadisticaService estadisticaService;
 
     // TODO: priorizar performance
-    @GetMapping("/cantidad-eventos")
+    @GetMapping("/eventos/cantidad")
     @Operation(summary = "Devuelve la cantidad de eventos registrados en el sistema")
 
     public int cantidadEventos() {
         return estadisticaService.cantidadEventos();
     }
 
-    @GetMapping("/cantidad-inscripciones")
+    @GetMapping("/inscripciones/cantidad")
     @Operation(summary = "Devuelve la cantidad de de inscripciones registrados en todo sistema")
 
     public int cantidadInscripciones() {
         return estadisticaService.cantidadInscribiciones();
     }
 
-    @GetMapping("/{eventoId}/tasa-conversionwl")
+    @GetMapping("/eventos/{eventoId}/tasa-conversionwl")
     @Operation(summary = "Devuelve la tasa de conversion de wait list de un evento")
 
     public int tasaConversionWL(@PathVariable String eventoId) {

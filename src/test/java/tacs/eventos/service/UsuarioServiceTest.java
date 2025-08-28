@@ -7,8 +7,8 @@ import tacs.eventos.model.Evento;
 import tacs.eventos.model.InscripcionEvento;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
-import tacs.eventos.repository.InscripcionesRepository;
-import tacs.eventos.repository.UsuarioRepository;
+import tacs.eventos.repository.inscripcion.InscripcionesRepository;
+import tacs.eventos.repository.usuario.UsuarioRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,9 +58,8 @@ class UsuarioServiceTest {
         when(usuarioRepository.obtenerPorEmail(email))
                 .thenReturn(Optional.of(new Usuario(email, password, Set.of(RolUsuario.USUARIO))));
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            usuarioService.registrar(email, password);
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.registrar(email, password));
 
         assertEquals("Email ya registrado", exception.getMessage());
     }

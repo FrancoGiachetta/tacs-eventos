@@ -3,8 +3,8 @@ package tacs.eventos.service;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import tacs.eventos.model.Evento;
-import tacs.eventos.repository.EventosRepository;
-import tacs.eventos.repository.InscripcionesRepository;
+import tacs.eventos.repository.evento.EventosRepository;
+import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class EstadisticaService {
         if (evento.isPresent()) {
             totalInscriptos = evento.get().getInscritos();
             totalEnWaitList = evento.get().getWaitlist().size();
-            calculoTasa = (totalInscriptos / totalEnWaitList) * 100;
+            calculoTasa = (totalInscriptos / (totalEnWaitList + totalEnWaitList)) * 100;
 
         }
 
