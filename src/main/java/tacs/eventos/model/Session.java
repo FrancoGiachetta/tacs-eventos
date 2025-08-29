@@ -13,5 +13,19 @@ public class Session {
     private String token; // UUID aleatorio en texto
     private String userId;
     private Instant expiresAt;
-    private boolean active;
+    private boolean active = true;
+
+    public Session(String token, String userId, Instant expiresAt) {
+        this.token = token;
+        this.userId = userId;
+        this.expiresAt = expiresAt;
+    }
+
+    public void deactivate() {
+        this.active = false;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
 }
