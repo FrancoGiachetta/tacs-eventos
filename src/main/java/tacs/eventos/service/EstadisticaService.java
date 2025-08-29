@@ -18,11 +18,11 @@ public class EstadisticaService {
     private final WaitlistRepository waitlistRepository;
 
     public EstadisticaService(@Qualifier("eventosInMemoryRepo") EventosRepository eventosRepository,
-                              @Qualifier("inscripcionesInMemoryRepo") InscripcionesRepository inscripcionesRepository,
-                              @Qualifier("waitlistsInMemoryRepo") WaitlistRepository waitlistRepository) {
+            @Qualifier("inscripcionesInMemoryRepo") InscripcionesRepository inscripcionesRepository,
+            @Qualifier("waitlistsInMemoryRepo") WaitlistRepository waitlistRepository) {
         this.eventosRepository = eventosRepository;
         this.inscripcionesRepository = inscripcionesRepository;
-        this.waitlistRepository= waitlistRepository;
+        this.waitlistRepository = waitlistRepository;
     }
 
     // TODO: la query deberia ir a la base count sobre inscripciones para tener una mejor performance
@@ -35,7 +35,7 @@ public class EstadisticaService {
         return this.eventosRepository.cantidaEventos();
     }
 
-    //TODO: falta chequear si esta bien aplicado esta logica que pide de tasa de conversion de waitList
+    // TODO: falta chequear si esta bien aplicado esta logica que pide de tasa de conversion de waitList
     public int calcularTasaConversionWL(String id) {
         Optional<Evento> evento = this.eventosRepository.getEvento(id);
 
@@ -47,8 +47,8 @@ public class EstadisticaService {
         if (evento.isPresent() && evento.get().isAbierto()) {
             TotalInscripcionesEvento = this.inscripcionesRepository.getInscripcionesPorEvento(evento.get()).size();
             totalEnWaitList = this.waitlistRepository.waitlist(evento.get());
-            totalWL=totalEnWaitList.getItems().size();
-            calculoTasa = (TotalInscripcionesEvento /  totalWL) * 100;
+            totalWL = totalEnWaitList.getItems().size();
+            calculoTasa = (TotalInscripcionesEvento / totalWL) * 100;
         }
         return calculoTasa;
     }
