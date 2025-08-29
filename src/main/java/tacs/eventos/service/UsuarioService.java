@@ -3,8 +3,9 @@ package tacs.eventos.service;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import tacs.eventos.dto.EstadoInscripcionResponse;
 import tacs.eventos.model.Evento;
-import tacs.eventos.dto.InscripcionEventoDTO;
+import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
@@ -40,18 +41,27 @@ public class UsuarioService {
         return repo.obtenerPorEmail(email);
     }
 
-    public List<InscripcionEventoDTO> obtenerInscripciones(String usuarioId) {
+    public List<InscripcionResponse> obtenerInscripciones(String usuarioId) {
         Usuario usuario = repo.obtenerPorId(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         List<InscripcionEvento> inscripciones = inscripcionesRepository.getInscripcionesPorParticipante(usuario);
-        List<InscripcionEventoDTO> inscripcionDTOs = inscripciones.stream()
-                .map(insc -> new InscripcionEventoDTO(insc.getEvento(), insc.getEstado())).collect(Collectors.toList());
-
-        List<Evento> eventosEnWaitlist = waitlistRepository.eventosEnCuyasWaitlistEsta(usuario);
-        List<InscripcionEventoDTO> waitlistDTOs = eventosEnWaitlist.stream()
-                .map(evento -> new InscripcionEventoDTO(evento, EstadoInscripcion.valueOf("WAITLIST")))
+        List<InscripcionResponse> inscripcionResponses = inscripciones.stream()
+                .map(insc -> new InscripcionResponse(insc.getEvento().getId(), mapEstado(insc.getEstado())))
                 .collect(Collectors.toList());
 
-        return Stream.concat(inscripcionDTOs.stream(), waitlistDTOs.stream()).collect(Collectors.toList());
+        List<Evento> eventosEnWaitlist = waitlistRepository.eventosEnCuyasWaitlistEsta(usuario);
+        List<InscripcionResponse> waitlistResponses = eventosEnWaitlist.stream()
+                .map(evento -> new InscripcionResponse(evento.getId(), EstadoInscripcionResponse.EN_WAITLIST))
+                .collect(Collectors.toList());
+
+        return Stream.concat(inscripcionResponses.stream(), waitlistResponses.stream()).collect(Collectors.toList());
+    }
+
+    private EstadoInscripcionResponse mapEstado(EstadoInscripcion estado) {
+        return switch (estado) {
+        case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
+        case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
+        case WAITLIST -> EstadoInscripcionResponse.EN_WAITLIST;
+        };
     }
 }

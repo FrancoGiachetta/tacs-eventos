@@ -41,18 +41,15 @@ public class InscripcionesController {
         // Si el usuario ya está inscripto o en la waitlist, no hace nada y devuelve la inscripción existente con el
         // código 200 OK
         if (inscripcionesService.inscripcionEstaConfirmada(evento, usuario))
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(InscripcionResponse.confirmada(usuario.getId(), evento.getId()));
+            return ResponseEntity.status(HttpStatus.OK).body(InscripcionResponse.confirmada(evento.getId()));
 
         if (inscripcionesService.inscripcionEstaEnWaitlist(evento, usuario))
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(InscripcionResponse.enWaitlist(usuario.getId(), evento.getId()));
+            return ResponseEntity.status(HttpStatus.OK).body(InscripcionResponse.enWaitlist(evento.getId()));
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist, y retorna 201 CREATED y la inscripción
         var resultadoInscripcion = inscripcionesService.inscribirOMandarAWaitlist(evento, usuario);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(resultadoInscripcion.isPresent() ? InscripcionResponse.confirmada(usuario.getId(), evento.getId())
-                        : InscripcionResponse.enWaitlist(usuario.getId(), evento.getId()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(resultadoInscripcion.isPresent()
+                ? InscripcionResponse.confirmada(evento.getId()) : InscripcionResponse.enWaitlist(evento.getId()));
     }
 
     /**
