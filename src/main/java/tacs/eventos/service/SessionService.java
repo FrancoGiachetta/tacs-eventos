@@ -35,6 +35,7 @@ public class SessionService {
     }
 
     public void logout(String token) {
+        sesiones.findByToken(token).ifPresent(Session::deactivate);
         sesiones.invalidate(token);
     }
 
@@ -46,7 +47,7 @@ public class SessionService {
     private Session createSession(Usuario u) {
         String token = UUID.randomUUID().toString();
         Instant exp = Instant.now().plus(minutes, ChronoUnit.MINUTES);
-        Session s = new Session(token, u.getId(), exp, true);
+        Session s = new Session(token, u.getId(), exp);
         sesiones.save(s);
         return s;
     }
