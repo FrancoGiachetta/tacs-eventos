@@ -12,7 +12,7 @@ import tacs.eventos.repository.usuario.UsuarioRepository;
 import tacs.eventos.service.InscripcionesService;
 
 @RestController
-@RequestMapping("/api/inscripciones")
+@RequestMapping("/api/v1/inscripciones")
 @AllArgsConstructor
 public class InscripcionesController {
     private final UsuarioRepository usuarioRepository;

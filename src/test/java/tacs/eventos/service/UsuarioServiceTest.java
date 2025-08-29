@@ -7,6 +7,8 @@ import tacs.eventos.model.Evento;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
+import tacs.eventos.dto.InscripcionEventoDTO;
+import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
 import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
@@ -95,12 +97,13 @@ class UsuarioServiceTest {
                 InscripcionFactory.directa(usuario, evento2));
 
         when(inscripcionesRepository.getInscripcionesPorParticipante(usuario)).thenReturn(inscripciones);
-
         when(waitlistRepository.eventosEnCuyasWaitlistEsta(usuario)).thenReturn(List.of(evento3));
 
         var result = usuarioService.obtenerInscripciones(usuario.getId());
 
-        // Compara ignorando el orden
-        assertEquals(result.stream().collect(Collectors.toSet()), Set.of(evento1, evento2, evento3));
+        var esperado = Set.of(new InscripcionEventoDTO(evento1, EstadoInscripcion.CONFIRMADA),
+                new InscripcionEventoDTO(evento2, EstadoInscripcion.CONFIRMADA),
+                new InscripcionEventoDTO(evento3, EstadoInscripcion.WAITLIST));
+        assertEquals(esperado, result.stream().collect(Collectors.toSet()));
     }
 }

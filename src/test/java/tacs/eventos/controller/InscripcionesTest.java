@@ -82,7 +82,7 @@ public class InscripcionesTest {
             when(waitlistRepository.waitlist(e1)).thenReturn(w1);
 
             // Mockea el pedido POST y verifica que retorne 201 CREATED y la inscripción
-            mockMvc.perform(post("/api/inscripciones").contentType(MediaType.APPLICATION_JSON)
+            mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
                     .andExpect(status().isCreated()).andExpect(content().json(objectMapper.writeValueAsString(
                             new InscripcionResponse(u1.getId(), e1.getId(), EstadoInscripcionResponse.CONFIRMADA))));
@@ -99,7 +99,7 @@ public class InscripcionesTest {
             // Hace que el evento no tenga cupo
             when(inscripcionesRepository.cantidadInscriptos(e1)).thenReturn(2);
             // Mockea el pedido POST y verifica que retorne 201 CREATED y la inscripción
-            mockMvc.perform(post("/api/inscripciones").contentType(MediaType.APPLICATION_JSON)
+            mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
                     .andExpect(status().isCreated()).andExpect(content().json(objectMapper.writeValueAsString(
                             new InscripcionResponse(u1.getId(), e1.getId(), EstadoInscripcionResponse.EN_WAITLIST))));
@@ -115,7 +115,7 @@ public class InscripcionesTest {
             when(waitlistRepository.waitlist(e1)).thenReturn(w1);
 
             // Mockea el pedido POST y verifica que retorne 200 OK y la inscripción
-            mockMvc.perform(post("/api/inscripciones").contentType(MediaType.APPLICATION_JSON)
+            mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
                     .andExpect(status().isOk()).andExpect(content().json(objectMapper.writeValueAsString(
                             new InscripcionResponse(u1.getId(), e1.getId(), EstadoInscripcionResponse.EN_WAITLIST))));
@@ -128,7 +128,7 @@ public class InscripcionesTest {
 
         @Test
         void siElUsuarioNoExisteMuestraElErrorYNoRealizaLaInscripcion() throws Exception {
-            mockMvc.perform(post("/api/inscripciones").contentType(MediaType.APPLICATION_JSON).content(
+            mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON).content(
                     objectMapper.writeValueAsString(new InscripcionRequest("esteUsuarioNoExiste", e1.getId()))))
                     .andExpect(status().isBadRequest()).andExpect(status().reason("Usuario no encontrado"));
 
@@ -137,7 +137,7 @@ public class InscripcionesTest {
 
         @Test
         void siElEventoNoExisteMuestraElErrorYNoRealizaLaInscripcion() throws Exception {
-            mockMvc.perform(post("/api/inscripciones").contentType(MediaType.APPLICATION_JSON)
+            mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), "esteEventoNoExiste"))))
                     .andExpect(status().isBadRequest()).andExpect(status().reason("Evento no encontrado"));
 
@@ -158,7 +158,7 @@ public class InscripcionesTest {
             InscripcionEvento i1 = InscripcionFactory.directa(u1, e1);
             when(inscripcionesRepository.getInscripcion(u1, e1)).thenReturn(Optional.of(i1));
 
-            mockMvc.perform(delete("/api/inscripciones").contentType(MediaType.APPLICATION_JSON)
+            mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))));
 
             assertEquals(i1.getEstado(), EstadoInscripcion.CANCELADA);
@@ -171,7 +171,7 @@ public class InscripcionesTest {
             w1.agregar(u1);
             when(waitlistRepository.waitlist(e1)).thenReturn(w1);
 
-            mockMvc.perform(delete("/api/inscripciones").contentType(MediaType.APPLICATION_JSON)
+            mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))));
 
             assertEquals(w1.candidatos(), List.of());
@@ -179,7 +179,7 @@ public class InscripcionesTest {
 
         @Test
         void siElUsuarioNoExisteRetorna400BadRequest() throws Exception {
-            mockMvc.perform(delete("/api/inscripciones").contentType(MediaType.APPLICATION_JSON).content(
+            mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON).content(
                     objectMapper.writeValueAsString(new InscripcionRequest("Este usuario no existe", e1.getId()))))
                     .andExpect(status().isBadRequest()).andExpect(status().reason("Usuario no encontrado"));
 
@@ -189,7 +189,7 @@ public class InscripcionesTest {
 
         @Test
         void siElEventoNoExisteRetorna400BadRequest() throws Exception {
-            mockMvc.perform(delete("/api/inscripciones").contentType(MediaType.APPLICATION_JSON).content(
+            mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON).content(
                     objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), "Este Evento no existe"))))
                     .andExpect(status().isBadRequest()).andExpect(status().reason("Evento no encontrado"));
 
@@ -213,7 +213,7 @@ public class InscripcionesTest {
             when(waitlistRepository.waitlist(e1)).thenReturn(w1);
 
             // Cancela la inscripción del usuario 1
-            mockMvc.perform(delete("/api/inscripciones").contentType(MediaType.APPLICATION_JSON)
+            mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))));
 
             // Chequea que la waitlist haya quedado vacía
@@ -233,7 +233,7 @@ public class InscripcionesTest {
             InscripcionEvento i1 = InscripcionFactory.directa(u1, e1);
             when(inscripcionesRepository.getInscripcion(u1, e1)).thenReturn(Optional.of(i1));
 
-            mockMvc.perform(delete("/api/inscripciones").contentType(MediaType.APPLICATION_JSON)
+            mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))));
         }
     }
