@@ -15,8 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Session;
 import tacs.eventos.model.Usuario;
-import tacs.eventos.repository.SessionRepository;
-import tacs.eventos.repository.UsuarioRepository;
+import tacs.eventos.repository.sesion.SessionRepository;
+import tacs.eventos.repository.usuario.UsuarioRepository;
 import tacs.eventos.service.SessionService;
 
 @SpringBootTest
