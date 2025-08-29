@@ -8,9 +8,6 @@ public class Session {
     private Instant expiresAt;
     private boolean active = true;
 
-    public Session() {
-    }
-
     public Session(String token, String userId, Instant expiresAt) {
         this.token = token;
         this.userId = userId;
