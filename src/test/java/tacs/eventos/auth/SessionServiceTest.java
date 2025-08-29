@@ -78,7 +78,6 @@ class SessionServiceTest {
         when(sesiones.findByToken("tok")).thenReturn(Optional.of(s));
         when(usuarios.obtenerPorId(u.getId())).thenReturn(Optional.of(u));
 
-
         var out = service.validate("tok");
         assertTrue(out.isPresent());
         assertEquals("a@b.com", out.get().getEmail());
@@ -102,7 +101,6 @@ class SessionServiceTest {
 
         when(sesiones.findByToken("t1")).thenReturn(Optional.of(s));
         when(usuarios.obtenerPorId(usuario.getId())).thenReturn(Optional.of(usuario));
-
 
         // Comprobar que es válida
         assertTrue(service.validate("t1").isPresent());
