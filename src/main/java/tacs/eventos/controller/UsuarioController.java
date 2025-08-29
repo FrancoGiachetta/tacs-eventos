@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tacs.eventos.dto.InscripcionEventoDTO;
+import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.service.UsuarioService;
 
@@ -27,7 +27,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/mis-inscripciones/{userId}")
-    public List<InscripcionEventoDTO> getMisInscripciones(@PathVariable String userId) {
+    public List<InscripcionResponse> getMisInscripciones(@PathVariable String userId) {
         return usuarioService.obtenerInscripciones(userId);
     }
 }

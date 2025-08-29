@@ -85,7 +85,7 @@ public class InscripcionesTest {
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
                     .andExpect(status().isCreated()).andExpect(content().json(objectMapper.writeValueAsString(
-                            new InscripcionResponse(u1.getId(), e1.getId(), EstadoInscripcionResponse.CONFIRMADA))));
+                            new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.CONFIRMADA))));
 
             // Verifica que se haya guardado la inscripción en el repo
             verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.directa(u1, e1));
@@ -102,7 +102,7 @@ public class InscripcionesTest {
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
                     .andExpect(status().isCreated()).andExpect(content().json(objectMapper.writeValueAsString(
-                            new InscripcionResponse(u1.getId(), e1.getId(), EstadoInscripcionResponse.EN_WAITLIST))));
+                            new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.EN_WAITLIST))));
 
             assertEquals(w1.candidatos(), List.of(u1));
         }
@@ -118,7 +118,7 @@ public class InscripcionesTest {
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
                     .andExpect(status().isOk()).andExpect(content().json(objectMapper.writeValueAsString(
-                            new InscripcionResponse(u1.getId(), e1.getId(), EstadoInscripcionResponse.EN_WAITLIST))));
+                            new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.EN_WAITLIST))));
 
             // Verifica que la waitlist no haya sido modificada
             assertEquals(w1.candidatos(), List.of(u1));

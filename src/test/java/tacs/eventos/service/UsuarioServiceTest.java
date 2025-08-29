@@ -7,7 +7,8 @@ import tacs.eventos.model.Evento;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
-import tacs.eventos.dto.InscripcionEventoDTO;
+import tacs.eventos.dto.InscripcionResponse;
+import tacs.eventos.dto.EstadoInscripcionResponse;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
 import tacs.eventos.repository.WaitlistRepository;
@@ -101,9 +102,9 @@ class UsuarioServiceTest {
 
         var result = usuarioService.obtenerInscripciones(usuario.getId());
 
-        var esperado = Set.of(new InscripcionEventoDTO(evento1, EstadoInscripcion.CONFIRMADA),
-                new InscripcionEventoDTO(evento2, EstadoInscripcion.CONFIRMADA),
-                new InscripcionEventoDTO(evento3, EstadoInscripcion.WAITLIST));
+        var esperado = Set.of(new InscripcionResponse(evento1.getId(), EstadoInscripcionResponse.CONFIRMADA),
+                new InscripcionResponse(evento2.getId(), EstadoInscripcionResponse.CONFIRMADA),
+                new InscripcionResponse(evento3.getId(), EstadoInscripcionResponse.EN_WAITLIST));
         assertEquals(esperado, result.stream().collect(Collectors.toSet()));
     }
 }
