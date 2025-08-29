@@ -1,7 +1,14 @@
 package tacs.eventos.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.Instant;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 public class Session {
     private String token; // UUID aleatorio en texto
     private String userId;
@@ -17,23 +24,11 @@ public class Session {
         this.expiresAt = expiresAt;
     }
 
-    public String getToken() {
-        return token;
-    }
-
     public void deactivate() {
         this.active = false;
     }
 
     public boolean isActive() {
         return active;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public Instant getExpiresAt() {
-        return expiresAt;
     }
 }
