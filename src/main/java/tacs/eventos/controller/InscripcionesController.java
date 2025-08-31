@@ -34,9 +34,9 @@ public class InscripcionesController {
         var optEvento = eventosRepository.getEvento(inscripcionRequest.eventoId());
 
         var usuario = optUsuario
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         var evento = optEvento
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Evento no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
 
         // Si el usuario ya está inscripto o en la waitlist, no hace nada y devuelve la inscripción existente con el
         // código 200 OK
@@ -67,9 +67,9 @@ public class InscripcionesController {
         var optUsuario = usuarioRepository.obtenerPorId(inscripcionRequest.usuarioId());
 
         var usuario = optUsuario
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         var evento = eventosRepository.getEvento(inscripcionRequest.eventoId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Evento no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
 
         inscripcionesService.cancelarInscripcion(evento, usuario);
     }
