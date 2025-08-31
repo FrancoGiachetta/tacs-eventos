@@ -14,10 +14,10 @@ import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -104,6 +104,6 @@ class UsuarioServiceTest {
         var esperado = Set.of(new InscripcionResponse(evento1.getId(), EstadoInscripcionResponse.CONFIRMADA),
                 new InscripcionResponse(evento2.getId(), EstadoInscripcionResponse.CONFIRMADA),
                 new InscripcionResponse(evento3.getId(), EstadoInscripcionResponse.PENDIENTE));
-        assertEquals(esperado, result.stream().collect(Collectors.toSet()));
+        assertEquals(esperado, new HashSet<>(result));
     }
 }
