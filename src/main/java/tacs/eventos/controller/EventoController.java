@@ -29,7 +29,7 @@ public class EventoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Evento crearEvento(@Valid  @RequestBody EventoDTO dto) {
+    public Evento crearEvento(@Valid @RequestBody EventoDTO dto) {
         Evento evento = mapper.map(dto, Evento.class);
         return eventoService.crearEvento(evento);
     }
