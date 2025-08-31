@@ -13,6 +13,10 @@ import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 
 import java.util.Optional;
 
+/**
+ * Punto de entrada para realizar o cancelar inscripciones, pasando por la waitlist si es necesario, y realizando las
+ * validaciones pertientes.
+ */
 @Service
 @AllArgsConstructor
 public class InscripcionesService {
@@ -42,6 +46,9 @@ public class InscripcionesService {
      * Si el usuario estaba inscripto, cancela su inscripción. Si no estaba inscripto, lo saca de la waitlist (si es que
      * estaba). Si no estaba inscripto y tampoco en la waitlist, no hace nada. Si se sacó de la waitlist, confirma la
      * incripción del próximo, pero en forma asincrónica, para no demorar la respuesta de este métod0.
+     *
+     * @param evento
+     * @param usuario
      */
     public void cancelarInscripcion(Evento evento, Usuario usuario) {
         // Si el usuario estaba inscripto, cancela su inscripción
@@ -53,16 +60,31 @@ public class InscripcionesService {
         inscribirProximo(evento);
     }
 
+    /**
+     * @param evento
+     * @param usuario
+     *
+     * @return true si un usuario tiene una inscripción para el evento, y esta fue confirmada
+     */
     public boolean inscripcionEstaConfirmada(Evento evento, Usuario usuario) {
         return inscripcionesRepository.getInscripcion(usuario, evento).isPresent();
     }
 
+    /**
+     * @param evento
+     * @param usuario
+     *
+     * @return true si el usuario está en la waitlist del evento, false si no
+     */
     public boolean inscripcionEstaEnWaitlist(Evento evento, Usuario usuario) {
         return waitlistRepository.waitlist(evento).contiene(usuario);
     }
 
     /**
      * Intenta inscribir al usuario directamente al evento (sin pasar por la waitlist).
+     *
+     * @param inscripcion
+     *            la inscripción que se quiere intentar realizar
      *
      * @return la inscripción realizada, o un Optional vacío si no pudo realizar la inscripción porque no había lugar
      */
@@ -87,6 +109,8 @@ public class InscripcionesService {
     /**
      * Promueve al próximo de la waitlist a inscripción, si es que hay alguien en la waitlist. Este métod0 es
      * asincrónico.
+     *
+     * @param evento
      */
     @Async
     protected void inscribirProximo(Evento evento) {

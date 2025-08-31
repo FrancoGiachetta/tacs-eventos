@@ -13,5 +13,10 @@ public interface WaitlistRepository {
      */
     Waitlist waitlist(Evento evento);
 
+    /**
+     * @param usuario
+     *
+     * @return eventos para los cuales el usuario está en la waitlist
+     */
     List<Evento> eventosEnCuyasWaitlistEsta(Usuario usuario);
 }

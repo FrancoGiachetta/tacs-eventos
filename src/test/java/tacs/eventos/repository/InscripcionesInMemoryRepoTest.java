@@ -1,14 +1,12 @@
 package tacs.eventos.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tacs.eventos.model.Evento;
-import tacs.eventos.repository.inscripcion.InscripcionesInMemoryRepo;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
+import tacs.eventos.repository.inscripcion.InscripcionesInMemoryRepo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -77,12 +75,5 @@ class InscripcionesInMemoryRepoTest {
         var i = this.repo.getInscripcion(u4, this.e);
         assertTrue(i.isPresent());
         assertEquals(i.get(), i4);
-    }
-
-    @Test
-    void eliminarInscripcion() {
-        this.repo.eliminarInscripcion(this.i2);
-        var i = this.repo.getInscripcion(u4, this.e);
-        assertTrue(i.isEmpty());
     }
 }

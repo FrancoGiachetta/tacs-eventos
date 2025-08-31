@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tacs.eventos.dto.EstadoInscripcionResponse;
-import tacs.eventos.model.Evento;
 import tacs.eventos.dto.InscripcionResponse;
-import tacs.eventos.model.inscripcion.EstadoInscripcion;
+import tacs.eventos.model.Evento;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
@@ -51,7 +51,7 @@ public class UsuarioService {
 
         List<Evento> eventosEnWaitlist = waitlistRepository.eventosEnCuyasWaitlistEsta(usuario);
         List<InscripcionResponse> waitlistResponses = eventosEnWaitlist.stream()
-                .map(evento -> new InscripcionResponse(evento.getId(), EstadoInscripcionResponse.EN_WAITLIST))
+                .map(evento -> new InscripcionResponse(evento.getId(), EstadoInscripcionResponse.PENDIENTE))
                 .collect(Collectors.toList());
 
         return Stream.concat(inscripcionResponses.stream(), waitlistResponses.stream()).collect(Collectors.toList());
@@ -61,7 +61,7 @@ public class UsuarioService {
         return switch (estado) {
         case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
         case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
-        case WAITLIST -> EstadoInscripcionResponse.EN_WAITLIST;
+        case PENDIENTE -> EstadoInscripcionResponse.PENDIENTE;
         };
     }
 }

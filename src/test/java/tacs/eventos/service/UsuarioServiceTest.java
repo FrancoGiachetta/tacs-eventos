@@ -3,13 +3,12 @@ package tacs.eventos.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import tacs.eventos.dto.EstadoInscripcionResponse;
+import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
-import tacs.eventos.dto.InscripcionResponse;
-import tacs.eventos.dto.EstadoInscripcionResponse;
-import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
 import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
@@ -104,7 +103,7 @@ class UsuarioServiceTest {
 
         var esperado = Set.of(new InscripcionResponse(evento1.getId(), EstadoInscripcionResponse.CONFIRMADA),
                 new InscripcionResponse(evento2.getId(), EstadoInscripcionResponse.CONFIRMADA),
-                new InscripcionResponse(evento3.getId(), EstadoInscripcionResponse.EN_WAITLIST));
+                new InscripcionResponse(evento3.getId(), EstadoInscripcionResponse.PENDIENTE));
         assertEquals(esperado, result.stream().collect(Collectors.toSet()));
     }
 }

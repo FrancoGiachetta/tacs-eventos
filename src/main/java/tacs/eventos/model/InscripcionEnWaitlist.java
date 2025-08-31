@@ -5,6 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * Representa un ítem en la waitlist de un evento. O sea, una inscripción que está en la waitlist, que luego podrá o no
+ * dar lugar a una inscripción confirmada.
+ */
 @RequiredArgsConstructor
 @Getter
 public class InscripcionEnWaitlist {
