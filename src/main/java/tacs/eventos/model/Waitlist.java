@@ -68,4 +68,8 @@ public class Waitlist {
     public List<Usuario> candidatos() {
         return items.stream().map(InscripcionEnWaitlist::getCandidato).collect(Collectors.toList());
     }
+
+    public List<InscripcionEnWaitlist> getItems() {
+        return items.stream().toList();
+    }
 }
