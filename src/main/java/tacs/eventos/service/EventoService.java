@@ -47,5 +47,4 @@ public class EventoService {
         this.eventosRepository.guardarEvento(evento);
     }
 
-
 }

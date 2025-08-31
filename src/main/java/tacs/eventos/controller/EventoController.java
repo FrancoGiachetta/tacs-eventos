@@ -43,8 +43,7 @@ public class EventoController {
 
     @PostMapping
     public Evento crearEvento(@AuthenticationPrincipal String email, @RequestBody EventoDTO dto) {
-        var optUsuario = usuarioService.buscarPorEmail(email);
-        var usuario = optUsuario.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no encontrado"));
+        var usuario = this.buscarUsuario(email);
 
         Evento evento = mapper.map(dto, Evento.class);
         evento.setOrganizador(usuario);
@@ -87,10 +86,8 @@ public class EventoController {
     }
 
     @PutMapping("/{eventoId}/estado")
-    public ResponseEntity<Map<String, Object>> actualizarEstadoEvento(
-        @AuthenticationPrincipal String email,
-        @PathVariable String eventoId,
-        EventoEstadoDTO dto) {
+    public ResponseEntity<Map<String, Object>> actualizarEstadoEvento(@AuthenticationPrincipal String email,
+            @PathVariable String eventoId, EventoEstadoDTO dto) {
 
         var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
@@ -112,10 +109,8 @@ public class EventoController {
     }
 
     @GetMapping("/{eventoId}/inscripciones")
-    public List<InscripcionEvento> getInscriptosAEvento(
-        @AuthenticationPrincipal String email,
-        @PathVariable String eventoId
-    ) {
+    public List<InscripcionEvento> getInscriptosAEvento(@AuthenticationPrincipal String email,
+            @PathVariable String eventoId) {
         var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
         if (!evento.getOrganizador().equals(usuario)) {
@@ -126,10 +121,7 @@ public class EventoController {
     }
 
     @GetMapping("/{eventoId}/waitlist")
-    public Waitlist getWaitlistDeEvento(
-        @AuthenticationPrincipal String email,
-        @PathVariable String eventoId
-    ) {
+    public Waitlist getWaitlistDeEvento(@AuthenticationPrincipal String email, @PathVariable String eventoId) {
         var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
         if (!evento.getOrganizador().equals(usuario)) {
@@ -140,11 +132,8 @@ public class EventoController {
     }
 
     @GetMapping("/{eventoId}/inscripciones/{usuarioId}")
-    public InscripcionEvento getInscripcion(
-        @AuthenticationPrincipal String email,
-        @PathVariable String eventoId,
-        @PathVariable String usuarioId
-    ) {
+    public InscripcionEvento getInscripcion(@AuthenticationPrincipal String email, @PathVariable String eventoId,
+            @PathVariable String usuarioId) {
         var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
         if (!evento.getOrganizador().equals(usuario)) {
@@ -154,11 +143,8 @@ public class EventoController {
     }
 
     @DeleteMapping("/{eventoId}/inscripciones/{usuarioId}")
-    public ResponseEntity<Void> cancelarInscripcion(
-        @AuthenticationPrincipal String email,
-        @PathVariable String eventoId,
-        @PathVariable String usuarioId
-    ) {
+    public ResponseEntity<Void> cancelarInscripcion(@AuthenticationPrincipal String email,
+            @PathVariable String eventoId, @PathVariable String usuarioId) {
         var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
         if (!evento.getOrganizador().equals(usuario)) {
@@ -169,11 +155,8 @@ public class EventoController {
     }
 
     @DeleteMapping("/{eventoId}/waitlist/{usuarioId}")
-    public ResponseEntity<Void> cancelarInscripcionEnWaitlist(
-        @AuthenticationPrincipal String email,
-        @PathVariable String eventoId,
-        @PathVariable String usuarioId
-    ) {
+    public ResponseEntity<Void> cancelarInscripcionEnWaitlist(@AuthenticationPrincipal String email,
+            @PathVariable String eventoId, @PathVariable String usuarioId) {
         var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
         if (!evento.getOrganizador().equals(usuario)) {
@@ -186,19 +169,22 @@ public class EventoController {
 
     private Usuario buscarUsuario(String email) {
         var optUsuario = usuarioService.buscarPorEmail(email);
-        var usuario = optUsuario.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no encontrado"));
+        var usuario = optUsuario
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no encontrado"));
         return usuario;
     }
 
     private Evento buscarEvento(String id) {
         var optEvento = this.eventoService.buscarEventoPorId(id);
-        var evento = optEvento.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Evento no encontrado"));
+        var evento = optEvento
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Evento no encontrado"));
         return evento;
     }
 
     private InscripcionEvento buscarInscripcion(Usuario usuario, Evento evento) {
         var optInscripcion = this.inscripcionesService.buscarInscripcion(usuario, evento);
-        var inscripcion = optInscripcion.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inscripcion no encontrada"));
+        var inscripcion = optInscripcion
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inscripcion no encontrada"));
         return inscripcion;
     }
 }
