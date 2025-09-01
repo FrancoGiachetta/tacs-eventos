@@ -21,6 +21,13 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
     private final ModelMapper modelMapper;
 
+    /**
+     * Busca un usuario en base a su email.
+     *
+     * @param email email asociado al usuario a buscar.
+     *
+     * @return datos del usuario. Vacío si no se encuentra el email.
+     */
     @GetMapping("/usuarios/{email}")
     public Optional<Usuario> getUsuario(@PathVariable String email) {
         return usuarioService.buscarPorEmail(email);
