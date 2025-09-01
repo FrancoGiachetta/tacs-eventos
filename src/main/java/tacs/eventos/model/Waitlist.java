@@ -69,7 +69,7 @@ public class Waitlist {
         return items.stream().map(InscripcionEnWaitlist::getCandidato).collect(Collectors.toList());
     }
 
-    public List<InscripcionEnWaitlist> getItems() {
-        return items.stream().toList();
+    public ConcurrentLinkedQueue<InscripcionEnWaitlist> getItems() {
+        return items;
     }
 }

@@ -1,5 +1,6 @@
 package tacs.eventos.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -39,7 +40,8 @@ public class EventoController {
     private final ModelMapper mapper;
 
     @PostMapping
-    public EventoDTO crearEvento(@AuthenticationPrincipal String email, @RequestBody EventoDTO dto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public EventoDTO crearEvento(@AuthenticationPrincipal String email, @Valid @RequestBody EventoDTO dto) {
         var usuario = this.buscarUsuario(email);
 
         Evento evento = mapper.map(dto, Evento.class);
@@ -138,7 +140,7 @@ public class EventoController {
 
         return this.inscripcionesService.buscarInscripcionesDeEvento(evento).stream()
                 .filter((InscripcionEvento i) -> i.getEstado() == EstadoInscripcion.CONFIRMADA)
-                .map((InscripcionEvento i) -> modelMapper.map(i, InscripcionResponse.class)).toList();
+                .map((InscripcionEvento i) -> InscripcionResponse.confirmada(evento.getId())).toList();
     }
 
     /**
