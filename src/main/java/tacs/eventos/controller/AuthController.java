@@ -23,7 +23,7 @@ public class AuthController {
     }
 
     /**
-     * Registra la sesión de un usuario.
+     * Registra un nuevo usuario.
      *
      * @param req
      *            datos de registro de sesión. Contiene el email y la contraseña.
