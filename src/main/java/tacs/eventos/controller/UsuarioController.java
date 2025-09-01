@@ -24,7 +24,8 @@ public class UsuarioController {
     /**
      * Busca un usuario en base a su email.
      *
-     * @param email email asociado al usuario a buscar.
+     * @param email
+     *            email asociado al usuario a buscar.
      *
      * @return datos del usuario. Vacío si no se encuentra el email.
      */
@@ -36,7 +37,8 @@ public class UsuarioController {
     /**
      * Retorna las inscripciones de un usuario según su id.
      *
-     * @param userId id del usuario.
+     * @param userId
+     *            id del usuario.
      *
      * @return las inscripciones del usuario.
      */

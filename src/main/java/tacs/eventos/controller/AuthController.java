@@ -25,7 +25,8 @@ public class AuthController {
     /**
      * Registra la sesión de un usuario.
      *
-     * @param req datos de registro de sesión. Contiene el email y la contraseña.
+     * @param req
+     *            datos de registro de sesión. Contiene el email y la contraseña.
      *
      * @return el token de la sesión y su tiempo de expieración.
      */
@@ -41,7 +42,8 @@ public class AuthController {
     /**
      * Loguea a un usuario según sus datos de sesion.
      *
-     * @param req datos de inicio de sesión. Contiene el email y la contraseña.
+     * @param req
+     *            datos de inicio de sesión. Contiene el email y la contraseña.
      *
      * @return el token de la sesión y su tiempo de expieración. Si alguno de los tados no es correcto, retorna 401.
      */
@@ -56,8 +58,10 @@ public class AuthController {
     /**
      * Cierra la sesión de un usuario.
      *
-     * @param token token asociado a una sesión.
-     * @param body información sobre la sesión a cerrar. Contiene el token y tiempo de expiración.
+     * @param token
+     *            token asociado a una sesión.
+     * @param body
+     *            información sobre la sesión a cerrar. Contiene el token y tiempo de expiración.
      */
     @PostMapping("/logout")
     @Operation(summary = "Invalidar el token de sesión actual (enviar por header o body)")

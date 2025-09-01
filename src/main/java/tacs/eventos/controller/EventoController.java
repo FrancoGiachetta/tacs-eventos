@@ -28,7 +28,8 @@ public class EventoController {
     /**
      * Crea un nuevo evento.
      *
-     * @param dto datos del evento a crear.
+     * @param dto
+     *            datos del evento a crear.
      *
      * @return datos del evento creado.
      */
@@ -41,12 +42,18 @@ public class EventoController {
     /**
      * Devuelve todos los eventos vigentes. Aplica filtros si los hubiera.
      *
-     * @param precioMinimoParam precio mínimo del evento.
-     * @param precioMaximoParam precio máximo del evento.
-     * @param fechaMinParam fecha mínima de creación del evento.
-     * @param fechaMaxParam fecha máxima de creación del evento
-     * @param categoriaParam categoría buscada del evento.
-     * @param palabrasClaveParam palabras que definen características del evento buscado.
+     * @param precioMinimoParam
+     *            precio mínimo del evento.
+     * @param precioMaximoParam
+     *            precio máximo del evento.
+     * @param fechaMinParam
+     *            fecha mínima de creación del evento.
+     * @param fechaMaxParam
+     *            fecha máxima de creación del evento
+     * @param categoriaParam
+     *            categoría buscada del evento.
+     * @param palabrasClaveParam
+     *            palabras que definen características del evento buscado.
      *
      * @return lista de eventos que cumplan con los filtros utilizados, si los hay.
      */

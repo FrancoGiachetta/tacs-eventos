@@ -6,16 +6,18 @@ import java.util.Optional;
 
 public interface SessionRepository {
     /**
-     *  Guarda una nueva sesion.
+     * Guarda una nueva sesion.
      *
-     * @param session una sesión.
+     * @param session
+     *            una sesión.
      *
      * @return la sesion guardada.
      */
     Session save(Session session);
 
     /**
-     * @param token token asosiado a una sesión.
+     * @param token
+     *            token asosiado a una sesión.
      *
      * @return la sesión asociada al token, vacío si no existe tal sesión.
      */

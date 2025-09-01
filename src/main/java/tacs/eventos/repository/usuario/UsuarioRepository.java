@@ -12,14 +12,16 @@ public interface UsuarioRepository {
     List<Usuario> obtenerTodos();
 
     /**
-     * @param email email de un usuario.
+     * @param email
+     *            email de un usuario.
      *
      * @return el usuario al que le corresponde el email.
      */
     Optional<Usuario> obtenerPorEmail(String email);
 
     /**
-     * @param id id de un usuario.
+     * @param id
+     *            id de un usuario.
      *
      * @return el usuario al que le corresponde el id.
      */
@@ -28,14 +30,16 @@ public interface UsuarioRepository {
     /**
      * Guarda un usuario.
      *
-     * @param usuario usuario a guardar.
+     * @param usuario
+     *            usuario a guardar.
      */
     void guardar(Usuario usuario);
 
     /**
      * Elimina un usuario.
      *
-     * @param usuario usuario a eliminar.
+     * @param usuario
+     *            usuario a eliminar.
      */
     void eliminar(Usuario usuario);
 }
