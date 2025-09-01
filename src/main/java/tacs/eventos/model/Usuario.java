@@ -36,4 +36,8 @@ public class Usuario {
         return this.id.hashCode();
     }
 
+    public boolean tieneRol(RolUsuario rol) {
+        return this.roles.contains(rol);
+    }
+
 }
