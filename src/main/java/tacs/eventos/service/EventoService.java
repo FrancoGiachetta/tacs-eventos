@@ -6,7 +6,6 @@ import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.repository.evento.EventosRepository;
-import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,14 +20,28 @@ public class EventoService {
         return evento;
     }
 
+    /**
+     * @return todos los eventos
+     */
     public List<Evento> listarEventos() {
         return this.eventosRepository.todos();
     }
 
+    /**
+     * @param id
+     *
+     * @return el evento con ese id u Optional.empty() si no existe
+     */
     public Optional<Evento> buscarEventoPorId(String id) {
         return this.eventosRepository.getEvento(id);
     }
 
+    /**
+     * @param filtros
+     *            lista de filtros de búsqueda a aplicar
+     *
+     * @return lista de eventos que cumplen con todos los filtros de búsqueda
+     */
     public List<Evento> filtrarEventos(List<FiltroBusqueda<Evento>> filtros) {
         return this.eventosRepository.filtrarEventos(filtros);
     }
