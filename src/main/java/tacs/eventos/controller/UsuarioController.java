@@ -19,27 +19,23 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/usuario")
 @AllArgsConstructor
-public class UsuarioController
-{
+public class UsuarioController {
 
     private final UsuarioService usuarioService;
     private final EventosRepository eventosRepository;
 
     @GetMapping("/{email}") // todo eliminar este endpoint
-    public Optional<Usuario> getUsuario(@PathVariable String email)
-    {
+    public Optional<Usuario> getUsuario(@PathVariable String email) {
         return usuarioService.buscarPorEmail(email);
     }
 
     @GetMapping("/mis-inscripciones")
-    public List<InscripcionEventoDTO> getMisInscripciones(@AuthenticationPrincipal Usuario usuario)
-    {
+    public List<InscripcionEventoDTO> getMisInscripciones(@AuthenticationPrincipal Usuario usuario) {
         return usuarioService.obtenerInscripciones(usuario.getId());
     }
 
     @GetMapping("/mis-eventos")
-    public List<Evento> getMisEventos(@AuthenticationPrincipal Usuario usuario)
-    {
+    public List<Evento> getMisEventos(@AuthenticationPrincipal Usuario usuario) {
         return eventosRepository.getEventosPorOrganizador(usuario.getId());
     }
 }

@@ -29,8 +29,7 @@ public class SessionAuthFilter extends OncePerRequestFilter {
         System.out.println("Token: " + token);
         if (token != null) {
             sessions.validate(token).ifPresent(u -> {
-                var authorities = u.getRoles().stream()
-                        .map(r -> new SimpleGrantedAuthority("ROLE_" + r.name()))
+                var authorities = u.getRoles().stream().map(r -> new SimpleGrantedAuthority("ROLE_" + r.name()))
                         .toList();
 
                 var auth = new UsernamePasswordAuthenticationToken(u, null, authorities);
