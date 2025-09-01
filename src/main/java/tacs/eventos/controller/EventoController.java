@@ -1,10 +1,9 @@
 package tacs.eventos.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 import org.modelmapper.ModelMapper;
+import org.springframework.web.bind.annotation.*;
 import tacs.eventos.dto.EventoDTO;
-import tacs.eventos.dto.InscripcionDTO;
 import tacs.eventos.model.Evento;
 import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorCategoria;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/eventos")
+@RequestMapping("/api/v1/eventos")
 @AllArgsConstructor
 public class EventoController {
 
@@ -83,36 +82,5 @@ public class EventoController {
 
             return eventoService.filtrarEventos(filtros);
         }
-    }
-
-    /**
-     * Inscribe un usuario a un evento si éste posee vacantes. De no haber vacantes, la inscripción es colocada
-     * en una lista de espera.
-     *
-     * @param eventoId id del evento al cual inscribir al usuario.
-     *
-     * @param dto datos de inscripción.
-     *
-     * @return datos sobre la inscripcion.
-     */
-    @PostMapping("/{eventoId}/inscripcion")
-    public String inscribirUsuario(@PathVariable String eventoId, @RequestBody InscripcionDTO dto) {
-        boolean confirmado = eventoService.inscribirUsuario(eventoId, dto.usuarioId());
-        return confirmado ? "Usuario inscrito correctamente" : "Usuario agregado a waitlist";
-    }
-
-    /**
-     * Cancela una inscripción.
-     *
-     * @param eventoId id del evento del cual cancelar la inscripción.
-     *
-     * @param dto datos de la inscripción.
-     *
-     * @return datos sobre la inscripción cancelada.
-     */
-    @PostMapping("/{eventoId}/cancelar")
-    public String cancelarInscripcion(@PathVariable String eventoId, @RequestBody InscripcionDTO dto) {
-        boolean exito = eventoService.cancelarInscripcion(eventoId, dto.usuarioId());
-        return exito ? "CancelaciÃ³n realizada" : "Usuario no encontrado";
     }
 }

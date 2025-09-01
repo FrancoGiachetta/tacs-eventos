@@ -4,15 +4,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tacs.eventos.model.Evento;
-import tacs.eventos.model.InscripcionEvento;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.inscripcion.InscripcionEvento;
+import tacs.eventos.dto.InscripcionResponse;
+import tacs.eventos.dto.EstadoInscripcionResponse;
+import tacs.eventos.model.inscripcion.EstadoInscripcion;
+import tacs.eventos.model.inscripcion.InscripcionFactory;
+import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -23,14 +29,17 @@ class UsuarioServiceTest {
     private InscripcionesRepository inscripcionesRepository;
     private PasswordEncoder passwordEncoder;
     private UsuarioService usuarioService;
+    private WaitlistRepository waitlistRepository;
 
     @BeforeEach
     void setUp() {
         usuarioRepository = mock(UsuarioRepository.class);
         inscripcionesRepository = mock(InscripcionesRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
+        waitlistRepository = mock(WaitlistRepository.class);
 
-        usuarioService = new UsuarioService(usuarioRepository, inscripcionesRepository, passwordEncoder);
+        usuarioService = new UsuarioService(usuarioRepository, inscripcionesRepository, waitlistRepository,
+                passwordEncoder);
     }
 
     @Test
@@ -79,20 +88,23 @@ class UsuarioServiceTest {
 
     @Test
     void obtenerInscripcionesRetornaListaDeEventos() {
-        String usuarioId = "123";
+        Usuario usuario = new Usuario("asd@mail.com", "asd", Set.of(RolUsuario.USUARIO));
+        when(usuarioRepository.obtenerPorId(usuario.getId())).thenReturn(Optional.of(usuario));
         Evento evento1 = new Evento("Evento 1", "Desc 1", null, 60, "Ubicacion", 100, 500, "Categoria");
         Evento evento2 = new Evento("Evento 2", "Desc 2", null, 120, "Ubicacion", 50, 1000, "Categoria");
+        Evento evento3 = new Evento("Evento 3", "Desc 3", null, 120, "Ubicacion", 50, 1000, "Categoria");
 
-        List<InscripcionEvento> inscripciones = List.of(new InscripcionEvento(usuarioId, evento1),
-                new InscripcionEvento(usuarioId, evento2));
+        List<InscripcionEvento> inscripciones = List.of(InscripcionFactory.directa(usuario, evento1),
+                InscripcionFactory.directa(usuario, evento2));
 
-        when(inscripcionesRepository.getInscripcionesPorParticipante(usuarioId)).thenReturn(inscripciones);
+        when(inscripcionesRepository.getInscripcionesPorParticipante(usuario)).thenReturn(inscripciones);
+        when(waitlistRepository.eventosEnCuyasWaitlistEsta(usuario)).thenReturn(List.of(evento3));
 
-        List<Evento> result = usuarioService.obtenerInscripciones(usuarioId);
+        var result = usuarioService.obtenerInscripciones(usuario.getId());
 
-        assertEquals(2, result.size());
-        assertEquals("Evento 1", result.get(0).getTitulo());
-        assertEquals("Evento 2", result.get(1).getTitulo());
-
+        var esperado = Set.of(new InscripcionResponse(evento1.getId(), EstadoInscripcionResponse.CONFIRMADA),
+                new InscripcionResponse(evento2.getId(), EstadoInscripcionResponse.CONFIRMADA),
+                new InscripcionResponse(evento3.getId(), EstadoInscripcionResponse.EN_WAITLIST));
+        assertEquals(esperado, result.stream().collect(Collectors.toSet()));
     }
 }
