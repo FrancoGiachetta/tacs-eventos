@@ -14,7 +14,7 @@ public record InscripcionResponse(String eventoId, EstadoInscripcionResponse est
     /**
      * @param eventoId
      *
-     * @return una inscripción para ese evento, en estado EN_WAITLIST
+     * @return una inscripción para ese evento, en estado PENDIENTE
      */
     public static InscripcionResponse enWaitlist(String eventoId) {
         return new InscripcionResponse(eventoId, EstadoInscripcionResponse.PENDIENTE);
