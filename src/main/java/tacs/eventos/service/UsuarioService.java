@@ -63,9 +63,9 @@ public class UsuarioService {
 
     private EstadoInscripcionResponse mapEstado(EstadoInscripcion estado) {
         return switch (estado) {
-            case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
-            case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
-            case WAITLIST -> EstadoInscripcionResponse.EN_WAITLIST;
+        case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
+        case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
+        case WAITLIST -> EstadoInscripcionResponse.EN_WAITLIST;
         };
     }
 }

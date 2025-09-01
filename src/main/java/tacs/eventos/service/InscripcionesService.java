@@ -27,6 +27,7 @@ public class InscripcionesService {
      *
      * @param evento
      * @param usuario
+     *
      * @return la inscripción generada si pudo inscribirlo, o un Optional vacío si lo mandó a la waitlist.
      */
     public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario) {

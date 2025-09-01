@@ -83,7 +83,7 @@ public class InscripcionesTest {
 
             // Mockea el pedido POST y verifica que retorne 201 CREATED y la inscripción
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
+                    .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
                     .andExpect(status().isCreated()).andExpect(content().json(objectMapper.writeValueAsString(
                             new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.CONFIRMADA))));
 
@@ -100,7 +100,7 @@ public class InscripcionesTest {
             when(inscripcionesRepository.cantidadInscriptos(e1)).thenReturn(2);
             // Mockea el pedido POST y verifica que retorne 201 CREATED y la inscripción
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
+                    .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
                     .andExpect(status().isCreated()).andExpect(content().json(objectMapper.writeValueAsString(
                             new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.EN_WAITLIST))));
 
@@ -116,7 +116,7 @@ public class InscripcionesTest {
 
             // Mockea el pedido POST y verifica que retorne 200 OK y la inscripción
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
+                    .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
                     .andExpect(status().isOk()).andExpect(content().json(objectMapper.writeValueAsString(
                             new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.EN_WAITLIST))));
 
@@ -129,7 +129,7 @@ public class InscripcionesTest {
         @Test
         void siElUsuarioNoExisteMuestraElErrorYNoRealizaLaInscripcion() throws Exception {
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON).content(
-                            objectMapper.writeValueAsString(new InscripcionRequest("esteUsuarioNoExiste", e1.getId()))))
+                    objectMapper.writeValueAsString(new InscripcionRequest("esteUsuarioNoExiste", e1.getId()))))
                     .andExpect(status().isNotFound()).andExpect(status().reason("Usuario no encontrado"));
 
             verify(inscripcionesRepository, never()).guardarInscripcion(any());
@@ -138,7 +138,7 @@ public class InscripcionesTest {
         @Test
         void siElEventoNoExisteMuestraElErrorYNoRealizaLaInscripcion() throws Exception {
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), "esteEventoNoExiste"))))
+                    .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), "esteEventoNoExiste"))))
                     .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
 
             verifyNoInteractions(inscripcionesRepository);
@@ -180,7 +180,7 @@ public class InscripcionesTest {
         @Test
         void siElUsuarioNoExisteRetorna404BadRequest() throws Exception {
             mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON).content(
-                            objectMapper.writeValueAsString(new InscripcionRequest("Este usuario no existe", e1.getId()))))
+                    objectMapper.writeValueAsString(new InscripcionRequest("Este usuario no existe", e1.getId()))))
                     .andExpect(status().isNotFound()).andExpect(status().reason("Usuario no encontrado"));
 
             verifyNoInteractions(inscripcionesRepository);
@@ -190,7 +190,7 @@ public class InscripcionesTest {
         @Test
         void siElEventoNoExisteRetorna404BadRequest() throws Exception {
             mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON).content(
-                            objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), "Este Evento no existe"))))
+                    objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), "Este Evento no existe"))))
                     .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
 
             verifyNoInteractions(inscripcionesRepository);

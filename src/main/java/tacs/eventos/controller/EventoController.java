@@ -69,7 +69,8 @@ public class EventoController {
             @RequestParam(value = "palabrasClave", required = false) List<String> palabrasClaveParam) {
         if (precioMinimoParam == null && precioMaximoParam == null && fechaMinParam == null && fechaMaxParam == null
                 && categoriaParam == null && palabrasClaveParam == null) {
-            return eventoService.listarEventos().stream().map((Evento e) -> modelMapper.map(e, EventoDTO.class)).toList();
+            return eventoService.listarEventos().stream().map((Evento e) -> modelMapper.map(e, EventoDTO.class))
+                    .toList();
         } else {
             LocalDate fechaMinima = fechaMinParam != null ? fechaMinParam : LocalDate.now();
             LocalDate fechaMaxima = fechaMaxParam != null ? fechaMaxParam : LocalDate.MAX;
@@ -89,8 +90,8 @@ public class EventoController {
                 filtros.add(new FiltradoPorPalabrasClave(palabrasClaveParam));
             }
 
-            return eventoService.filtrarEventos(filtros).stream().map(e ->
-                    modelMapper.map(e, EventoDTO.class)).toList();
+            return eventoService.filtrarEventos(filtros).stream().map(e -> modelMapper.map(e, EventoDTO.class))
+                    .toList();
         }
     }
 
@@ -100,12 +101,13 @@ public class EventoController {
      * @param email
      * @param eventoId
      * @param dto
+     *
      * @return Respuesta vacía, con un status code de 204.
      */
     @PutMapping("/{eventoId}/estado")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> actualizarEstadoEvento(@AuthenticationPrincipal String email,
-                                                       @PathVariable String eventoId, EventoEstadoDTO dto) {
+            @PathVariable String eventoId, EventoEstadoDTO dto) {
 
         var usuario = this.buscarUsuarioPorEmail(email);
         var evento = this.buscarEvento(eventoId);
@@ -128,12 +130,13 @@ public class EventoController {
      *
      * @param email
      * @param eventoId
+     *
      * @return La lista de inscriptos.
      */
     @GetMapping("/{eventoId}/inscripcion")
     @ResponseStatus(HttpStatus.OK)
     public List<InscripcionResponse> getInscriptosAEvento(@AuthenticationPrincipal String email,
-                                                          @PathVariable String eventoId) {
+            @PathVariable String eventoId) {
         var usuario = this.buscarUsuarioPorEmail(email);
         var evento = this.buscarEvento(eventoId);
         if (!evento.getOrganizador().equals(usuario)) {
@@ -152,18 +155,19 @@ public class EventoController {
      * @param email
      * @param eventoId
      * @param usuarioId
+     *
      * @return La inscripcion solicitada.
      */
     @GetMapping("/{eventoId}/inscripcion/{usuarioId}")
     @ResponseStatus(HttpStatus.OK)
     public InscripcionResponse getInscripcion(@AuthenticationPrincipal String email, @PathVariable String eventoId,
-                                              @PathVariable String usuarioId) {
+            @PathVariable String usuarioId) {
         var usuarioQueInvoca = this.buscarUsuarioPorEmail(email);
         var evento = this.buscarEvento(eventoId);
         var usuarioInscripto = this.buscarUsuarioPorId(usuarioId);
         if (!evento.getOrganizador().equals(usuarioQueInvoca) && !usuarioInscripto.equals(usuarioQueInvoca)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador del evento y tampoco " +
-                    "es el dueño de la inscripción");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "El usuario no es organizador del evento y tampoco " + "es el dueño de la inscripción");
         }
         boolean inscripcionConfirmada = this.inscripcionesService.inscripcionEstaConfirmada(evento, usuarioInscripto);
         boolean inscripcionEnWaitlist = this.inscripcionesService.inscripcionEstaEnWaitlist(evento, usuarioInscripto);
@@ -184,43 +188,56 @@ public class EventoController {
      * @param emailUsuarioLogueado
      * @param eventoId
      * @param usuarioId
+     *
      * @return Status code No Content si fue cancelada correctamente.
      */
     @DeleteMapping("/{eventoId}/inscripcion/{usuarioId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    /* TODO: me parece que hace poco se cambió para que el AutenthicationPrincipal sea directamente el Usuario. Si es así, cambiarlo acá y en todos los lugares de este controller donde se lee el AuthenticacionPrincipal como si fuera el email. */
-    public void cancelarInscripcion(@AuthenticationPrincipal String emailUsuarioLogueado,
-                                    @PathVariable String eventoId, @PathVariable String usuarioId) {
+    /*
+     * TODO: me parece que hace poco se cambió para que el AutenthicationPrincipal sea directamente el Usuario. Si es
+     * así, cambiarlo acá y en todos los lugares de este controller donde se lee el AuthenticacionPrincipal como si
+     * fuera el email.
+     */
+    public void cancelarInscripcion(@AuthenticationPrincipal String emailUsuarioLogueado, @PathVariable String eventoId,
+            @PathVariable String usuarioId) {
         var usuarioLogueado = this.buscarUsuarioPorEmail(emailUsuarioLogueado);
         var usuarioADesinscribir = this.buscarUsuarioPorId(usuarioId);
         var evento = this.buscarEvento(eventoId);
         if (!usuarioLogueado.equals(usuarioADesinscribir) && !usuarioLogueado.equals(evento.getOrganizador())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Los únicos usuarios que pueden cancelar una " +
-                    "inscripción son el usuario que se inscribió, y el organizador del evento");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Los únicos usuarios que pueden cancelar una "
+                    + "inscripción son el usuario que se inscribió, y el organizador del evento");
         }
         inscripcionesService.cancelarInscripcion(evento, usuarioADesinscribir);
     }
 
     /**
      * Inscribe a un usuario a un evento. El único usuario que puede inscribirse es él mismo. Si la inscripción ya está
-     * creada, retorna un código 303 See Other con la ubicación de la inscripción. Si la inscripción se crea, retorna
-     * un código 201 Created con la ubicación de la inscripción.
+     * creada, retorna un código 303 See Other con la ubicación de la inscripción. Si la inscripción se crea, retorna un
+     * código 201 Created con la ubicación de la inscripción.
      *
      * @param emailUsuarioLogueado
      * @param eventoId
      * @param usuarioId
+     *
      * @return ResponseEntity con el status code correspondiente y sin body.
      */
     @PostMapping("/{eventoId}/inscripcion/{usuarioId}")
     public ResponseEntity<Void> inscribirUsuarioAEvento(@AuthenticationPrincipal String emailUsuarioLogueado,
-                                                        @PathVariable String eventoId, @PathVariable String usuarioId) {
+            @PathVariable String eventoId, @PathVariable String usuarioId) {
         var usuarioLogueado = this.buscarUsuarioPorEmail(emailUsuarioLogueado);
         var usuarioAInscribir = this.buscarUsuarioPorId(usuarioId);
         var evento = this.buscarEvento(eventoId);
-        /* TODO: ver si no se puede hacer esta validación en alguna forma distinta, con alguna herramienta de Spring, porque está repetida en todos los métodos */
-        /* TODO: retornar otro código de error, esto es inseguro porque estamos avisando a un posible atacante que ese usuario existe */
+        /*
+         * TODO: ver si no se puede hacer esta validación en alguna forma distinta, con alguna herramienta de Spring,
+         * porque está repetida en todos los métodos
+         */
+        /*
+         * TODO: retornar otro código de error, esto es inseguro porque estamos avisando a un posible atacante que ese
+         * usuario existe
+         */
         if (!usuarioLogueado.equals(usuarioAInscribir)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Los únicos usuarios que pueden inscribirse a un evento son ellos mismos");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Los únicos usuarios que pueden inscribirse a un evento son ellos mismos");
         }
         var location = URI.create(String.format("/api/v1/evento/%s/inscripcion/%s", eventoId, usuarioId));
         // Si el usuario ya está inscripto o en la waitlist, no hace nada y devuelve la inscripción existente con el
@@ -230,8 +247,7 @@ public class EventoController {
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist
         var resultadoInscripcion = inscripcionesService.inscribirOMandarAWaitlist(evento, usuarioAInscribir);
-        return resultadoInscripcion.isPresent()
-                ? ResponseEntity.created(location).build()
+        return resultadoInscripcion.isPresent() ? ResponseEntity.created(location).build()
                 : ResponseEntity.status(HttpStatus.SEE_OTHER).location(location).build();
     }
 
@@ -240,12 +256,13 @@ public class EventoController {
      *
      * @param email
      * @param eventoId
+     *
      * @return Las inscripciones de la waitlist.
      */
     @GetMapping("/{eventoId}/waitlist")
     @ResponseStatus(HttpStatus.OK)
     public List<InscripcionEnWaitlistResponse> getWaitlistDeEvento(@AuthenticationPrincipal String email,
-                                                                   @PathVariable String eventoId) {
+            @PathVariable String eventoId) {
         var usuario = this.buscarUsuarioPorEmail(email);
         var evento = this.buscarEvento(eventoId);
         if (!evento.getOrganizador().equals(usuario)) {
