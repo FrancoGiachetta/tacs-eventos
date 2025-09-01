@@ -41,14 +41,15 @@ public class EstadisticaService {
 
         int calculoTasa = 0;
 
-        int TotalInscripcionesEvento;
-        Waitlist totalEnWaitList;
-        int totalWL;
         if (evento.isPresent() && evento.get().isAbierto()) {
+
+            int TotalInscripcionesEvento;
+            Waitlist eventoWaitlist;
+            int totalInscripcionesEnWaitlist;
             TotalInscripcionesEvento = this.inscripcionesRepository.getInscripcionesPorEvento(evento.get()).size();
-            totalEnWaitList = this.waitlistRepository.waitlist(evento.get());
-            totalWL = totalEnWaitList.getItems().size();
-            calculoTasa = (TotalInscripcionesEvento / totalWL) * 100;
+            eventoWaitlist = this.waitlistRepository.waitlist(evento.get());
+            totalInscripcionesEnWaitlist = eventoWaitlist.getItems().size();
+            calculoTasa = (TotalInscripcionesEvento / totalInscripcionesEnWaitlist) * 100;
         }
         return calculoTasa;
     }
