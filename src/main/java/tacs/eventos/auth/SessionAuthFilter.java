@@ -26,7 +26,6 @@ public class SessionAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         String token = extractToken(request);
-        System.out.println("Token: " + token);
         if (token != null) {
             sessions.validate(token).ifPresent(u -> {
                 var authorities = u.getRoles().stream().map(r -> new SimpleGrantedAuthority("ROLE_" + r.name()))

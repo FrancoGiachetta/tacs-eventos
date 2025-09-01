@@ -34,25 +34,22 @@ public class InscripcionesController {
         var optEvento = eventosRepository.getEvento(inscripcionRequest.eventoId());
 
         var usuario = optUsuario
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         var evento = optEvento
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Evento no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
 
         // Si el usuario ya está inscripto o en la waitlist, no hace nada y devuelve la inscripción existente con el
         // código 200 OK
         if (inscripcionesService.inscripcionEstaConfirmada(evento, usuario))
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(InscripcionResponse.confirmada(usuario.getId(), evento.getId()));
+            return ResponseEntity.status(HttpStatus.OK).body(InscripcionResponse.confirmada(evento.getId()));
 
         if (inscripcionesService.inscripcionEstaEnWaitlist(evento, usuario))
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(InscripcionResponse.enWaitlist(usuario.getId(), evento.getId()));
+            return ResponseEntity.status(HttpStatus.OK).body(InscripcionResponse.enWaitlist(evento.getId()));
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist, y retorna 201 CREATED y la inscripción
         var resultadoInscripcion = inscripcionesService.inscribirOMandarAWaitlist(evento, usuario);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(resultadoInscripcion.isPresent() ? InscripcionResponse.confirmada(usuario.getId(), evento.getId())
-                        : InscripcionResponse.enWaitlist(usuario.getId(), evento.getId()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(resultadoInscripcion.isPresent()
+                ? InscripcionResponse.confirmada(evento.getId()) : InscripcionResponse.enWaitlist(evento.getId()));
     }
 
     /**
@@ -70,9 +67,9 @@ public class InscripcionesController {
         var optUsuario = usuarioRepository.obtenerPorId(inscripcionRequest.usuarioId());
 
         var usuario = optUsuario
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         var evento = eventosRepository.getEvento(inscripcionRequest.eventoId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Evento no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
 
         inscripcionesService.cancelarInscripcion(evento, usuario);
     }

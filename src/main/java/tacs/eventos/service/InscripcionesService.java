@@ -11,6 +11,7 @@ import tacs.eventos.model.inscripcion.InscripcionFactory;
 import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -59,6 +60,18 @@ public class InscripcionesService {
 
     public boolean inscripcionEstaEnWaitlist(Evento evento, Usuario usuario) {
         return waitlistRepository.waitlist(evento).contiene(usuario);
+    }
+
+    public Optional<InscripcionEvento> buscarInscripcion(Usuario usuario, Evento evento) {
+        return inscripcionesRepository.getInscripcion(usuario, evento);
+    }
+
+    public List<InscripcionEvento> buscarInscripcionesDeEvento(Evento evento) {
+        return inscripcionesRepository.getInscripcionesPorEvento(evento);
+    }
+
+    public Waitlist buscarWaitlistDeEvento(Evento evento) {
+        return waitlistRepository.waitlist(evento);
     }
 
     /**

@@ -37,3 +37,5 @@ Francisco Veiga
 Carlos Renfige
 Marco Rodriguez Melgarejo
 Lucas Thier
+
+## Pre push ejecutar mvn net.revelc.code.formatter:formatter-maven-plugin:2.20.0:format

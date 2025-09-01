@@ -1,6 +1,7 @@
 package tacs.eventos.model;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,6 +18,10 @@ public class Evento {
     private double precio;
     private String categoria;
     private boolean abierto;
+
+    @Getter
+    @Setter
+    private Usuario organizador;
 
     public Evento(String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
             String ubicacion, int cupoMaximo, double precio, String categoria) {
@@ -39,6 +44,10 @@ public class Evento {
 
     public void cerrarEvento() {
         this.abierto = false;
+    }
+
+    public void abrirEvento() {
+        this.abierto = true;
     }
 
     @Override
