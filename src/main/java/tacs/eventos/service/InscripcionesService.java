@@ -27,7 +27,6 @@ public class InscripcionesService {
      *
      * @param evento
      * @param usuario
-     *
      * @return la inscripción generada si pudo inscribirlo, o un Optional vacío si lo mandó a la waitlist.
      */
     public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario) {
@@ -52,6 +51,10 @@ public class InscripcionesService {
         // puede tardar (ya que la inscripción está sincronizada por evento), y al usuario que canceló su inscripción le
         // tenemos que devolver en el momento el response confirmandole que su incscipción fue cancelada.
         inscribirProximo(evento);
+    }
+
+    public boolean inscripcionConfirmadaOEnWaitlist(Evento evento, Usuario usuario) {
+        return inscripcionEstaConfirmada(evento, usuario) || inscripcionEstaEnWaitlist(evento, usuario);
     }
 
     public boolean inscripcionEstaConfirmada(Evento evento, Usuario usuario) {

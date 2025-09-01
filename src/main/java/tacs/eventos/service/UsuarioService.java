@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tacs.eventos.dto.EstadoInscripcionResponse;
-import tacs.eventos.model.Evento;
 import tacs.eventos.dto.InscripcionResponse;
-import tacs.eventos.model.inscripcion.EstadoInscripcion;
+import tacs.eventos.model.Evento;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
@@ -41,6 +41,10 @@ public class UsuarioService {
         return repo.obtenerPorEmail(email);
     }
 
+    public Optional<Usuario> buscarPorId(String id) {
+        return repo.obtenerPorId(id);
+    }
+
     public List<InscripcionResponse> obtenerInscripciones(String usuarioId) {
         Usuario usuario = repo.obtenerPorId(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
@@ -59,9 +63,9 @@ public class UsuarioService {
 
     private EstadoInscripcionResponse mapEstado(EstadoInscripcion estado) {
         return switch (estado) {
-        case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
-        case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
-        case WAITLIST -> EstadoInscripcionResponse.EN_WAITLIST;
+            case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
+            case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
+            case WAITLIST -> EstadoInscripcionResponse.EN_WAITLIST;
         };
     }
 }
