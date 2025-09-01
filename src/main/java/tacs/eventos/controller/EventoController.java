@@ -11,6 +11,7 @@ import tacs.eventos.dto.*;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.InscripcionEnWaitlist;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorCategoria;
@@ -127,7 +128,7 @@ public class EventoController {
      */
     @GetMapping("/{eventoId}/inscripciones")
     @ResponseStatus(HttpStatus.OK)
-    public List<InscripcionEventoDTO> getInscriptosAEvento(@AuthenticationPrincipal String email,
+    public List<InscripcionResponse> getInscriptosAEvento(@AuthenticationPrincipal String email,
             @PathVariable String eventoId) {
         var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
@@ -136,7 +137,8 @@ public class EventoController {
         }
 
         return this.inscripcionesService.buscarInscripcionesDeEvento(evento).stream()
-                .map((InscripcionEvento i) -> modelMapper.map(i, InscripcionEventoDTO.class)).toList();
+                .filter((InscripcionEvento i) -> i.getEstado() == EstadoInscripcion.CONFIRMADA)
+                .map((InscripcionEvento i) -> modelMapper.map(i, InscripcionResponse.class)).toList();
     }
 
     /**
@@ -151,7 +153,7 @@ public class EventoController {
      */
     @GetMapping("/{eventoId}/inscripciones/{usuarioId}")
     @ResponseStatus(HttpStatus.OK)
-    public InscripcionEventoDTO getInscripcion(@AuthenticationPrincipal String email, @PathVariable String eventoId,
+    public InscripcionResponse getInscripcion(@AuthenticationPrincipal String email, @PathVariable String eventoId,
             @PathVariable String usuarioId) {
         var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
@@ -159,7 +161,7 @@ public class EventoController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador del evento");
         }
         var inscripcion = this.buscarInscripcion(usuario, evento);
-        return modelMapper.map(inscripcion, InscripcionEventoDTO.class);
+        return modelMapper.map(inscripcion, InscripcionResponse.class);
 
     }
 
