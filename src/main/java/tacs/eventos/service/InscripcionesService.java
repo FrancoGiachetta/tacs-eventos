@@ -64,6 +64,7 @@ public class InscripcionesService {
     /**
      * @param evento
      * @param usuario
+     *
      * @return si el usuario está en la waitlist o tiene una inscripción confirmada para ese evento
      */
     public boolean inscripcionConfirmadaOEnWaitlist(Evento evento, Usuario usuario) {
