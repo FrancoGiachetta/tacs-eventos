@@ -49,6 +49,7 @@ public class EventoController {
     }
 
     @GetMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public List<EventoDTO> listarEventos(
             @RequestParam(value = "precioPesosMin", required = false) Double precioMinimoParam,
             @RequestParam(value = "precioPesosMax", required = false) Double precioMaximoParam,
@@ -84,7 +85,16 @@ public class EventoController {
         }
     }
 
+    /**
+     * Cambia el estado de un evento entre abierto y cerrado.
+     *
+     * @param email
+     * @param eventoId
+     * @param dto
+     * @return Respuesta vacía, con un status code de 204.
+     */
     @PutMapping("/{eventoId}/estado")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<> actualizarEstadoEvento(@AuthenticationPrincipal String email,
             @PathVariable String eventoId, EventoEstadoDTO dto) {
 
@@ -104,7 +114,15 @@ public class EventoController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    /**
+     * Devuelve las inscripciones para un evento.
+     *
+     * @param email
+     * @param eventoId
+     * @return La lista de inscriptos.
+     */
     @GetMapping("/{eventoId}/inscripciones")
+    @ResponseStatus(HttpStatus.OK)
     public List<InscripcionEventoDTO> getInscriptosAEvento(@AuthenticationPrincipal String email,
             @PathVariable String eventoId) {
         var usuario = this.buscarUsuario(email);
@@ -117,7 +135,16 @@ public class EventoController {
             .map((InscripcionEvento i) -> modelMapper.map(i, InscripcionEventoDTO.class)).toList();
     }
 
+    /**
+     * Devuelve la infromación sobre una inscripcion especifica. El usuario debe ser organizador del evento para poder ver esto.
+     *
+     * @param email
+     * @param eventoId
+     * @param usuarioId
+     * @return La inscripcion solicitada.
+     */
     @GetMapping("/{eventoId}/inscripciones/{usuarioId}")
+    @ResponseStatus(HttpStatus.OK)
     public InscripcionEventoDTO getInscripcion(@AuthenticationPrincipal String email, @PathVariable String eventoId,
             @PathVariable String usuarioId) {
         var usuario = this.buscarUsuario(email);
@@ -130,7 +157,17 @@ public class EventoController {
 
     }
 
+    /**
+     * Cancela una inscripción. El usuario debe ser organizador para poder ver esto.
+     * TODO: En un futuro, un usuario normal también va a poder cancelar su inscripción con este método. Ahora mismo esa acción se realiza desde el InscripcionesController.
+     *
+     * @param email
+     * @param eventoId
+     * @param usuarioId
+     * @return Status code No Content si fue cancelada correctamente.
+     */
     @DeleteMapping("/{eventoId}/inscripciones/{usuarioId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> cancelarInscripcion(@AuthenticationPrincipal String email,
             @PathVariable String eventoId, @PathVariable String usuarioId) {
         var usuario = this.buscarUsuario(email);
@@ -142,7 +179,15 @@ public class EventoController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    /**
+     * Permite obtener las inscripciones en waitlist.
+     *
+     * @param email
+     * @param eventoId
+     * @return Las inscripciones de la waitlist.
+     */
     @GetMapping("/{eventoId}/waitlist")
+    @ResponseStatus(HttpStatus.OK)
     public List<InscripcionEnWaitlistDTO> getWaitlistDeEvento(@AuthenticationPrincipal String email, @PathVariable String eventoId) {
         var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
