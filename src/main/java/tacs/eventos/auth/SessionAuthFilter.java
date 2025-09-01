@@ -13,7 +13,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import tacs.eventos.service.SessionService;
 
 import java.io.IOException;
-import java.util.stream.Collectors;
 
 @Component
 public class SessionAuthFilter extends OncePerRequestFilter {
@@ -30,10 +29,11 @@ public class SessionAuthFilter extends OncePerRequestFilter {
         System.out.println("Token: " + token);
         if (token != null) {
             sessions.validate(token).ifPresent(u -> {
-                System.out.println("Usuario autenticado: " + u.getEmail());
-                var authorities = u.getRoles().stream().map(r -> new SimpleGrantedAuthority("ROLE_" + r.name()))
-                        .collect(Collectors.toList());
-                var auth = new UsernamePasswordAuthenticationToken(u.getEmail(), null, authorities);
+                var authorities = u.getRoles().stream()
+                        .map(r -> new SimpleGrantedAuthority("ROLE_" + r.name()))
+                        .toList();
+
+                var auth = new UsernamePasswordAuthenticationToken(u, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             });
         }
