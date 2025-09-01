@@ -1,3 +1,6 @@
 package tacs.eventos.dto;
 
-public record InscripcionRequest(String usuarioId) { }
+import jakarta.validation.constraints.NotBlank;
+
+public record InscripcionRequest(@NotBlank String usuarioId, @NotBlank String eventoId) {
+}
