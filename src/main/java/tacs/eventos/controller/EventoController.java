@@ -1,7 +1,9 @@
 package tacs.eventos.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tacs.eventos.dto.EventoDTO;
 import tacs.eventos.model.Evento;
@@ -26,7 +28,8 @@ public class EventoController {
     private final ModelMapper mapper;
 
     @PostMapping
-    public Evento crearEvento(@RequestBody EventoDTO dto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Evento crearEvento(@Valid @RequestBody EventoDTO dto) {
         Evento evento = mapper.map(dto, Evento.class);
         return eventoService.crearEvento(evento);
     }
