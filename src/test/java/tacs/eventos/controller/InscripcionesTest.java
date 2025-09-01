@@ -102,9 +102,9 @@ public class InscripcionesTest {
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
                     .andExpect(status().isCreated()).andExpect(content().json(objectMapper.writeValueAsString(
-                            new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.EN_WAITLIST))));
+                            new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.PENDIENTE))));
 
-            assertEquals(w1.candidatos(), List.of(u1));
+            assertEquals(List.of(u1), w1.candidatos());
         }
 
         @Test
@@ -118,10 +118,10 @@ public class InscripcionesTest {
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
                     .andExpect(status().isOk()).andExpect(content().json(objectMapper.writeValueAsString(
-                            new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.EN_WAITLIST))));
+                            new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.PENDIENTE))));
 
             // Verifica que la waitlist no haya sido modificada
-            assertEquals(w1.candidatos(), List.of(u1));
+            assertEquals(List.of(u1), w1.candidatos());
             // Verifica que no se haya creado ninguna inscripción
             verify(inscripcionesRepository, never()).guardarInscripcion(any());
         }
@@ -161,7 +161,7 @@ public class InscripcionesTest {
             mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))));
 
-            assertEquals(i1.getEstado(), EstadoInscripcion.CANCELADA);
+            assertEquals(EstadoInscripcion.CANCELADA, i1.getEstado());
         }
 
         @Test
@@ -174,7 +174,7 @@ public class InscripcionesTest {
             mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))));
 
-            assertEquals(w1.candidatos(), List.of());
+            assertEquals(List.of(), w1.candidatos());
         }
 
         @Test

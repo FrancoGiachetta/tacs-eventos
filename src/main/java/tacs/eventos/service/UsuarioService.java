@@ -50,13 +50,11 @@ public class UsuarioService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         List<InscripcionEvento> inscripciones = inscripcionesRepository.getInscripcionesPorParticipante(usuario);
         List<InscripcionResponse> inscripcionResponses = inscripciones.stream()
-                .map(insc -> new InscripcionResponse(insc.getEvento().getId(), mapEstado(insc.getEstado())))
-                .collect(Collectors.toList());
+                .map(insc -> new InscripcionResponse(insc.getEvento().getId(), mapEstado(insc.getEstado()))).toList();
 
         List<Evento> eventosEnWaitlist = waitlistRepository.eventosEnCuyasWaitlistEsta(usuario);
         List<InscripcionResponse> waitlistResponses = eventosEnWaitlist.stream()
-                .map(evento -> new InscripcionResponse(evento.getId(), EstadoInscripcionResponse.EN_WAITLIST))
-                .collect(Collectors.toList());
+                .map(evento -> new InscripcionResponse(evento.getId(), EstadoInscripcionResponse.PENDIENTE)).toList();
 
         return Stream.concat(inscripcionResponses.stream(), waitlistResponses.stream()).collect(Collectors.toList());
     }
@@ -65,7 +63,7 @@ public class UsuarioService {
         return switch (estado) {
         case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
         case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
-        case WAITLIST -> EstadoInscripcionResponse.EN_WAITLIST;
+        case PENDIENTE -> EstadoInscripcionResponse.PENDIENTE;
         };
     }
 }

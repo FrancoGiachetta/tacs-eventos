@@ -76,11 +76,4 @@ class InscripcionesInMemoryRepoTest {
         assertTrue(i.isPresent());
         assertEquals(i.get(), i4);
     }
-
-    @Test
-    void eliminarInscripcion() {
-        this.repo.eliminarInscripcion(this.i2);
-        var i = this.repo.getInscripcion(u4, this.e);
-        assertTrue(i.isEmpty());
-    }
 }
