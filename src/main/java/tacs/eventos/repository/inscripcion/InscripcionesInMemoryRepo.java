@@ -47,11 +47,6 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
     }
 
     @Override
-    public void eliminarInscripcion(InscripcionEvento inscripcion) {
-        this.inscripciones.remove(inscripcion);
-    }
-
-    @Override
     public int cantidadInscriptos(Evento evento) {
         /*
          * Si esto llega a no ser performante, podemos guardar las inscripciones en un diccionario indexado por Evento y

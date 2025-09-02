@@ -1,6 +1,7 @@
 package tacs.eventos.model;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,6 +19,10 @@ public class Evento {
     private String categoria;
     private boolean abierto;
 
+    @Getter
+    @Setter
+    private Usuario organizador;
+
     public Evento(String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
             String ubicacion, int cupoMaximo, double precio, String categoria) {
 
@@ -33,12 +38,27 @@ public class Evento {
         this.abierto = true;
     }
 
+    /**
+     * Verifica si el evento permite nuevas inscripciones.
+     *
+     * @param inscritos
+     *            Número actual de inscritos en el evento.
+     *
+     * @return true si el evento está abierto y no ha alcanzado el cupo máximo, false en caso contrario.
+     */
     public boolean permiteIncripcion(int inscritos) {
         return abierto && (inscritos < cupoMaximo);
     }
 
+    /**
+     * Marca el evento como cerrado, impidiendo nuevas inscripciones.
+     */
     public void cerrarEvento() {
         this.abierto = false;
+    }
+
+    public void abrirEvento() {
+        this.abierto = true;
     }
 
     @Override

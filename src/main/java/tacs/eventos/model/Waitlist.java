@@ -61,11 +61,23 @@ public class Waitlist {
         return Optional.ofNullable(items.poll());
     }
 
+    /**
+     * @param candidato
+     *
+     * @return si esta waitlist contiene a ese candidato
+     */
     public boolean contiene(Usuario candidato) {
         return candidatos().stream().anyMatch(candidato::equals);
     }
 
+    /**
+     * @return todos los candidatos que forman parte de esta waitlist, en orden
+     */
     public List<Usuario> candidatos() {
         return items.stream().map(InscripcionEnWaitlist::getCandidato).collect(Collectors.toList());
+    }
+
+    public ConcurrentLinkedQueue<InscripcionEnWaitlist> getItems() {
+        return items;
     }
 }

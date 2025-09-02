@@ -102,9 +102,9 @@ public class InscripcionesTest {
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
                     .andExpect(status().isCreated()).andExpect(content().json(objectMapper.writeValueAsString(
-                            new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.EN_WAITLIST))));
+                            new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.PENDIENTE))));
 
-            assertEquals(w1.candidatos(), List.of(u1));
+            assertEquals(List.of(u1), w1.candidatos());
         }
 
         @Test
@@ -118,10 +118,10 @@ public class InscripcionesTest {
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))))
                     .andExpect(status().isOk()).andExpect(content().json(objectMapper.writeValueAsString(
-                            new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.EN_WAITLIST))));
+                            new InscripcionResponse(e1.getId(), EstadoInscripcionResponse.PENDIENTE))));
 
             // Verifica que la waitlist no haya sido modificada
-            assertEquals(w1.candidatos(), List.of(u1));
+            assertEquals(List.of(u1), w1.candidatos());
             // Verifica que no se haya creado ninguna inscripción
             verify(inscripcionesRepository, never()).guardarInscripcion(any());
         }
@@ -130,7 +130,7 @@ public class InscripcionesTest {
         void siElUsuarioNoExisteMuestraElErrorYNoRealizaLaInscripcion() throws Exception {
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON).content(
                     objectMapper.writeValueAsString(new InscripcionRequest("esteUsuarioNoExiste", e1.getId()))))
-                    .andExpect(status().isBadRequest()).andExpect(status().reason("Usuario no encontrado"));
+                    .andExpect(status().isNotFound()).andExpect(status().reason("Usuario no encontrado"));
 
             verify(inscripcionesRepository, never()).guardarInscripcion(any());
         }
@@ -139,7 +139,7 @@ public class InscripcionesTest {
         void siElEventoNoExisteMuestraElErrorYNoRealizaLaInscripcion() throws Exception {
             mockMvc.perform(post("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), "esteEventoNoExiste"))))
-                    .andExpect(status().isBadRequest()).andExpect(status().reason("Evento no encontrado"));
+                    .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
 
             verifyNoInteractions(inscripcionesRepository);
         }
@@ -161,7 +161,7 @@ public class InscripcionesTest {
             mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))));
 
-            assertEquals(i1.getEstado(), EstadoInscripcion.CANCELADA);
+            assertEquals(EstadoInscripcion.CANCELADA, i1.getEstado());
         }
 
         @Test
@@ -174,24 +174,24 @@ public class InscripcionesTest {
             mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), e1.getId()))));
 
-            assertEquals(w1.candidatos(), List.of());
+            assertEquals(List.of(), w1.candidatos());
         }
 
         @Test
-        void siElUsuarioNoExisteRetorna400BadRequest() throws Exception {
+        void siElUsuarioNoExisteRetorna404BadRequest() throws Exception {
             mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON).content(
                     objectMapper.writeValueAsString(new InscripcionRequest("Este usuario no existe", e1.getId()))))
-                    .andExpect(status().isBadRequest()).andExpect(status().reason("Usuario no encontrado"));
+                    .andExpect(status().isNotFound()).andExpect(status().reason("Usuario no encontrado"));
 
             verifyNoInteractions(inscripcionesRepository);
             verifyNoInteractions(waitlistRepository);
         }
 
         @Test
-        void siElEventoNoExisteRetorna400BadRequest() throws Exception {
+        void siElEventoNoExisteRetorna404BadRequest() throws Exception {
             mockMvc.perform(delete("/api/v1/inscripciones").contentType(MediaType.APPLICATION_JSON).content(
                     objectMapper.writeValueAsString(new InscripcionRequest(u1.getId(), "Este Evento no existe"))))
-                    .andExpect(status().isBadRequest()).andExpect(status().reason("Evento no encontrado"));
+                    .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
 
             verifyNoInteractions(inscripcionesRepository);
             verifyNoInteractions(waitlistRepository);

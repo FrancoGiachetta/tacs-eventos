@@ -31,11 +31,17 @@ public class InscripcionEvento {
         this.fechaHoraCancelacion = Optional.of(fechaHoraCancelacion);
     }
 
+    /**
+     * Cancela la inscripción si no está ya cancelada.
+     */
     public void cancelar() {
         if (!getEstado().equals(EstadoInscripcion.CANCELADA)) // Si no está cancelada
             setFechaHoraCancelacion(LocalDateTime.now()); // La cancela
     }
 
+    /**
+     * @return el estado de la inscripción
+     */
     public EstadoInscripcion getEstado() {
         if (fechaHoraCancelacion.isPresent())
             return EstadoInscripcion.CANCELADA;

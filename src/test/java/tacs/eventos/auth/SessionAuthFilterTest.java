@@ -56,9 +56,10 @@ public class SessionAuthFilterTest {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         assertNotNull(auth);
-        assertEquals("user@mail.com", auth.getName());
+        assertSame(usuario, auth.getPrincipal());
+        assertEquals("user@mail.com", ((Usuario) auth.getPrincipal()).getEmail());
+        // Verificar rol mapeado
         assertTrue(auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USUARIO")));
-
         verify(chain).doFilter(req, res);
     }
 
@@ -77,7 +78,8 @@ public class SessionAuthFilterTest {
 
         var auth = SecurityContextHolder.getContext().getAuthentication();
         assertNotNull(auth);
-        assertEquals("admin@mail.com", auth.getName());
+        assertSame(usuario, auth.getPrincipal());
+        assertEquals("admin@mail.com", ((Usuario) auth.getPrincipal()).getEmail());
         assertTrue(auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
 
         verify(chain).doFilter(req, res);
