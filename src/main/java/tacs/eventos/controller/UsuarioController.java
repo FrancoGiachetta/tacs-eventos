@@ -1,13 +1,11 @@
 package tacs.eventos.controller;
 
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tacs.eventos.dto.InscripcionEventoDTO;
 import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
@@ -25,7 +23,6 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
     private final EventosRepository eventosRepository;
 
-    @GetMapping("/{email}") // todo eliminar este endpoint
     /**
      * Busca un usuario en base a su email.
      *
@@ -34,7 +31,7 @@ public class UsuarioController {
      *
      * @return datos del usuario. Vacío si no se encuentra el email.
      */
-    @GetMapping("/usuarios/{email}")
+    @GetMapping("/{email}") // todo eliminar este endpoint
     public Optional<Usuario> getUsuario(@PathVariable String email) {
         return usuarioService.buscarPorEmail(email);
     }
@@ -42,19 +39,24 @@ public class UsuarioController {
     /**
      * Retorna las inscripciones de un usuario según su id.
      *
-     * @param userId
-     *            id del usuario.
+     * @param usuario
+     *            datos del usuario.
      *
      * @return las inscripciones del usuario.
      */
-    @GetMapping("/mis-inscripciones/{userId}")
-    public List<InscripcionResponse> getMisInscripciones(@PathVariable String userId) {
-        return usuarioService.obtenerInscripciones(userId);
     @GetMapping("/mis-inscripciones")
     public List<InscripcionResponse> getMisInscripciones(@AuthenticationPrincipal Usuario usuario) {
         return usuarioService.obtenerInscripciones(usuario.getId());
     }
 
+    /**
+     * Retorna los eventos para los cuales el usuario es el organizador.
+     *
+     * @param usuario
+     *            datos del usuario.
+     *
+     * @return los eventos organizados por el usuario.
+     */
     @GetMapping("/mis-eventos")
     public List<Evento> getMisEventos(@AuthenticationPrincipal Usuario usuario) {
         return eventosRepository.getEventosPorOrganizador(usuario.getId());
