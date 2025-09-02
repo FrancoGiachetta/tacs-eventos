@@ -39,11 +39,17 @@ public class EventoController {
 
     private final ModelMapper mapper;
 
+    /**
+     * Crea un nuevo evento.
+     *
+     * @param dto
+     *            datos del evento a crear.
+     *
+     * @return datos del evento creado.
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventoDTO crearEvento(@AuthenticationPrincipal String email, @Valid @RequestBody EventoDTO dto) {
-        var usuario = this.buscarUsuario(email);
-
+    public EventoDTO crearEvento(@AuthenticationPrincipal Usuario usuario, @Valid @RequestBody EventoDTO dto) {
         Evento evento = mapper.map(dto, Evento.class);
         evento.setOrganizador(usuario);
 
@@ -51,6 +57,24 @@ public class EventoController {
         return modelMapper.map(evento, EventoDTO.class);
     }
 
+    /**
+     * Devuelve todos los eventos vigentes. Aplica filtros si los hubiera.
+     *
+     * @param precioMinimoParam
+     *            precio mínimo del evento.
+     * @param precioMaximoParam
+     *            precio máximo del evento.
+     * @param fechaMinParam
+     *            fecha mínima de creación del evento.
+     * @param fechaMaxParam
+     *            fecha máxima de creación del evento
+     * @param categoriaParam
+     *            categoría buscada del evento.
+     * @param palabrasClaveParam
+     *            palabras que definen características del evento buscado.
+     *
+     * @return lista de eventos que cumplan con los filtros utilizados, si los hay.
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.CREATED)
     public List<EventoDTO> listarEventos(
@@ -93,7 +117,7 @@ public class EventoController {
     /**
      * Cambia el estado de un evento entre abierto y cerrado.
      *
-     * @param email
+     * @param usuario
      * @param eventoId
      * @param dto
      *
@@ -101,10 +125,9 @@ public class EventoController {
      */
     @PutMapping("/{eventoId}/estado")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> actualizarEstadoEvento(@AuthenticationPrincipal String email,
+    public ResponseEntity<Void> actualizarEstadoEvento(@AuthenticationPrincipal Usuario usuario,
             @PathVariable String eventoId, EventoEstadoDTO dto) {
 
-        var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
 
         if (!evento.getOrganizador().equals(usuario)) {
@@ -123,16 +146,15 @@ public class EventoController {
     /**
      * Devuelve las inscripciones para un evento.
      *
-     * @param email
+     * @param usuario
      * @param eventoId
      *
      * @return La lista de inscriptos.
      */
     @GetMapping("/{eventoId}/inscripciones")
     @ResponseStatus(HttpStatus.OK)
-    public List<InscripcionResponse> getInscriptosAEvento(@AuthenticationPrincipal String email,
+    public List<InscripcionResponse> getInscriptosAEvento(@AuthenticationPrincipal Usuario usuario,
             @PathVariable String eventoId) {
-        var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
         if (!evento.getOrganizador().equals(usuario)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador del evento");
@@ -147,7 +169,7 @@ public class EventoController {
      * Devuelve la infromación sobre una inscripcion especifica. El usuario debe ser organizador del evento para poder
      * ver esto.
      *
-     * @param email
+     * @param usuario
      * @param eventoId
      * @param usuarioId
      *
@@ -155,9 +177,8 @@ public class EventoController {
      */
     @GetMapping("/{eventoId}/inscripciones/{usuarioId}")
     @ResponseStatus(HttpStatus.OK)
-    public InscripcionResponse getInscripcion(@AuthenticationPrincipal String email, @PathVariable String eventoId,
+    public InscripcionResponse getInscripcion(@AuthenticationPrincipal Usuario usuario, @PathVariable String eventoId,
             @PathVariable String usuarioId) {
-        var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
         if (!evento.getOrganizador().equals(usuario)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador del evento");
@@ -172,7 +193,7 @@ public class EventoController {
      * normal también va a poder cancelar su inscripción con este método. Ahora mismo esa acción se realiza desde el
      * InscripcionesController.
      *
-     * @param email
+     * @param usuario
      * @param eventoId
      * @param usuarioId
      *
@@ -180,9 +201,8 @@ public class EventoController {
      */
     @DeleteMapping("/{eventoId}/inscripciones/{usuarioId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> cancelarInscripcion(@AuthenticationPrincipal String email,
+    public ResponseEntity<Void> cancelarInscripcion(@AuthenticationPrincipal Usuario usuario,
             @PathVariable String eventoId, @PathVariable String usuarioId) {
-        var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
         if (!evento.getOrganizador().equals(usuario)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador del evento");
@@ -194,16 +214,15 @@ public class EventoController {
     /**
      * Permite obtener las inscripciones en waitlist.
      *
-     * @param email
+     * @param usuario
      * @param eventoId
      *
      * @return Las inscripciones de la waitlist.
      */
     @GetMapping("/{eventoId}/waitlist")
     @ResponseStatus(HttpStatus.OK)
-    public List<InscripcionEnWaitlistResponse> getWaitlistDeEvento(@AuthenticationPrincipal String email,
+    public List<InscripcionEnWaitlistResponse> getWaitlistDeEvento(@AuthenticationPrincipal Usuario usuario,
             @PathVariable String eventoId) {
-        var usuario = this.buscarUsuario(email);
         var evento = this.buscarEvento(eventoId);
         if (!evento.getOrganizador().equals(usuario)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador del evento");

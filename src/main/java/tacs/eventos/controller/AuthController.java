@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import tacs.eventos.dto.LoginRequest;
 import tacs.eventos.dto.RegistroRequest;
 import tacs.eventos.dto.SessionResponse;
-import tacs.eventos.dto.UsuarioResponse;
-import tacs.eventos.model.Usuario;
 import tacs.eventos.service.SessionService;
 import tacs.eventos.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -26,6 +24,14 @@ public class AuthController {
         this.sesiones = sesiones;
     }
 
+    /**
+     * Registra un nuevo usuario.
+     *
+     * @param req
+     *            datos de registro de sesión. Contiene el email y la contraseña.
+     *
+     * @return el token de la sesión y su tiempo de expieración.
+     */
     @PostMapping("/register")
     @Operation(summary = "Registra un usuario")
     @ApiResponses(value = {
@@ -39,6 +45,14 @@ public class AuthController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 
+    /**
+     * Loguea a un usuario según sus datos de sesion.
+     *
+     * @param req
+     *            datos de inicio de sesión. Contiene el email y la contraseña.
+     *
+     * @return el token de la sesión y su tiempo de expieración. Si alguno de los tados no es correcto, retorna 401.
+     */
     @PostMapping("/login")
     @Operation(summary = "Login que devuelve token de sesión y expiración")
     @ApiResponses(value = {
@@ -51,6 +65,14 @@ public class AuthController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 
+    /**
+     * Cierra la sesión de un usuario.
+     *
+     * @param token
+     *            token asociado a una sesión.
+     * @param body
+     *            información sobre la sesión a cerrar. Contiene el token y tiempo de expiración.
+     */
     @PostMapping("/logout")
     @Operation(summary = "Invalidar el token de sesión actual (enviar por header o body)")
     public ResponseEntity<Void> logout(@RequestHeader(value = "X-Session-Token", required = false) String token,
