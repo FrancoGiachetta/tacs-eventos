@@ -12,9 +12,9 @@ public class SessionInMemoryRepository implements SessionRepository {
     private final Map<String, Session> byToken = new ConcurrentHashMap<>();
 
     @Override
-    public Session save(Session s) {
-        byToken.put(s.getToken(), s);
-        return s;
+    public Session save(Session session) {
+        byToken.put(session.getToken(), session);
+        return session;
     }
 
     @Override

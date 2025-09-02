@@ -39,6 +39,14 @@ public class EventoController {
 
     private final ModelMapper mapper;
 
+    /**
+     * Crea un nuevo evento.
+     *
+     * @param dto
+     *            datos del evento a crear.
+     *
+     * @return datos del evento creado.
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EventoDTO crearEvento(@AuthenticationPrincipal String email, @Valid @RequestBody EventoDTO dto) {
@@ -51,6 +59,24 @@ public class EventoController {
         return modelMapper.map(evento, EventoDTO.class);
     }
 
+    /**
+     * Devuelve todos los eventos vigentes. Aplica filtros si los hubiera.
+     *
+     * @param precioMinimoParam
+     *            precio mínimo del evento.
+     * @param precioMaximoParam
+     *            precio máximo del evento.
+     * @param fechaMinParam
+     *            fecha mínima de creación del evento.
+     * @param fechaMaxParam
+     *            fecha máxima de creación del evento
+     * @param categoriaParam
+     *            categoría buscada del evento.
+     * @param palabrasClaveParam
+     *            palabras que definen características del evento buscado.
+     *
+     * @return lista de eventos que cumplan con los filtros utilizados, si los hay.
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.CREATED)
     public List<EventoDTO> listarEventos(
