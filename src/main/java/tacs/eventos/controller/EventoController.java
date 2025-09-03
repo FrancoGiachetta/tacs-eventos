@@ -40,10 +40,15 @@ public class EventoController {
 
     private final ModelMapper mapper;
 
+    /**
+     * Crea un nuevo evento.
+     *
+     * @param dto datos del evento a crear.
+     * @return datos del evento creado.
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> crearEvento(@AuthenticationPrincipal String email, @Valid @RequestBody EventoDTO dto) {
-        var usuario = this.buscarUsuarioPorEmail(email);
+    public ResponseEntity<Void> crearEvento(@AuthenticationPrincipal Usuario usuario, @Valid @RequestBody EventoDTO dto) {
         Evento evento = mapper.map(dto, Evento.class);
         evento.setOrganizador(usuario);
         var eventoCreado = eventoService.crearEvento(evento);
@@ -51,6 +56,12 @@ public class EventoController {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Devuelve el evento con el id en el url
+     *
+     * @param eventoId
+     * @return los datos del evento pedido
+     */
     @GetMapping("/{eventoId}")
     @ResponseStatus(HttpStatus.OK)
     public EventoDTO obtenerEvento(@PathVariable String eventoId) {
@@ -58,6 +69,17 @@ public class EventoController {
         return modelMapper.map(evento, EventoDTO.class);
     }
 
+    /**
+     * Devuelve todos los eventos vigentes. Aplica filtros si los hubiera.
+     *
+     * @param precioMinimoParam  precio mínimo del evento.
+     * @param precioMaximoParam  precio máximo del evento.
+     * @param fechaMinParam      fecha mínima de creación del evento.
+     * @param fechaMaxParam      fecha máxima de creación del evento
+     * @param categoriaParam     categoría buscada del evento.
+     * @param palabrasClaveParam palabras que definen características del evento buscado.
+     * @return lista de eventos que cumplan con los filtros utilizados, si los hay.
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<EventoDTO> listarEventos(
@@ -98,18 +120,16 @@ public class EventoController {
     /**
      * Cambia el estado de un evento entre abierto y cerrado.
      *
-     * @param email
+     * @param usuario
      * @param eventoId
      * @param dto
-     *
      * @return Respuesta vacía, con un status code de 204.
      */
     @PutMapping("/{eventoId}/estado")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> actualizarEstadoEvento(@AuthenticationPrincipal String email,
-            @PathVariable String eventoId, EventoEstadoDTO dto) {
+    public ResponseEntity<Void> actualizarEstadoEvento(@AuthenticationPrincipal Usuario usuario,
+                                                       @PathVariable String eventoId, EventoEstadoDTO dto) {
 
-        var usuario = this.buscarUsuarioPorEmail(email);
         var evento = this.buscarEvento(eventoId);
 
         if (!evento.getOrganizador().equals(usuario)) {
@@ -128,16 +148,14 @@ public class EventoController {
     /**
      * Devuelve las inscripciones para un evento.
      *
-     * @param email
+     * @param usuario
      * @param eventoId
-     *
      * @return La lista de inscriptos.
      */
     @GetMapping("/{eventoId}/inscripcion")
     @ResponseStatus(HttpStatus.OK)
-    public List<InscripcionResponse> getInscriptosAEvento(@AuthenticationPrincipal String email,
-            @PathVariable String eventoId) {
-        var usuario = this.buscarUsuarioPorEmail(email);
+    public List<InscripcionResponse> getInscriptosAEvento(@AuthenticationPrincipal Usuario usuario,
+                                                          @PathVariable String eventoId) {
         var evento = this.buscarEvento(eventoId);
         if (!evento.getOrganizador().equals(usuario)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador del evento");
@@ -152,20 +170,18 @@ public class EventoController {
      * Devuelve la infromación sobre una inscripcion especifica. El usuario debe ser organizador del evento para poder
      * ver esto.
      *
-     * @param email
+     * @param usuarioLogueado
      * @param eventoId
      * @param usuarioId
-     *
      * @return La inscripcion solicitada.
      */
     @GetMapping("/{eventoId}/inscripcion/{usuarioId}")
     @ResponseStatus(HttpStatus.OK)
-    public InscripcionResponse getInscripcion(@AuthenticationPrincipal String email, @PathVariable String eventoId,
-            @PathVariable String usuarioId) {
-        var usuarioQueInvoca = this.buscarUsuarioPorEmail(email);
+    public InscripcionResponse getInscripcion(@AuthenticationPrincipal Usuario usuarioLogueado, @PathVariable String eventoId,
+                                              @PathVariable String usuarioId) {
         var evento = this.buscarEvento(eventoId);
         var usuarioInscripto = this.buscarUsuarioPorId(usuarioId);
-        if (!evento.getOrganizador().equals(usuarioQueInvoca) && !usuarioInscripto.equals(usuarioQueInvoca)) {
+        if (!evento.getOrganizador().equals(usuarioLogueado) && !usuarioInscripto.equals(usuarioLogueado)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "El usuario no es organizador del evento y tampoco " + "es el dueño de la inscripción");
         }
@@ -186,22 +202,15 @@ public class EventoController {
      * <p>
      * Hace un soft delete, no borra realmente la inscripción si no que la marca como cancelada.
      *
-     * @param emailUsuarioLogueado
-     * @param eventoId
-     * @param usuarioId
-     *
+     * @param usuarioLogueado usuario logueado en el sistema
+     * @param eventoId        id del evento cuya inscripción se quiere cancelar
+     * @param usuarioId       id del usuario que se quiere desinscribir
      * @return Status code No Content si fue cancelada correctamente.
      */
     @DeleteMapping("/{eventoId}/inscripcion/{usuarioId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    /*
-     * TODO: me parece que hace poco se cambió para que el AutenthicationPrincipal sea directamente el Usuario. Si es
-     * así, cambiarlo acá y en todos los lugares de este controller donde se lee el AuthenticacionPrincipal como si
-     * fuera el email.
-     */
-    public void cancelarInscripcion(@AuthenticationPrincipal String emailUsuarioLogueado, @PathVariable String eventoId,
-            @PathVariable String usuarioId) {
-        var usuarioLogueado = this.buscarUsuarioPorEmail(emailUsuarioLogueado);
+    public void cancelarInscripcion(@AuthenticationPrincipal Usuario usuarioLogueado, @PathVariable String eventoId,
+                                    @PathVariable String usuarioId) {
         var usuarioADesinscribir = this.buscarUsuarioPorId(usuarioId);
         var evento = this.buscarEvento(eventoId);
         if (!usuarioLogueado.equals(usuarioADesinscribir) && !usuarioLogueado.equals(evento.getOrganizador())) {
@@ -212,20 +221,17 @@ public class EventoController {
     }
 
     /**
-     * Inscribe a un usuario a un evento. El único usuario que puede inscribirse es él mismo. Si la inscripción ya está
-     * creada, retorna un código 303 See Other con la ubicación de la inscripción. Si la inscripción se crea, retorna un
-     * código 201 Created con la ubicación de la inscripción.
+     * Inscribe a un usuario a un evento. El único usuario que puede inscribirse es él mismo.
      *
-     * @param emailUsuarioLogueado
+     * @param usuarioLogueado
      * @param eventoId
      * @param usuarioId
-     *
-     * @return ResponseEntity con el status code correspondiente y sin body.
+     * @return ResponseEntity Un body vacío con la ubicación de la inscripción en el location header. Si se creó
+     * exitosamente, devuelve el código 201 CREATED. Si la inscripción ya existía, devuelve el código 303 SEE OTHER.
      */
     @PostMapping("/{eventoId}/inscripcion/{usuarioId}")
-    public ResponseEntity<Void> inscribirUsuarioAEvento(@AuthenticationPrincipal String emailUsuarioLogueado,
-            @PathVariable String eventoId, @PathVariable String usuarioId) {
-        var usuarioLogueado = this.buscarUsuarioPorEmail(emailUsuarioLogueado);
+    public ResponseEntity<Void> inscribirUsuarioAEvento(@AuthenticationPrincipal Usuario usuarioLogueado,
+                                                        @PathVariable String eventoId, @PathVariable String usuarioId) {
         var usuarioAInscribir = this.buscarUsuarioPorId(usuarioId);
         var evento = this.buscarEvento(eventoId);
         /*
@@ -256,16 +262,14 @@ public class EventoController {
     /**
      * Permite obtener las inscripciones en waitlist.
      *
-     * @param email
+     * @param usuario
      * @param eventoId
-     *
      * @return Las inscripciones de la waitlist.
      */
     @GetMapping("/{eventoId}/waitlist")
     @ResponseStatus(HttpStatus.OK)
-    public List<InscripcionEnWaitlistResponse> getWaitlistDeEvento(@AuthenticationPrincipal String email,
-            @PathVariable String eventoId) {
-        var usuario = this.buscarUsuarioPorEmail(email);
+    public List<InscripcionEnWaitlistResponse> getWaitlistDeEvento(@AuthenticationPrincipal Usuario usuario,
+                                                                   @PathVariable String eventoId) {
         var evento = this.buscarEvento(eventoId);
         if (!evento.getOrganizador().equals(usuario)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador del evento");
@@ -276,13 +280,6 @@ public class EventoController {
                     var usuarioResponse = modelMapper.map(i.getCandidato(), UsuarioResponse.class);
                     return new InscripcionEnWaitlistResponse(usuarioResponse, i.getFechaIngreso());
                 }).toList();
-    }
-
-    private Usuario buscarUsuarioPorEmail(String email) {
-        var optUsuario = usuarioService.buscarPorEmail(email);
-        var usuario = optUsuario
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
-        return usuario;
     }
 
     private Usuario buscarUsuarioPorId(String id) {
