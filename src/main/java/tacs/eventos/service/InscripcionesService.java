@@ -31,7 +31,6 @@ public class InscripcionesService {
      *
      * @param evento
      * @param usuario
-     *
      * @return la inscripción generada si pudo inscribirlo, o un Optional vacío si lo mandó a la waitlist.
      */
     public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario) {
@@ -45,26 +44,28 @@ public class InscripcionesService {
 
     /**
      * Si el usuario estaba inscripto, cancela su inscripción. Si no estaba inscripto, lo saca de la waitlist (si es que
-     * estaba). Si no estaba inscripto y tampoco en la waitlist, no hace nada. Si se sacó de la waitlist, confirma la
-     * incripción del próximo, pero en forma asincrónica, para no demorar la respuesta de este métod0.
+     * estaba). Si se sacó de la waitlist, confirma la incripción del próximo, pero en forma asincrónica, para no
+     * demorar la respuesta de este métod0.
      *
      * @param evento
      * @param usuario
      */
     public void cancelarInscripcion(Evento evento, Usuario usuario) {
-        // Si el usuario estaba inscripto, cancela su inscripción
-        inscripcionesRepository.getInscripcion(usuario, evento).ifPresentOrElse(InscripcionEvento::cancelar,
+        // Si el usuario estaba inscripto, cancela su inscripción. Si no, intenta sacarlo de la waitlist.
+        var inscripcionConfirmada = inscripcionesRepository.getInscripcionConfirmada(usuario, evento);
+        inscripcionConfirmada.ifPresentOrElse(InscripcionEvento::cancelar,
                 () -> waitlistRepository.waitlist(evento).anularInscripcion(usuario));
-        // Promueve al próximo de la waitlist (si hay alguien). Hace esto en forma asincrónica, porque es una acción que
-        // puede tardar (ya que la inscripción está sincronizada por evento), y al usuario que canceló su inscripción le
-        // tenemos que devolver en el momento el response confirmandole que su incscipción fue cancelada.
-        inscribirProximo(evento);
+        if (inscripcionConfirmada.isPresent()) { // Si se eliminó una inscripción confirmada (se liberó un lugar)
+            // Promueve al próximo de la waitlist (si hay alguien). Hace esto en forma asincrónica, porque es una acción que
+            // puede tardar (ya que la inscripción está sincronizada por evento), y al usuario que canceló su inscripción le
+            // tenemos que devolver en el momento el response confirmandole que su incscipción fue cancelada.
+            inscribirProximo(evento);
+        }
     }
 
     /**
      * @param evento
      * @param usuario
-     *
      * @return si el usuario está en la waitlist o tiene una inscripción confirmada para ese evento
      */
     public boolean inscripcionConfirmadaOEnWaitlist(Evento evento, Usuario usuario) {
@@ -74,25 +75,23 @@ public class InscripcionesService {
     /**
      * @param evento
      * @param usuario
-     *
-     * @return true si un usuario tiene una inscripción para el evento, y esta fue confirmada
+     * @return true si un usuario tiene una inscripción confirmada para el evento
      */
     public boolean inscripcionEstaConfirmada(Evento evento, Usuario usuario) {
-        return inscripcionesRepository.getInscripcion(usuario, evento).isPresent();
+        return buscarInscripcionConfirmada(usuario, evento).isPresent();
     }
 
     /**
      * @param evento
      * @param usuario
-     *
      * @return true si el usuario está en la waitlist del evento, false si no
      */
     public boolean inscripcionEstaEnWaitlist(Evento evento, Usuario usuario) {
         return waitlistRepository.waitlist(evento).contiene(usuario);
     }
 
-    public Optional<InscripcionEvento> buscarInscripcion(Usuario usuario, Evento evento) {
-        return inscripcionesRepository.getInscripcion(usuario, evento);
+    public Optional<InscripcionEvento> buscarInscripcionConfirmada(Usuario usuario, Evento evento) {
+        return inscripcionesRepository.getInscripcionConfirmada(usuario, evento);
     }
 
     public List<InscripcionEvento> buscarInscripcionesDeEvento(Evento evento) {
@@ -106,9 +105,7 @@ public class InscripcionesService {
     /**
      * Intenta inscribir al usuario directamente al evento (sin pasar por la waitlist).
      *
-     * @param inscripcion
-     *            la inscripción que se quiere intentar realizar
-     *
+     * @param inscripcion la inscripción que se quiere intentar realizar
      * @return la inscripción realizada, o un Optional vacío si no pudo realizar la inscripción porque no había lugar
      */
     private Optional<InscripcionEvento> intentarInscribir(InscripcionEvento inscripcion) {
