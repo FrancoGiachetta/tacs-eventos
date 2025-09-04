@@ -1,10 +1,26 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { Usuario } from "@/tipos";
+import api from '../lib/api';
+
 
 export default function BarraSuperior() {
-    const [open, setOpen] = useState(false)
-    const user: Usuario = null // todo: cambiar por useAuth()
+    const [open, setOpen] = useState(false);
+    const navigate = useNavigate();
+    const token = localStorage.getItem('token');
+
+    const handleLogout = async () => {
+        try {
+            await api.post('/api/v1/auth/logout', {}, {
+                headers: {
+                    'X-Session-Token': token || ''
+                }
+            });
+        } catch (e) {
+            // Ignorar error
+        }
+        localStorage.removeItem('token');
+        navigate('/login');
+    };
 
     return (
         <header className="sticky top-0 z-40 bg-blue-400 text-white">
@@ -22,27 +38,26 @@ export default function BarraSuperior() {
                             className="ml-2 rounded-full bg-white/15 px-3 py-1 text-sm hover:bg-white/25"
                             onClick={() => setOpen(v => !v)}
                         >
-                            {user ? user.name : 'Elegir usuario'}
+                            {token ? 'Usuario' : 'Elegir usuario'}
                         </button>
 
                         {open && (
                             <div className="absolute right-0 mt-2 w-48 rounded-md bg-white text-slate-900 shadow-lg">
-                                {!user ? (
-                                    <div className="flex flex-col p-2 gap-2">
-                                        <button onClick={() => setOpen(false)} className="rounded border px-3 py-1 text-left">Iniciar sesión</button>
-                                        <button onClick={() => setOpen(false)} className="rounded border px-3 py-1 text-left">Registrarse</button>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col p-2 gap-2">
-                                        <span className="text-sm">{user.name} — {user.role}</span>
-                                        <button onClick={() => setOpen(false)} className="rounded border px-3 py-1 text-left">Salir</button>
-                                    </div>
-                                )}
+                                <div className="flex flex-col p-2 gap-2">
+                                    {!token ? (
+                                        <>
+                                            <Link to="/login" onClick={() => setOpen(false)} className="rounded border px-3 py-1 text-left">Iniciar sesión</Link>
+                                            <Link to="/registro" onClick={() => setOpen(false)} className="rounded border px-3 py-1 text-left">Registrarse</Link>
+                                        </>
+                                    ) : (
+                                        <button onClick={handleLogout} className="rounded border px-3 py-1 text-left">Salir</button>
+                                    )}
+                                </div>
                             </div>
                         )}
                     </div>
                 </div>
             </div>
         </header>
-    )
+    );
 }

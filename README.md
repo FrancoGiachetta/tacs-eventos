@@ -9,6 +9,7 @@ Antes de ejecutar el proyecto
 - [Java 17+](https://jdk.java.net/java-se-ri/17-MR1)
 - [Maven 3.9+](https://maven.apache.org/)
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/)
+- Node.js
 
 ##  Instalación
 
@@ -39,3 +40,9 @@ Marco Rodriguez Melgarejo
 Lucas Thier
 
 ## Pre push ejecutar mvn net.revelc.code.formatter:formatter-maven-plugin:2.20.0:format
+
+## Ejecucion con Front
+
+    Ejecutar back en Intellij o consola
+    Realizar npm install en VS Code (Unica vez)
+    Ejecutar npm run para ejecutar front
