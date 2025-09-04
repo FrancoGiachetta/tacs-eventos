@@ -36,3 +36,8 @@ build/
 .env
 .env.*
 !.env.example
+
+# Node.js (frontend)
+frontend/node_modules/
+frontend/dist/
+node_modules/
