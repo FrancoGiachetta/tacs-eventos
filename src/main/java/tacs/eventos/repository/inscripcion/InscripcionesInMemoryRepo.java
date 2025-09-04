@@ -24,14 +24,16 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
     }
 
     @Override
-    public Optional<InscripcionEvento> getInscripcion(Usuario participante, Evento evento) {
+    public Optional<InscripcionEvento> getInscripcionConfirmada(Usuario participante, Evento evento) {
         return this.inscripciones.stream()
-                .filter(i -> i.getEvento().equals(evento) && i.getParticipante().equals(participante)).findFirst();
+                .filter(i -> i.getEvento().equals(evento) && i.getParticipante().equals(participante))
+                .filter(i -> i.getEstado() == EstadoInscripcion.CONFIRMADA).findFirst();
     }
 
     @Override
-    public List<InscripcionEvento> getInscripcionesPorParticipante(Usuario participante) {
-        return this.inscripciones.stream().filter(i -> i.getParticipante().equals(participante)).toList();
+    public List<InscripcionEvento> getInscripcionesConfirmadasPorParticipante(Usuario participante) {
+        return this.inscripciones.stream().filter(i -> i.getParticipante().equals(participante))
+                .filter(i -> i.getEstado() != EstadoInscripcion.CANCELADA).toList();
     }
 
     @Override

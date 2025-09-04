@@ -41,10 +41,15 @@ public class UsuarioService {
         return repo.obtenerPorEmail(email);
     }
 
-    public List<InscripcionResponse> obtenerInscripciones(String usuarioId) {
+    public Optional<Usuario> buscarPorId(String id) {
+        return repo.obtenerPorId(id);
+    }
+
+    public List<InscripcionResponse> obtenerInscripcionesNoCanceladas(String usuarioId) {
         Usuario usuario = repo.obtenerPorId(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-        List<InscripcionEvento> inscripciones = inscripcionesRepository.getInscripcionesPorParticipante(usuario);
+        List<InscripcionEvento> inscripciones = inscripcionesRepository
+                .getInscripcionesConfirmadasPorParticipante(usuario);
         List<InscripcionResponse> inscripcionResponses = inscripciones.stream()
                 .map(insc -> new InscripcionResponse(insc.getEvento().getId(), mapEstado(insc.getEstado()))).toList();
 

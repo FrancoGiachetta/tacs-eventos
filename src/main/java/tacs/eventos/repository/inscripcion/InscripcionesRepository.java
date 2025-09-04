@@ -23,14 +23,14 @@ public interface InscripcionesRepository {
      *
      * @return la inscripción (cancelada o confirmada) de un participante a un evento, si es que esta existe
      */
-    Optional<InscripcionEvento> getInscripcion(Usuario participante, Evento evento);
+    Optional<InscripcionEvento> getInscripcionConfirmada(Usuario participante, Evento evento);
 
     /**
      * @param participante
      *
-     * @return todas las inscripciones (canceladas o confirmadas) de ese participante
+     * @return las inscripciones confirmadas de ese participante
      */
-    List<InscripcionEvento> getInscripcionesPorParticipante(Usuario participante);
+    List<InscripcionEvento> getInscripcionesConfirmadasPorParticipante(Usuario participante);
 
     /**
      * @param evento

@@ -47,15 +47,15 @@ class InscripcionesInMemoryRepoTest {
     }
 
     @Test
-    void getInscripcion() {
-        var inscripcion = this.repo.getInscripcion(u1, this.e);
+    void getInscripcionConfirmada() {
+        var inscripcion = this.repo.getInscripcionConfirmada(u1, this.e);
         assertTrue(inscripcion.isPresent());
         assertEquals(this.i1, inscripcion.get());
     }
 
     @Test
-    void getInscripcionesPorParticipante() {
-        var inscripciones = this.repo.getInscripcionesPorParticipante(u1);
+    void getInscripcionesConfirmadasPorParticipante() {
+        var inscripciones = this.repo.getInscripcionesConfirmadasPorParticipante(u1);
         assertEquals(1, inscripciones.size());
         assertTrue(inscripciones.contains(this.i1));
     }
@@ -72,7 +72,7 @@ class InscripcionesInMemoryRepoTest {
     void guardarInscripcion() {
         var i4 = InscripcionFactory.directa(u4, this.e);
         this.repo.guardarInscripcion(i4);
-        var i = this.repo.getInscripcion(u4, this.e);
+        var i = this.repo.getInscripcionConfirmada(u4, this.e);
         assertTrue(i.isPresent());
         assertEquals(i.get(), i4);
     }
