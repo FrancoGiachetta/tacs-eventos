@@ -84,8 +84,8 @@ public class InscripcionesTest {
             when(inscripcionesRepository.getInscripcionConfirmada(u1, e1)).thenReturn(Optional.of(i1));
             // Mockea el pedido GET y verifica que retorne 200 OK y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(get(url))
-                    .andExpect(status().isOk()).andExpect(content().string(objectMapper.writeValueAsString(InscripcionResponse.confirmada(e1.getId()))));
+            mockMvc.perform(get(url)).andExpect(status().isOk()).andExpect(
+                    content().string(objectMapper.writeValueAsString(InscripcionResponse.confirmada(e1.getId()))));
         }
 
         @Test
@@ -97,9 +97,8 @@ public class InscripcionesTest {
 
             // Mockea el pedido GET y verifica que retorne 200 OK y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(get(url))
-                    .andExpect(status().isOk()).andExpect(content().string(
-                            objectMapper.writeValueAsString(InscripcionResponse.enWaitlist(e1.getId()))));
+            mockMvc.perform(get(url)).andExpect(status().isOk()).andExpect(
+                    content().string(objectMapper.writeValueAsString(InscripcionResponse.enWaitlist(e1.getId()))));
         }
 
         @Test
@@ -125,8 +124,7 @@ public class InscripcionesTest {
 
             // Mockea el pedido POST y verifica que retorne 201 CREATED y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(post(url))
-                    .andExpect(status().isCreated()).andExpect(header().string("Location", url));
+            mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
 
             // Verifica que se haya guardado la inscripción en el repo
             verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.directa(u1, e1));
@@ -141,8 +139,7 @@ public class InscripcionesTest {
             when(inscripcionesRepository.cantidadInscriptos(e1)).thenReturn(2);
             // Mockea el pedido POST y verifica que retorne 201 CREATED y apunte a la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(post(url))
-                    .andExpect(status().isCreated()).andExpect(header().string("Location", url));
+            mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
 
             assertEquals(List.of(u1), w1.candidatos());
         }
@@ -156,8 +153,7 @@ public class InscripcionesTest {
 
             // Mockea el pedido POST y verifica que retorne SEE OTHER y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(post(url))
-                    .andExpect(status().isSeeOther()).andExpect(header().string("Location", url));
+            mockMvc.perform(post(url)).andExpect(status().isSeeOther()).andExpect(header().string("Location", url));
 
             // Verifica que la waitlist no haya sido modificada
             assertEquals(List.of(u1), w1.candidatos());
@@ -168,8 +164,9 @@ public class InscripcionesTest {
         @Test
         void siElUsuarioNoExisteMuestraElErrorYNoRealizaLaInscripcion() throws Exception {
             mockMvc.perform(post("/api/v1/evento/" + e1.getId() + "/inscripcion/" + "esteUsuarioNoExiste"))
-                    .andExpect(status().isForbidden()).andExpect(status().reason("Solamente pueden crear una inscripción " +
-                            "el usuario que se va a inscribir, o el organizador del evento"));
+                    .andExpect(status().isForbidden())
+                    .andExpect(status().reason("Solamente pueden crear una inscripción "
+                            + "el usuario que se va a inscribir, o el organizador del evento"));
 
             verify(inscripcionesRepository, never()).guardarInscripcion(any());
         }

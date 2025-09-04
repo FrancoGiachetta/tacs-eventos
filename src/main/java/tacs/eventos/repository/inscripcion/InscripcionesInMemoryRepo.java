@@ -27,8 +27,7 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
     public Optional<InscripcionEvento> getInscripcionConfirmada(Usuario participante, Evento evento) {
         return this.inscripciones.stream()
                 .filter(i -> i.getEvento().equals(evento) && i.getParticipante().equals(participante))
-                .filter(i -> i.getEstado() == EstadoInscripcion.CONFIRMADA)
-                .findFirst();
+                .filter(i -> i.getEstado() == EstadoInscripcion.CONFIRMADA).findFirst();
     }
 
     @Override
