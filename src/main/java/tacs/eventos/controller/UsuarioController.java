@@ -24,22 +24,18 @@ public class UsuarioController {
     /**
      * Retorna las inscripciones de un usuario según su id.
      *
-     * @param usuario
-     *            datos del usuario.
-     *
+     * @param usuario datos del usuario.
      * @return las inscripciones del usuario.
      */
     @GetMapping("/mis-inscripciones")
     public List<InscripcionResponse> getMisInscripciones(@AuthenticationPrincipal Usuario usuario) {
-        return usuarioService.obtenerInscripciones(usuario.getId());
+        return usuarioService.obtenerInscripcionesNoCanceladas(usuario.getId());
     }
 
     /**
      * Retorna los eventos para los cuales el usuario es el organizador.
      *
-     * @param usuario
-     *            datos del usuario.
-     *
+     * @param usuario datos del usuario.
      * @return los eventos organizados por el usuario.
      */
     @GetMapping("/mis-eventos")

@@ -20,21 +20,18 @@ public interface InscripcionesRepository {
     /**
      * @param participante
      * @param evento
-     *
      * @return la inscripción (cancelada o confirmada) de un participante a un evento, si es que esta existe
      */
     Optional<InscripcionEvento> getInscripcionConfirmada(Usuario participante, Evento evento);
 
     /**
      * @param participante
-     *
-     * @return todas las inscripciones (canceladas o confirmadas) de ese participante
+     * @return las inscripciones confirmadas de ese participante
      */
-    List<InscripcionEvento> getInscripcionesPorParticipante(Usuario participante);
+    List<InscripcionEvento> getInscripcionesConfirmadasPorParticipante(Usuario participante);
 
     /**
      * @param evento
-     *
      * @return todas las inscripciones (canceladas o confirmadas) de ese evento
      */
     List<InscripcionEvento> getInscripcionesPorEvento(Evento evento);
@@ -46,7 +43,6 @@ public interface InscripcionesRepository {
 
     /**
      * @param evento
-     *
      * @return cantidad de inscripciones confirmadas para ese evento
      */
     int cantidadInscriptos(Evento evento);

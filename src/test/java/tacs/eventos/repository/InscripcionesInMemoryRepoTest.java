@@ -54,8 +54,8 @@ class InscripcionesInMemoryRepoTest {
     }
 
     @Test
-    void getInscripcionesPorParticipante() {
-        var inscripciones = this.repo.getInscripcionesPorParticipante(u1);
+    void getInscripcionesConfirmadasPorParticipante() {
+        var inscripciones = this.repo.getInscripcionesConfirmadasPorParticipante(u1);
         assertEquals(1, inscripciones.size());
         assertTrue(inscripciones.contains(this.i1));
     }

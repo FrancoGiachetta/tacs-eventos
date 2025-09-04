@@ -45,10 +45,10 @@ public class UsuarioService {
         return repo.obtenerPorId(id);
     }
 
-    public List<InscripcionResponse> obtenerInscripciones(String usuarioId) {
+    public List<InscripcionResponse> obtenerInscripcionesNoCanceladas(String usuarioId) {
         Usuario usuario = repo.obtenerPorId(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-        List<InscripcionEvento> inscripciones = inscripcionesRepository.getInscripcionesPorParticipante(usuario);
+        List<InscripcionEvento> inscripciones = inscripcionesRepository.getInscripcionesConfirmadasPorParticipante(usuario);
         List<InscripcionResponse> inscripcionResponses = inscripciones.stream()
                 .map(insc -> new InscripcionResponse(insc.getEvento().getId(), mapEstado(insc.getEstado()))).toList();
 
@@ -61,9 +61,9 @@ public class UsuarioService {
 
     private EstadoInscripcionResponse mapEstado(EstadoInscripcion estado) {
         return switch (estado) {
-        case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
-        case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
-        case PENDIENTE -> EstadoInscripcionResponse.PENDIENTE;
+            case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
+            case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
+            case PENDIENTE -> EstadoInscripcionResponse.PENDIENTE;
         };
     }
 }
