@@ -15,9 +15,9 @@ backend/.mvn/wrapper/maven-wrapper.jar
 
 ### IntelliJ IDEA ###
 **.idea
-*.iws
-*.iml
-*.ipr
+**.iws
+**.iml
+**.ipr
 
 ### NetBeans ###
 /nbproject/private/
