@@ -22,9 +22,9 @@ jobs:
             distribution: 'temurin'
             java-version: '21'
         - name: Maven Package
-          run: mvn -B clean package -DskipTests
+          run: mvn -f ./backend/pom.xml -B clean package -DskipTests
         - name: Maven Verify
-          run: mvn -B clean verify
+          run: mvn -f ./backend/pom.xml -B clean verify
 
   check-format:
       name: Check Format
@@ -38,7 +38,7 @@ jobs:
             java-version: '21'
         - name: Check Format
           run: |
-            mvn formatter:validate
+            mvn -f ./backend/pom.xml formatter:validate
         - name: Find Comment
           continue-on-error: true
           if: success() || failure()
@@ -85,5 +85,5 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t my-app:latest .
+          docker build -t eventos-backend:latest ./backend
           
