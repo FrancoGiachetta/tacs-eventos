@@ -14,10 +14,10 @@ backend/.mvn/wrapper/maven-wrapper.jar
 .sts4-cache
 
 ### IntelliJ IDEA ###
-backend/.idea
-*.iws
-*.iml
-*.ipr
+**/*.idea
+**/*.iws
+**/*.iml
+**/*.ipr
 
 ### NetBeans ###
 /nbproject/private/
