@@ -81,7 +81,7 @@ jobs:
         - name: Check Format Frontend
           run: |
             cd frontend
-            npm run fmt --check
+            npm run check-fmt
         - name: Find Comment
           continue-on-error: true
           if: success() || failure()
