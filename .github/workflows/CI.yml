@@ -81,7 +81,7 @@ jobs:
         - name: Check Format Frontend
           run: |
             cd frontend
-            npm run lint
+            npm run fmt --check
         - name: Find Comment
           continue-on-error: true
           if: success() || failure()
@@ -99,7 +99,7 @@ jobs:
             comment-id: ${{ steps.fc.outputs.comment-id }}
             issue-number: ${{ github.event.pull_request.number }}
             body: |
-              ❌ Frontend Code is not formatted! Please run `npm run lint -- --fix`.
+              ❌ Frontend Code is not formatted! Please run `npm run fmt`.
 
               <!-- thiscommentistofindthisformatfrontendcomment -->
             edit-mode: replace
