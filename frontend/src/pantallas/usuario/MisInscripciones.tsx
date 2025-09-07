@@ -19,38 +19,6 @@ type EventoResponse = {
   categoria: string
 }
 
-const eventos: EventoResponse[] = [{
-  titulo: "Test test 1",
-  descripcion: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quam dui, malesuada at congue sed, pellentesque ut leo. Sed pellentesque consectetur iaculis. Phasellus pulvinar lacus vel mattis gravida. Maecenas ut sodales eros. Nullam dolor neque, tempor non suscipit at, vehicula sit amet nulla. In hac habitasse platea dictumst.",
-  fechaHoraInicio: "2025-10-10 15:00:00.0000Z",
-  duracionMinutos: 120,
-  ubicacion: "Jorge Gascon 1900",
-  cupoMaximo: 100,
-  precio: 400000,
-  categoria: "Deportes"
-},
-{
-  titulo: "Test test 2",
-  descripcion: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quam dui, malesuada at congue sed, pellentesque ut leo. Sed pellentesque consectetur iaculis. Phasellus pulvinar lacus vel mattis gravida. Maecenas ut sodales eros. Nullam dolor neque, tempor non suscipit at, vehicula sit amet nulla. In hac habitasse platea dictumst.",
-  fechaHoraInicio: "2025-10-10 15:00:00.0000Z",
-  duracionMinutos: 120,
-  ubicacion: "Jorge Gascon 1900",
-  cupoMaximo: 100,
-  precio: 400000,
-  categoria: "Deportes"
-},
-{
-  titulo: "Test test 3",
-  descripcion: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quam dui, malesuada at congue sed, pellentesque ut leo. Sed pellentesque consectetur iaculis. Phasellus pulvinar lacus vel mattis gravida. Maecenas ut sodales eros. Nullam dolor neque, tempor non suscipit at, vehicula sit amet nulla. In hac habitasse platea dictumst.",
-  fechaHoraInicio: "2025-10-10 15:00:00.0000Z",
-  duracionMinutos: 120,
-  ubicacion: "Jorge Gascon 1900",
-  cupoMaximo: 100,
-  precio: 400000,
-  categoria: "Deportes"
-},
-]
-
 function InscripcionItem(props: InscripcionResponse): ReactNode {
     const { eventoId, estado } = props
     const [evento, setEvento] = useState<EventoResponse | null>(null)
@@ -69,11 +37,9 @@ function InscripcionItem(props: InscripcionResponse): ReactNode {
     }
 
     useEffect(() => {
-        // api.get(`/api/v1/evento/${eventoId}`)
-        api.get(`/api/v1/evento`)
+        api.get(`/api/v1/evento/${eventoId}`)
           .then(r => {
-            // const eventoDatos: EventoResponse = r.data
-            const eventoDatos = eventos[Number.parseInt(eventoId)]
+            const eventoDatos: EventoResponse = r.data
             setEvento(eventoDatos)
           })
     }, [])
@@ -172,12 +138,7 @@ export default function MisInscripciones() {
           .then(r => {
             const data = r.data
             const inscripcionesIds: InscripcionResponse[] = data.map((i: any) => {return {eventoId: i.eventoId, estado: i.estado}})
-            // setInscripciones(inscripcionesIds)
-            setInscripciones([
-                {eventoId: "0", estado: "CONFIRMADA"},
-                {eventoId: "1", estado: "PENDIENTE"},
-                {eventoId: "2", estado: "CANCELADA"}
-            ])
+            setInscripciones(inscripcionesIds)
             setLoaded(true)
           })
     }, [])
