@@ -22,7 +22,9 @@ const Registro: React.FC = () => {
       return;
     }
     if (!passwordRegex.test(password)) {
-      setError("La contraseña debe tener al menos 8 caracteres, incluir letras y números");
+      setError(
+        "La contraseña debe tener al menos 8 caracteres, incluir letras y números",
+      );
       return;
     }
     if (password !== confirmPassword) {
@@ -32,7 +34,7 @@ const Registro: React.FC = () => {
     try {
       await api.post("/api/v1/auth/register", { email, password });
       setSuccess("Registro exitoso. Redirigiendo al login...");
-      setTimeout(() => navigate('/login'), 1500);
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err: any) {
       setError("Error al registrar usuario o email ya registrado");
     }
@@ -40,15 +42,20 @@ const Registro: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-80">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded shadow-md w-80"
+      >
         <h2 className="text-2xl font-bold mb-6 text-center">Registro</h2>
         {error && <div className="text-red-600 mb-2 text-center">{error}</div>}
-        {success && <div className="text-green-600 mb-2 text-center">{success}</div>}
+        {success && (
+          <div className="text-green-600 mb-2 text-center">{success}</div>
+        )}
         <input
           type="email"
           placeholder="Email"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           className="w-full p-2 mb-4 border rounded"
           required
         />
@@ -56,7 +63,7 @@ const Registro: React.FC = () => {
           type="password"
           placeholder="Contraseña"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           className="w-full p-2 mb-4 border rounded"
           required
         />
@@ -64,14 +71,21 @@ const Registro: React.FC = () => {
           type="password"
           placeholder="Confirmar Contraseña"
           value={confirmPassword}
-          onChange={e => setConfirmPassword(e.target.value)}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           className="w-full p-2 mb-4 border rounded"
           required
         />
-        <button type="submit" className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700">Registrarse</button>
+        <button
+          type="submit"
+          className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700"
+        >
+          Registrarse
+        </button>
         <div className="text-center mt-2">
           <span>¿Ya tenés cuenta? </span>
-          <Link to="/login" className="text-blue-600 hover:underline">Iniciar sesión</Link>
+          <Link to="/login" className="text-blue-600 hover:underline">
+            Iniciar sesión
+          </Link>
         </div>
       </form>
     </div>
