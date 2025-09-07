@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import BarraSup from "./componentes/BarraSuperior";
-import ListaEventos from "./pantallas/eventos/ListaEventos";
-import Login from "./pantallas/Login";
-import Registro from "./pantallas/Registro";
+import ListaEventos from "./componentes/eventos/ListaEventos";
+import Login from "./componentes/Login";
+import Registro from "./componentes/Registro";
 
 import { useLocation } from "react-router-dom";
 
