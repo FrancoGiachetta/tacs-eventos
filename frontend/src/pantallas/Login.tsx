@@ -15,6 +15,7 @@ const Login: React.FC = () => {
       const res = await api.post("/api/v1/auth/login", { email, password });
       // Guardar el token en localStorage
       localStorage.setItem('token', res.data.token);
+      localStorage.setItem('authExpiresAt', res.data.expiresAt);
       // Redirigir a la pantalla principal
       navigate("/eventos");
     } catch (err: any) {
