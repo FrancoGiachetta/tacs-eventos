@@ -12,14 +12,14 @@ Antes de ejecutar el proyecto
 - [Maven 3.9+](https://maven.apache.org/)
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/)
 
-##  Instalación
+###  Instalación
 
 ```shell
 cd backend
 mvn clean install
 ```
 
-## Ejecución
+### Ejecución
 
 Desde Powershell:
 
@@ -50,14 +50,16 @@ cd frontend
 npm install // una sola vez
 ```
 
-### Ejecucion
+### Ejecución
 
 ```shell
 cd frontend
 npm run dev
 ```
 
-## Desarrollo 
+## Políticas de Desarrollo 
+
+### Formato
 
 Cada vez que vamos a hacer un push, debemos formatear el código correctamente:
 
@@ -66,6 +68,7 @@ Cada vez que vamos a hacer un push, debemos formatear el código correctamente:
 ```shell
 mvn net.revelc.code.formatter:formatter-maven-plugin:2.20.0:format
 ```
+
 - Frontend: 
 
 ```shell
