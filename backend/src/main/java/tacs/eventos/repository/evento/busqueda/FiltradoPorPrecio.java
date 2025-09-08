@@ -11,7 +11,14 @@ public class FiltradoPorPrecio implements FiltroBusqueda<Evento> {
 
     @Override
     public Boolean aplicarCondicionfiltrado(Evento evento) {
+        if (precioMinimo == null && precioMaximo == null) {
+            return true;
+        }
+
         double precio = evento.getPrecio();
-        return precio >= precioMinimo && precio <= precioMaximo;
+        boolean cumpleMinimo = precioMinimo == null || precio >= precioMinimo;
+        boolean cumpleMaximo = precioMaximo == null || precio <= precioMaximo;
+
+        return cumpleMinimo && cumpleMaximo;
     }
 }
