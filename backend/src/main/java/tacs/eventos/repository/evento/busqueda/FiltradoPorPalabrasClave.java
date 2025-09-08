@@ -19,7 +19,9 @@ public class FiltradoPorPalabrasClave implements FiltroBusqueda<Evento> {
 
         String eventoTexto = (evento.getTitulo() + " " + evento.getDescripcion()).toLowerCase();
 
-        // Todas las palabras clave deben estar presentes
-        return palabrasClave.stream().map(String::toLowerCase).allMatch(palabra -> eventoTexto.contains(palabra));
+        // Si cualquiera de las palabras clave está presente, es una coincidencia
+        return palabrasClave.stream()
+            .map(String::toLowerCase)
+            .anyMatch(palabra -> eventoTexto.contains(palabra));
     }
 }
