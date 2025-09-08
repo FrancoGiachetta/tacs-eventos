@@ -16,12 +16,10 @@ public class FiltradoPorPalabrasClave implements FiltroBusqueda<Evento> {
         if (palabrasClave == null || palabrasClave.isEmpty()) {
             return true;
         }
-        
+
         String eventoTexto = (evento.getTitulo() + " " + evento.getDescripcion()).toLowerCase();
-        
+
         // Todas las palabras clave deben estar presentes
-        return palabrasClave.stream()
-            .map(String::toLowerCase)
-            .allMatch(palabra -> eventoTexto.contains(palabra));
+        return palabrasClave.stream().map(String::toLowerCase).allMatch(palabra -> eventoTexto.contains(palabra));
     }
 }

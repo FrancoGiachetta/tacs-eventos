@@ -14,11 +14,11 @@ public class FiltradoPorPrecio implements FiltroBusqueda<Evento> {
         if (precioMinimo == null && precioMaximo == null) {
             return true;
         }
-        
+
         double precio = evento.getPrecio();
         boolean cumpleMinimo = precioMinimo == null || precio >= precioMinimo;
         boolean cumpleMaximo = precioMaximo == null || precio <= precioMaximo;
-        
+
         return cumpleMinimo && cumpleMaximo;
     }
 }
