@@ -65,10 +65,11 @@ export default function EventFilters({ onFilterChange, onReset }: EventFiltersPr
             }}
           >
             <option value="">Todas las categorías</option>
-            <option value="musica">Música</option>
-            <option value="deportes">Deportes</option>
-            <option value="teatro">Teatro</option>
-            <option value="arte">Arte</option>
+            <option value="Música">Música</option>
+            <option value="Deportes">Deportes</option>
+            <option value="Teatro">Teatro</option>
+            <option value="Arte">Arte</option>
+            <option value="Gastronomía">Gastronomía</option>
           </select>
         </div>
 

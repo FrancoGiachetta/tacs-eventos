@@ -9,15 +9,19 @@ import java.util.List;
 
 @AllArgsConstructor
 public class FiltradoPorPalabrasClave implements FiltroBusqueda<Evento> {
-    private final int ratioMinimo = 70;
     private List<String> palabrasClave;
 
     @Override
     public Boolean aplicarCondicionfiltrado(Evento evento) {
-        String palabrasClaveString = String.join(" ", palabrasClave);
-        double ratioDescripcion = FuzzySearch.tokenSetPartialRatio(evento.getDescripcion(), palabrasClaveString);
-        double ratioTitulo = FuzzySearch.tokenSetPartialRatio(evento.getTitulo(), palabrasClaveString);
-
-        return (ratioDescripcion >= ratioMinimo) || (ratioTitulo >= ratioMinimo);
+        if (palabrasClave == null || palabrasClave.isEmpty()) {
+            return true;
+        }
+        
+        String eventoTexto = (evento.getTitulo() + " " + evento.getDescripcion()).toLowerCase();
+        
+        // Todas las palabras clave deben estar presentes
+        return palabrasClave.stream()
+            .map(String::toLowerCase)
+            .allMatch(palabra -> eventoTexto.contains(palabra));
     }
 }

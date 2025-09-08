@@ -18,7 +18,7 @@ export default function ListaEventos() {
     queryKey: ['eventos', filtros, pagina],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (filtros.query?.trim()) params.append('query', filtros.query.trim());
+      if (filtros.query?.trim()) params.append('palabrasClave', filtros.query.trim());
       if (filtros.precioPesosMin !== undefined) params.append('precioPesosMin', filtros.precioPesosMin.toString());
       if (filtros.precioPesosMax !== undefined) params.append('precioPesosMax', filtros.precioPesosMax.toString());
       if (filtros.fechaInicioMin) params.append('fechaInicioMin', filtros.fechaInicioMin);
