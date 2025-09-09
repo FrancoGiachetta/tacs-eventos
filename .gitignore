@@ -1,6 +1,6 @@
 HELP.md
 target/
-.mvn/wrapper/maven-wrapper.jar
+backend/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
@@ -14,10 +14,10 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+**/*.idea
+**/*.iws
+**/*.iml
+**/*.ipr
 
 ### NetBeans ###
 /nbproject/private/
@@ -36,3 +36,8 @@ build/
 .env
 .env.*
 !.env.example
+
+# Node.js (frontend)
+frontend/node_modules/
+frontend/dist/
+node_modules/
