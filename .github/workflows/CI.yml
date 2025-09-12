@@ -26,8 +26,8 @@ jobs:
         - name: Maven Verify
           run: mvn -f ./backend/pom.xml -B clean verify
 
-  check-format:
-      name: Check Format
+  check-format-backend:
+      name: Check Format Backend
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
           with:
             distribution: 'temurin'
             java-version: '21'
-        - name: Check Format
+        - name: Check Format Backend
           run: |
             mvn -f ./backend/pom.xml formatter:validate
         - name: Find Comment
@@ -56,9 +56,9 @@ jobs:
             comment-id: ${{ steps.fc.outputs.comment-id }}
             issue-number: ${{ github.event.pull_request.number }}
             body: |
-              ❌ Code is not formatted! Please run `mvn formatter:validate`.
+              ❌ Backend Code is not formatted! Please run `mvn formatter:validate`.
 
-              <!-- thiscommentistofindthisformatcomment -->
+              <!-- thiscommentistofindthisformatbackendcomment -->
             edit-mode: replace
         - name: Create or update comment Success
           continue-on-error: true
@@ -68,9 +68,53 @@ jobs:
             comment-id: ${{ steps.fc.outputs.comment-id }}
             issue-number: ${{ github.event.pull_request.number }}
             body: |
-              ✅ Code is now correctly formatted.
+              ✅ Backend Code is now correctly formatted.
 
-              <!-- thiscommentistofindthisformatcomment -->
+              <!-- thiscommentistofindthisformatbackendcomment -->
+            edit-mode: replace
+
+  check-format-frontend:
+      name: Check Format Frontend
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - name: Check Format Frontend
+          run: |
+            cd frontend
+            npm install
+            npm run check-fmt
+        - name: Find Comment
+          continue-on-error: true
+          if: success() || failure()
+          uses: peter-evans/find-comment@v3
+          id: fc
+          with:
+            issue-number: ${{ github.event.pull_request.number }}
+            comment-author: "github-actions[bot]"
+            body-includes: thiscommentistofindthisformatcomment
+        - name: Create or update comment Failure
+          continue-on-error: true
+          if: failure()
+          uses: peter-evans/create-or-update-comment@v4
+          with:
+            comment-id: ${{ steps.fc.outputs.comment-id }}
+            issue-number: ${{ github.event.pull_request.number }}
+            body: |
+              ❌ Frontend Code is not formatted! Please run `npm run fmt`.
+
+              <!-- thiscommentistofindthisformatfrontendcomment -->
+            edit-mode: replace
+        - name: Create or update comment Success
+          continue-on-error: true
+          if: ${{ success() && steps.fc.outputs.comment-id != null }}
+          uses: peter-evans/create-or-update-comment@v4
+          with:
+            comment-id: ${{ steps.fc.outputs.comment-id }}
+            issue-number: ${{ github.event.pull_request.number }}
+            body: |
+              ✅ Frontend Code is now correctly formatted.
+
+              <!-- thiscommentistofindthisformatfrontendcomment -->
             edit-mode: replace
 
   docker-build:
