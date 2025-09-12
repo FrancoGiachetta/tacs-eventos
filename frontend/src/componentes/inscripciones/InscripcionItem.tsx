@@ -1,27 +1,13 @@
-import { useEffect, useState, type ReactNode } from "react"
+import { useState, useEffect} from "react"
+import type {ReactNode} from "react"
 import api from "../../lib/api"
 import { formatDate } from "../../lib/utils"
-import { DialogoConfirmar } from "../../componentes/DialogoConfirmar"
+import { DialogoConfirmar } from "../DialogoConfirmar"
+import type { Evento, Inscripcion } from "../../tipos"
 
-type InscripcionResponse = {
-    eventoId: string,
-    estado: string,
-}
-
-type EventoResponse = {
-  titulo: string,
-  descripcion: string,
-  fechaHoraInicio: string
-  duracionMinutos: number,
-  ubicacion: string,
-  cupoMaximo: number,
-  precio: number,
-  categoria: string
-}
-
-function InscripcionItem(props: InscripcionResponse): ReactNode {
+export default function InscripcionItem(props: Inscripcion): ReactNode {
     const { eventoId, estado } = props
-    const [evento, setEvento] = useState<EventoResponse | null>(null)
+    const [evento, setEvento] = useState<Evento | null>(null)
 
     const [dialogoCancelarAbierto, setDialogoCancelarAbierto] = useState(false);
 
@@ -39,7 +25,7 @@ function InscripcionItem(props: InscripcionResponse): ReactNode {
     useEffect(() => {
         api.get(`/api/v1/evento/${eventoId}`)
           .then(r => {
-            const eventoDatos: EventoResponse = r.data
+            const eventoDatos: Evento = r.data
             setEvento(eventoDatos)
           })
     }, [])
@@ -126,37 +112,4 @@ function EstadoInscripcionBadge(props: {estado: string}) {
         </div>
     </>
 
-}
-
-export default function MisInscripciones() {
-    
-    const [inscripciones, setInscripciones] = useState<InscripcionResponse[]>([])
-    const [loaded, setLoaded] = useState(false)
-
-    useEffect(() => {
-        api.get("/api/v1/usuario/mis-inscripciones")
-          .then(r => {
-            const data = r.data
-            const inscripcionesIds: InscripcionResponse[] = data.map((i: any) => {return {eventoId: i.eventoId, estado: i.estado}})
-            setInscripciones(inscripcionesIds)
-            setLoaded(true)
-          })
-    }, [])
-
-    return (
-        <div className="mt-10 w-[90%] mx-auto">
-            <h1 className="text-4xl">Mis inscripciones</h1>
-            <div className="mt-5 w-full mx-auto rounded-lg bg-gray-100 p-10 flex flex-col gap-4">
-                {loaded && (inscripciones.length > 0 ? inscripciones.map(
-                    (inscripcion: {eventoId: string, estado: string}) => (
-                    <InscripcionItem eventoId={inscripcion.eventoId} estado={inscripcion.estado} />
-                    ))
-                :
-                    <h3 className="text-3xl text-gray-600 font-bold text-center m-auto my-20">
-                        No est{'á'}s inscripto a ning{'ú'}n evento actualmente.
-                    </h3>
-                )}
-            </div>
-        </div>
-    )
 }

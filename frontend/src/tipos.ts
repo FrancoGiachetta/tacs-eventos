@@ -12,8 +12,8 @@ export interface Evento {
 }
 
 export interface Inscripcion {
-    id: string
-    estado: 'CONFITMADA' | 'WAITLIST' | 'CANCELADA'
+    eventoId: string
+    estado: 'CONFIRMADA' | 'PENDIENTE' | 'CANCELADA'
     createdAt: string
 }
 

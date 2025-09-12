@@ -3,7 +3,7 @@ import BarraSup from './componentes/BarraSuperior'
 import ListaEventos from './componentes/eventos/ListaEventos'
 import Login from './componentes/Login'
 import Registro from './componentes/Registro'
-import MisInscripciones from './pantallas/usuario/MisInscripciones';
+import MisInscripciones from './componentes/inscripciones/MisInscripciones';
 
 import { useLocation } from 'react-router-dom';
 
