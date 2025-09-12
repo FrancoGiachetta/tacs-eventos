@@ -3,6 +3,7 @@ import BarraSup from './componentes/BarraSuperior'
 import ListaEventos from './componentes/eventos/ListaEventos'
 import Login from './componentes/Login'
 import Registro from './componentes/Registro'
+import MisInscripciones from './componentes/inscripciones/MisInscripciones'
 
 import { useLocation } from 'react-router-dom'
 
@@ -18,6 +19,10 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/registro" element={<Registro />} />
                 <Route path="/eventos" element={<ListaEventos />} />
+                <Route
+                    path="/mis-inscripciones"
+                    element={<MisInscripciones />}
+                />
                 <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </>
