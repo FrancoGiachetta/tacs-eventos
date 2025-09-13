@@ -19,9 +19,9 @@ export interface Inscripcion {
 
 export interface ItemWaitlist {
     usuario: {
-        id: string,
+        id: string
         email: string
-    },
+    }
     fechaIngreso: string
 }
 

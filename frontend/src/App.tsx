@@ -19,7 +19,10 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/registro" element={<Registro />} />
                 <Route path="/eventos" element={<ListaEventos />} />
-                <Route path="/organizador/mis-eventos" element={<MisEventos />} />
+                <Route
+                    path="/organizador/mis-eventos"
+                    element={<MisEventos />}
+                />
                 <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </>
