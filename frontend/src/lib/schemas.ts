@@ -1,19 +1,18 @@
-import {z} from 'zod';
-import {es} from "zod/locales";
+import {z} from 'zod'
+import {es} from "zod/locales"
 
 function mensajeDeErrorMinimoCaracteres(cantidadMinima: number) {
-    return `Ingrese al menos ${cantidadMinima} caracteres`;
+    return `Ingrese al menos ${cantidadMinima} caracteres`
 }
-
 function mensajeDeErrorMaximoCaracteres(cantidadMaxima: number) {
-    return `No puede exceder los ${cantidadMaxima} caracteres`;
+    return `No puede exceder los ${cantidadMaxima} caracteres`
 }
 
-let mensajeDeErrorNumeroNoEntero = "Ingrese un número entero";
-let mensajeDeErrorNumeroNegativo = "El valor no puede ser negativo";
-let mensajeDeErrorNumeroInvalido = "Ingrese un número";
+let mensajeDeErrorNumeroNoEntero = "Ingrese un número entero"
+let mensajeDeErrorNumeroNegativo = "El valor no puede ser negativo"
+let mensajeDeErrorNumeroInvalido = "Ingrese un número"
 
-z.config(es());
+z.config(es())
 // TODO: poner estas mismas validaciones en el backend
 // Schema para la creacion de un evento, aseguro que tiene el formato correcto
 export const SchemaCrearEvento = z.object({
