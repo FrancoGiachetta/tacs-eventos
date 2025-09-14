@@ -18,6 +18,7 @@ const Login: React.FC = () => {
             })
             // Guardar el token en localStorage
             localStorage.setItem('token', res.data.token)
+            localStorage.setItem('authExpiresAt', res.data.expiresAt)
             // Redirigir a la pantalla principal
             navigate('/eventos')
         } catch (err: any) {

@@ -64,9 +64,9 @@ public class EventoController {
      */
     @GetMapping("/{eventoId}")
     @ResponseStatus(HttpStatus.OK)
-    public EventoDTO obtenerEvento(@PathVariable String eventoId) {
+    public EventoResponseDTO obtenerEvento(@PathVariable String eventoId) {
         var evento = this.buscarEvento(eventoId);
-        return modelMapper.map(evento, EventoDTO.class);
+        return modelMapper.map(evento, EventoResponseDTO.class);
     }
 
     /**
@@ -82,7 +82,7 @@ public class EventoController {
      */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<EventoDTO> listarEventos(
+    public List<EventoResponseDTO> listarEventos(
             @RequestParam(value = "precioPesosMin", required = false) Double precioMinimoParam,
             @RequestParam(value = "precioPesosMax", required = false) Double precioMaximoParam,
             @RequestParam(value = "fechaInicioMin", required = false) LocalDate fechaMinParam,
@@ -91,7 +91,7 @@ public class EventoController {
             @RequestParam(value = "palabrasClave", required = false) List<String> palabrasClaveParam) {
         if (precioMinimoParam == null && precioMaximoParam == null && fechaMinParam == null && fechaMaxParam == null
                 && categoriaParam == null && palabrasClaveParam == null) {
-            return eventoService.listarEventos().stream().map((Evento e) -> modelMapper.map(e, EventoDTO.class))
+            return eventoService.listarEventos().stream().map((Evento e) -> modelMapper.map(e, EventoResponseDTO.class))
                     .toList();
         } else {
             LocalDate fechaMinima = fechaMinParam != null ? fechaMinParam : LocalDate.now();
@@ -112,7 +112,7 @@ public class EventoController {
                 filtros.add(new FiltradoPorPalabrasClave(palabrasClaveParam));
             }
 
-            return eventoService.filtrarEventos(filtros).stream().map(e -> modelMapper.map(e, EventoDTO.class))
+            return eventoService.filtrarEventos(filtros).stream().map(e -> modelMapper.map(e, EventoResponseDTO.class))
                     .toList();
         }
     }
