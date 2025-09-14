@@ -6,9 +6,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tacs.eventos.dto.EventoResponseDTO;
+import tacs.eventos.dto.EventoResponse;
 import tacs.eventos.dto.InscripcionResponse;
-import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.repository.evento.EventosRepository;
 import tacs.eventos.service.UsuarioService;
@@ -27,9 +26,7 @@ public class UsuarioController {
     /**
      * Retorna las inscripciones de un usuario según su id.
      *
-     * @param usuario
-     *            datos del usuario.
-     *
+     * @param usuario datos del usuario.
      * @return las inscripciones del usuario.
      */
     @GetMapping("/mis-inscripciones")
@@ -40,14 +37,12 @@ public class UsuarioController {
     /**
      * Retorna los eventos para los cuales el usuario es el organizador.
      *
-     * @param usuario
-     *            datos del usuario.
-     *
+     * @param usuario datos del usuario.
      * @return los eventos organizados por el usuario.
      */
     @GetMapping("/mis-eventos")
-    public List<EventoResponseDTO> getMisEventos(@AuthenticationPrincipal Usuario usuario) {
+    public List<EventoResponse> getMisEventos(@AuthenticationPrincipal Usuario usuario) {
         return eventosRepository.getEventosPorOrganizador(usuario.getId()).stream()
-                .map(e -> this.modelMapper.map(e, EventoResponseDTO.class)).toList();
+                .map(e -> this.modelMapper.map(e, EventoResponse.class)).toList();
     }
 }
