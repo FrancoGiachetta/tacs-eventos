@@ -12,9 +12,17 @@ export interface Evento {
 }
 
 export interface Inscripcion {
-    id: string
+    eventoId: string
     estado: 'CONFITMADA' | 'WAITLIST' | 'CANCELADA'
     createdAt: string
+}
+
+export interface ItemWaitlist {
+    usuario: {
+        id: string
+        email: string
+    }
+    fechaIngreso: string
 }
 
 export interface Estadisticas {}
