@@ -134,7 +134,6 @@ function EstadoInscripcionBadge(props: { estado: string }) {
             break
         case 'CANCELADA':
             styles = canceladaStyles
-            text = 'Pendiente'
             text = 'Cancelada'
             break
     }
