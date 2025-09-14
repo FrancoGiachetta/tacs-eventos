@@ -1,17 +1,19 @@
-import { type SubmitHandler, useForm } from 'react-hook-form'
-import { type InputCrearEvento, SchemaCrearEvento } from '../../lib/schemas'
+import {type SubmitHandler, useForm} from 'react-hook-form'
+import {type InputCrearEvento, SchemaCrearEvento} from '../../lib/schemas'
 import api from '../../lib/api'
-import { zodResolver } from '@hookform/resolvers/zod'
+import {zodResolver} from '@hookform/resolvers/zod'
 
 export default function CreacionEvento() {
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
     } = useForm<InputCrearEvento>({
         resolver: zodResolver(SchemaCrearEvento),
     })
 
+    // TODO: IMPORTANTE: manejar y mostrar los errores que vengan del back end
+    // TODO: IMPORTANTE: mostrar un toast diciendo "Evento creado correctamente"
     const onSubmit: SubmitHandler<InputCrearEvento> = (
         data: InputCrearEvento
     ) => api.post('/api/v1/evento', data)
@@ -159,7 +161,7 @@ export default function CreacionEvento() {
                         <input
                             type="number"
                             id="cupoMaximo"
-                            {...register('cupoMaximo', { valueAsNumber: true })}
+                            {...register('cupoMaximo', {valueAsNumber: true})}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                             placeholder="Cupo máximo"
                         />
@@ -183,7 +185,7 @@ export default function CreacionEvento() {
                         <input
                             type="number"
                             id="precio"
-                            {...register('precio', { valueAsNumber: true })}
+                            {...register('precio', {valueAsNumber: true})}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                             placeholder="Precio"
                         />
