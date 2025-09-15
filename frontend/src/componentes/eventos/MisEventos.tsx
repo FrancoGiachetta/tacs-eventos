@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import api from '../../lib/api'
 import { type Inscripcion, type Evento, type ItemWaitlist } from '../../tipos'
 import { formatDate } from '../../lib/utils'

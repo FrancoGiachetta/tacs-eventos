@@ -1,5 +1,5 @@
-import {Link, useNavigate} from 'react-router-dom'
-import {useState} from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import api from '../lib/api'
 
 export default function BarraSuperior() {
@@ -34,7 +34,10 @@ export default function BarraSuperior() {
                         <Link to="/" className="hover:underline">
                             Eventos
                         </Link>
-                        <Link to="/organizador/eventos/nuevo" className="hover:underline">
+                        <Link
+                            to="/organizador/eventos/nuevo"
+                            className="hover:underline"
+                        >
                             Crear evento
                         </Link>
                         <Link

@@ -12,13 +12,13 @@ function App() {
         location.pathname === '/login' || location.pathname === '/registro'
     return (
         <>
-            {!hideBar && <BarraSup/>}
+            {!hideBar && <BarraSup />}
             <Routes>
-                <Route path="/" element={<Navigate to="/login" replace/>}/>
-                <Route path="/login" element={<Login/>}/>
-                <Route path="/registro" element={<Registro/>}/>
-                <Route path="/eventos" element={<ListaEventos/>}/>
-                <Route path="/organizador/new" element={<CreacionEvento/>}/>
+                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/registro" element={<Registro />} />
+                <Route path="/eventos" element={<ListaEventos />} />
+                <Route path="/organizador/new" element={<CreacionEvento />} />
                 <Route
                     path="/organizador/eventos/nuevo"
                     element={<CreacionEvento />}
@@ -27,7 +27,7 @@ function App() {
                     path="/organizador/mis-eventos"
                     element={<MisEventos />}
                 />
-                <Route path="*" element={<Navigate to="/login" replace/>}/>
+                <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </>
     )
