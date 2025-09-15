@@ -24,7 +24,9 @@ public class Evento {
     @Setter
     private int cupoMaximo;
     @Setter
-    private double precio; // TODO: cambiar el tipo de dato. Debería ser un número de precisión fija. Fijarme si no puedo recibir directamente BigDecimal o algo así en el DTO. Si no, que el front mande un String que cumpla la regex correcta, y el back lo transforme manualmente.
+    private double precio; // TODO: cambiar el tipo de dato. Debería ser un número de precisión fija. Fijarme si no
+                           // puedo recibir directamente BigDecimal o algo así en el DTO. Si no, que el front mande un
+                           // String que cumpla la regex correcta, y el back lo transforme manualmente.
     @Setter
     private String categoria;
     private boolean abierto = true;
@@ -33,7 +35,7 @@ public class Evento {
     private Usuario organizador;
 
     public Evento(String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
-                  String ubicacion, int cupoMaximo, double precio, String categoria) {
+            String ubicacion, int cupoMaximo, double precio, String categoria) {
 
         this.id = UUID.randomUUID().toString();
         this.titulo = titulo;
@@ -50,7 +52,9 @@ public class Evento {
     /**
      * Verifica si el evento permite nuevas inscripciones.
      *
-     * @param inscritos Número actual de inscritos en el evento.
+     * @param inscritos
+     *            Número actual de inscritos en el evento.
+     *
      * @return true si el evento está abierto y no ha alcanzado el cupo máximo, false en caso contrario.
      */
     public boolean permiteIncripcion(int inscritos) {

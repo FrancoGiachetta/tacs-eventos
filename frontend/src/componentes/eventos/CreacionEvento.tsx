@@ -1,36 +1,40 @@
-import {type SubmitHandler, useForm} from 'react-hook-form'
-import {type InputCrearEvento, SchemaCrearEvento} from '../../lib/schemas'
+import { type SubmitHandler, useForm } from 'react-hook-form'
+import { type InputCrearEvento, SchemaCrearEvento } from '../../lib/schemas'
 import api from '../../lib/api'
-import {zodResolver} from '@hookform/resolvers/zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'react-toastify'
-import { type ErrorDelServidor, esErrorDelServidor} from "../../tipos"
+import { type ErrorDelServidor, esErrorDelServidor } from '../../tipos'
 import ContainerDeToast from '../ContainerDeToast'
 
 export default function CreacionEvento() {
     const {
         register,
         handleSubmit,
-        formState: {errors},
+        formState: { errors },
         getValues,
-        reset
+        reset,
     } = useForm<InputCrearEvento>({
         resolver: zodResolver(SchemaCrearEvento),
     })
 
     const onSubmit: SubmitHandler<InputCrearEvento> = (
         data: InputCrearEvento
-    ) => api.post('/api/v1/evento', data)
-        .then(_ => {
-            toast.success(`Se ha creado el evento '${getValues('titulo')}'`)
-            reset()
-        })
-        .catch(error => {
-            if (esErrorDelServidor(error.response.data)) {
-                let errorDelServidor: ErrorDelServidor = error.response.data;
-                let primerError = errorDelServidor.errores[0];
-                toast.error(`Error con el campo ${primerError.campo}: ${primerError.mensaje}`)
-            }
-        })
+    ) =>
+        api
+            .post('/api/v1/evento', data)
+            .then((_) => {
+                toast.success(`Se ha creado el evento '${getValues('titulo')}'`)
+                reset()
+            })
+            .catch((error) => {
+                if (esErrorDelServidor(error.response.data)) {
+                    let errorDelServidor: ErrorDelServidor = error.response.data
+                    let primerError = errorDelServidor.errores[0]
+                    toast.error(
+                        `Error con el campo ${primerError.campo}: ${primerError.mensaje}`
+                    )
+                }
+            })
 
     /* TODO: si me dan ganas, hacer que la fecha del evento deba estar en el futuro (tendría que cambiar el schema de zod, el html, y el back end) */
     // TODO: si me dan ganas, hacer que se valide al cambiar de campo
@@ -175,7 +179,7 @@ export default function CreacionEvento() {
                         <input
                             type="number"
                             id="cupoMaximo"
-                            {...register('cupoMaximo', {valueAsNumber: true})}
+                            {...register('cupoMaximo', { valueAsNumber: true })}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                             placeholder="Cupo máximo"
                         />
@@ -199,7 +203,7 @@ export default function CreacionEvento() {
                         <input
                             type="number"
                             id="precio"
-                            {...register('precio', {valueAsNumber: true})}
+                            {...register('precio', { valueAsNumber: true })}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                             placeholder="Precio"
                         />
