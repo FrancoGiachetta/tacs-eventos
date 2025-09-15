@@ -1,1 +1,3 @@
-export declare function formatearFecha(fecha: string): string;
+export declare function formatDate(d: Date, opts?: {
+    withTime: boolean;
+}): string;

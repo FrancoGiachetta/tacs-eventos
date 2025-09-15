@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 // Schema para la creacion de un evento, aseguro que tiene el formato correcto
 export const SchemaCrearEvento = z.object({
@@ -11,7 +11,7 @@ export const SchemaCrearEvento = z.object({
     precio: z.number().min(0),
     categoria: z.string().optional().nullable(),
     abierto: z.boolean(),
-});
-export type InputCrearEvento = z.infer<typeof SchemaCrearEvento>;
+})
+export type InputCrearEvento = z.infer<typeof SchemaCrearEvento>
 
 //todo hacer lo mismo para los otros objetos
