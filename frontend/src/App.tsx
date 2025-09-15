@@ -23,7 +23,7 @@ function App() {
                     path="/organizador/mis-eventos"
                     element={<MisEventos />}
                 />
-                <Route path="*" element={<Navigate to="/login" replace />} />
+                <Route path="*" element={<Navigate to="/eventos" replace />} />
             </Routes>
         </>
     )

@@ -19,9 +19,12 @@ const Login: React.FC = () => {
             // Guardar el token en localStorage
             localStorage.setItem('token', res.data.token)
             localStorage.setItem('authExpiresAt', res.data.expiresAt)
+
+            console.log(`Login exitoso, token guardado: ${res.data.token}`)
+
             // Redirigir a la pantalla principal
             navigate('/eventos')
-        } catch (err: any) {
+        } catch (err) {
             setError('Credenciales incorrectas o error de conexión')
         }
     }
