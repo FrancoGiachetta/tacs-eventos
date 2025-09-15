@@ -2,21 +2,35 @@ import {type SubmitHandler, useForm} from 'react-hook-form'
 import {type InputCrearEvento, SchemaCrearEvento} from '../../lib/schemas'
 import api from '../../lib/api'
 import {zodResolver} from '@hookform/resolvers/zod'
+import { toast } from 'react-toastify'
+import { type ErrorDelServidor, esErrorDelServidor} from "../../tipos"
+import ContainerDeToast from '../ContainerDeToast'
 
 export default function CreacionEvento() {
     const {
         register,
         handleSubmit,
         formState: {errors},
+        getValues,
+        reset
     } = useForm<InputCrearEvento>({
         resolver: zodResolver(SchemaCrearEvento),
     })
 
-    // TODO: IMPORTANTE: manejar y mostrar los errores que vengan del back end
-    // TODO: IMPORTANTE: mostrar un toast diciendo "Evento creado correctamente"
     const onSubmit: SubmitHandler<InputCrearEvento> = (
         data: InputCrearEvento
     ) => api.post('/api/v1/evento', data)
+        .then(_ => {
+            toast.success(`Se ha creado el evento '${getValues('titulo')}'`)
+            reset()
+        })
+        .catch(error => {
+            if (esErrorDelServidor(error.response.data)) {
+                let errorDelServidor: ErrorDelServidor = error.response.data;
+                let primerError = errorDelServidor.errores[0];
+                toast.error(`Error con el campo ${primerError.campo}: ${primerError.mensaje}`)
+            }
+        })
 
     /* TODO: si me dan ganas, hacer que la fecha del evento deba estar en el futuro (tendría que cambiar el schema de zod, el html, y el back end) */
     // TODO: si me dan ganas, hacer que se valide al cambiar de campo
@@ -222,6 +236,8 @@ export default function CreacionEvento() {
                             </p>
                         }
                     </div>
+
+                    <ContainerDeToast />
 
                     <div className="mt-2 flex justify-end">
                         <button
