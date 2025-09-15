@@ -8,9 +8,10 @@ import { useLocation } from 'react-router-dom'
 import MisEventos from './componentes/eventos/MisEventos'
 
 function App() {
-    const location = useLocation();
-    const isAuthPage = location.pathname === '/login' || location.pathname === '/registro';
-    
+    const location = useLocation()
+    const isAuthPage =
+        location.pathname === '/login' || location.pathname === '/registro'
+
     return (
         <>
             {!isAuthPage && <BarraSup />}

@@ -1,23 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
 export function useAuth() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false)
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const expiresAt = localStorage.getItem('authExpiresAt');
-        
+        const token = localStorage.getItem('token')
+        const expiresAt = localStorage.getItem('authExpiresAt')
+
         if (token && expiresAt) {
-            const now = new Date();
-            const expiration = new Date(expiresAt);
-            setIsAuthenticated(now < expiration);
+            const now = new Date()
+            const expiration = new Date(expiresAt)
+            setIsAuthenticated(now < expiration)
         } else {
-            setIsAuthenticated(false);
+            setIsAuthenticated(false)
         }
-    }, []);
+    }, [])
 
     return {
         isAuthenticated,
         token: localStorage.getItem('token'),
-    };
+    }
 }

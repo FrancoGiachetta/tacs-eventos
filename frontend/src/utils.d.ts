@@ -1,1 +1,1 @@
-export declare function formatearFecha(fecha: string): string;
+export declare function formatearFecha(fecha: string): string

@@ -1,5 +1,7 @@
 interface PrivateRouteProps {
-    children: React.ReactNode;
+    children: React.ReactNode
 }
-export default function PrivateRoute({ children }: PrivateRouteProps): import("react/jsx-runtime").JSX.Element;
-export {};
+export default function PrivateRoute({
+    children,
+}: PrivateRouteProps): import('react/jsx-runtime').JSX.Element
+export {}
