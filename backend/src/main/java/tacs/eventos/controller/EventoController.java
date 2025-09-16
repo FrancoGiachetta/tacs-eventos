@@ -251,14 +251,17 @@ public class EventoController {
     /**
      * Inscribe a un usuario a un evento. El único usuario que puede inscribirse es él mismo.
      *
-     * @param usuarioLogueado usuario logueado al sistema
-     * @param eventoId        id del evento sobre el cual se quiere crear una inscripción
+     * @param usuarioLogueado
+     *            usuario logueado al sistema
+     * @param eventoId
+     *            id del evento sobre el cual se quiere crear una inscripción
+     *
      * @return ResponseEntity devuelve el código 201 CREATED y un body vacío
      */
     @PostMapping("/{eventoId}/inscripcion/")
     @ResponseStatus(HttpStatus.CREATED) // TODO: crear un id de inscripción y retornar el location
     public ResponseEntity<Void> inscribirUsuarioAEvento(@AuthenticationPrincipal Usuario usuarioLogueado,
-                                                        @PathVariable String eventoId) {
+            @PathVariable String eventoId) {
         var evento = this.buscarEvento(eventoId);
         // Si el usuario ya está inscripto o en la waitlist, no hace nada y devuelve la inscripción existente con el
         // código 200 OK

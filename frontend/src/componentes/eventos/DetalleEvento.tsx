@@ -8,7 +8,7 @@ import ContainerDeToast from '../ContainerDeToast'
 import { useParams } from 'react-router-dom'
 
 export default function DetalleEvento() {
-    let eventoId = useParams().eventoId;
+    let eventoId = useParams().eventoId
 
     let [eventoInfo, setEventoInfo] = useState<Evento | null>(null)
 

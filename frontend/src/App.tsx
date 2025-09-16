@@ -31,10 +31,7 @@ function App() {
                     path="/organizador/eventos/nuevo"
                     element={<FormularioEvento />}
                 />
-                <Route
-                    path="/eventos/:eventoId"
-                    element={<DetalleEvento />}
-                />
+                <Route path="/eventos/:eventoId" element={<DetalleEvento />} />
                 <Route
                     path="/organizador/mis-eventos"
                     element={<MisEventos />}
@@ -45,7 +42,6 @@ function App() {
                     element={<GestionarEventoConId />}
                 />
                 <Route path="*" element={<Navigate to="/eventos" replace />} />
-
             </Routes>
         </>
     )

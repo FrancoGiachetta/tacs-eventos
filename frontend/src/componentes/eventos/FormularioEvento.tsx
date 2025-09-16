@@ -12,7 +12,11 @@ interface Props {
     visualizar?: boolean
 }
 
-export default function FormularioEvento({ id, valoresPorDefecto, visualizar = false }: Props) {
+export default function FormularioEvento({
+    id,
+    valoresPorDefecto,
+    visualizar = false,
+}: Props) {
     const {
         register,
         handleSubmit,
