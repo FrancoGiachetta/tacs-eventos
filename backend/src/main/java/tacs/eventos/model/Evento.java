@@ -1,25 +1,36 @@
 package tacs.eventos.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@NoArgsConstructor
 @Getter
 public class Evento {
     private String id;
+    @Setter
     private String titulo;
+    @Setter
     private String descripcion;
+    @Setter
     private LocalDateTime fechaHoraInicio;
+    @Setter
     private int duracionMinutos;
+    @Setter
     private String ubicacion;
+    @Setter
     private int cupoMaximo;
-    private double precio;
+    @Setter
+    private double precio; // TODO: cambiar el tipo de dato. Debería ser un número de precisión fija. Fijarme si no
+    // puedo recibir directamente BigDecimal o algo así en el DTO. Si no, que el front mande un
+    // String que cumpla la regex correcta, y el back lo transforme manualmente.
+    @Setter
     private String categoria;
-    private boolean abierto;
+    private boolean abierto = true;
 
-    @Getter
     @Setter
     private Usuario organizador;
 
@@ -35,7 +46,6 @@ public class Evento {
         this.cupoMaximo = cupoMaximo;
         this.precio = precio;
         this.categoria = categoria;
-        this.abierto = true;
     }
 
     /**
@@ -63,7 +73,7 @@ public class Evento {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Evento evento && id.equals(evento.id);
+        return o instanceof Evento evento && evento.id != null && evento.id.equals(id);
     }
 
     @Override
