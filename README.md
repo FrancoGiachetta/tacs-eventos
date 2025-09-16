@@ -2,6 +2,15 @@
 
 Proyecto de la materia **TACS** - Gestión de Eventos con **Spring Boot**.
 
+## Docker
+
+Para poder ejecutar el proyecto con docker, desde el directorio raíz ejecutar:
+
+```shell
+docker-compose up
+```
+Este comando se encarga de buildear y levantar todos los containers necesarios.
+
 ## Backend
 
 ### Requisitos Previos
