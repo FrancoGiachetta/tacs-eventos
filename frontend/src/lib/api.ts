@@ -13,7 +13,7 @@ function logoutAndRedirect(reason = 'Sesión inválida') {
     return Promise.reject(new Error(reason))
 }
 
-const NOT_LOGGED_PATHS = ['/login', '/register', 'logout']
+const NOT_LOGGED_PATHS = ['/login', '/registro', 'logout']
 
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
