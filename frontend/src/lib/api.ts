@@ -57,7 +57,6 @@ api.interceptors.response.use(
         console.error('API error:', e?.response?.status, e?.response?.data)
         return Promise.reject(e)
     }
-
 )
 
 export default api
