@@ -228,8 +228,7 @@ public class EventoController {
      *
      * @param usuarioLogueado usuario logueado al sistema
      * @param eventoId        id del evento sobre el cual se quiere crear una inscripción
-     * @return ResponseEntity Si se creó exitosamente, devuelve el código 201 CREATED. Si la inscripción ya existía,
-     * devuelve el código 303 SEE OTHER.
+     * @return ResponseEntity devuelve el código 201 CREATED y un body vacío
      */
     @PostMapping("/{eventoId}/inscripcion/")
     @ResponseStatus(HttpStatus.CREATED) // TODO: crear un id de inscripción y retornar el location
@@ -239,7 +238,7 @@ public class EventoController {
         // Si el usuario ya está inscripto o en la waitlist, no hace nada y devuelve la inscripción existente con el
         // código 200 OK
         if (inscripcionesService.inscripcionConfirmadaOEnWaitlist(evento, usuarioLogueado))
-            return ResponseEntity.status(HttpStatus.SEE_OTHER).build();
+            return ResponseEntity.status(HttpStatus.CREATED).build(); // TODO: retornar SEE_OTHER y redigirir
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist
         inscripcionesService.inscribirOMandarAWaitlist(evento, usuarioLogueado);

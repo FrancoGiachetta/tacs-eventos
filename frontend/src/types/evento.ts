@@ -16,4 +16,4 @@ export interface EventoFiltros {
     page?: number
 }
 
-export type EstadoEvento = 'abierto' | 'completo' | 'espera'
+// export type EstadoEvento = 'abierto' | 'completo' | 'espera' // Ahora está modelado como el booleano 'abierto', pero lo vamos a cambiar

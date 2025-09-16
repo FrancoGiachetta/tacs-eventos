@@ -4,10 +4,9 @@ import ListaEventos from './componentes/eventos/ListaEventos'
 import Login from './componentes/Login'
 import Registro from './componentes/Registro'
 import Admin from './componentes/admin/Admin'
-import { useLocation } from 'react-router-dom'
 import MisInscripciones from './componentes/inscripciones/MisInscripciones'
 import MisEventos from './componentes/eventos/MisEventos'
-import CreacionEvento from './componentes/eventos/CreacionEvento'
+import FormularioEvento from './componentes/eventos/FormularioEvento'
 
 function App() {
     const location = useLocation()
@@ -28,7 +27,7 @@ function App() {
                 />
                 <Route
                     path="/organizador/eventos/nuevo"
-                    element={<CreacionEvento />}
+                    element={<FormularioEvento />}
                 />
                 <Route
                     path="/organizador/mis-eventos"

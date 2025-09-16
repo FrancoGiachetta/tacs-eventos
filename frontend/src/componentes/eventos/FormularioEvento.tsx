@@ -1,6 +1,5 @@
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { type InputCrearEvento, SchemaCrearEvento } from '../../lib/schemas'
-import { EstadoEvento } from '../../types/evento'
 import api from '../../lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'react-toastify'
@@ -9,11 +8,10 @@ import ContainerDeToast from '../ContainerDeToast'
 
 interface Props {
     id?: String
-    estado?: EstadoEvento
     valoresPorDefecto?: Partial<InputCrearEvento>
 }
 
-export default function FormularioEvento({ id, estado, valoresPorDefecto }: Props) {
+export default function FormularioEvento({ id, valoresPorDefecto }: Props) {
     const {
         register,
         handleSubmit,
@@ -68,24 +66,6 @@ export default function FormularioEvento({ id, estado, valoresPorDefecto }: Prop
                                 type="text"
                                 id="idEvento"
                                 value={id?.toString()}
-                                readOnly
-                                className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm bg-slate-100 text-slate-700"
-                            />
-                        </div>
-                    )}
-
-                    {estado && (
-                        <div className="flex flex-col gap-1">
-                            <label
-                                htmlFor="estado"
-                                className="text-sm font-medium text-slate-700"
-                            >
-                                Estado
-                            </label>
-                            <input
-                                type="text"
-                                id="estado"
-                                value={estado}
                                 readOnly
                                 className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm bg-slate-100 text-slate-700"
                             />
