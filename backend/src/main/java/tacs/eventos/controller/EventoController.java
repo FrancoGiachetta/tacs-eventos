@@ -50,8 +50,8 @@ public class EventoController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> crearEvento(@AuthenticationPrincipal Usuario usuario, @Valid @RequestBody EventoDTO dto,
-            HttpServletRequest request) {
+    public ResponseEntity<Void> crearEvento(@AuthenticationPrincipal Usuario usuario,
+            @Valid @RequestBody CreacionEventoRequest dto, HttpServletRequest request) {
         Evento evento = modelMapper.map(dto, Evento.class);
         evento.setOrganizador(usuario);
         eventoService.crearEvento(evento);
@@ -68,9 +68,9 @@ public class EventoController {
      */
     @GetMapping("/{eventoId}")
     @ResponseStatus(HttpStatus.OK)
-    public EventoResponseDTO obtenerEvento(@PathVariable String eventoId) {
+    public EventoResponse obtenerEvento(@PathVariable String eventoId) {
         var evento = this.buscarEvento(eventoId);
-        return modelMapper.map(evento, EventoResponseDTO.class);
+        return modelMapper.map(evento, EventoResponse.class);
     }
 
     /**
@@ -93,7 +93,7 @@ public class EventoController {
      */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<EventoResponseDTO> listarEventos(
+    public List<EventoResponse> listarEventos(
             @RequestParam(value = "precioPesosMin", required = false) Double precioMinimoParam,
             @RequestParam(value = "precioPesosMax", required = false) Double precioMaximoParam,
             @RequestParam(value = "fechaInicioMin", required = false) LocalDate fechaMinParam,
@@ -102,7 +102,7 @@ public class EventoController {
             @RequestParam(value = "palabrasClave", required = false) String palabrasClaveParam) {
         if (precioMinimoParam == null && precioMaximoParam == null && fechaMinParam == null && fechaMaxParam == null
                 && categoriaParam == null && palabrasClaveParam == null) {
-            return eventoService.listarEventos().stream().map((Evento e) -> modelMapper.map(e, EventoResponseDTO.class))
+            return eventoService.listarEventos().stream().map((Evento e) -> modelMapper.map(e, EventoResponse.class))
                     .toList();
         } else {
             List<FiltroBusqueda<Evento>> filtros = new ArrayList<>();
@@ -126,7 +126,7 @@ public class EventoController {
                 filtros.add(new FiltradoPorPalabrasClave(Arrays.asList(palabrasClaveParam.split("\\s+"))));
             }
 
-            return eventoService.filtrarEventos(filtros).stream().map(e -> modelMapper.map(e, EventoResponseDTO.class))
+            return eventoService.filtrarEventos(filtros).stream().map(e -> modelMapper.map(e, EventoResponse.class))
                     .toList();
         }
     }
@@ -201,20 +201,9 @@ public class EventoController {
         String mensajeNoEncontrado = "El usuario no está inscripto al evento";
 
         var evento = this.buscarEvento(eventoId);
+        // Si el usuario no existe, retorno que no está inscripto para no revelar si existe o no el usuario
         var usuarioInscripto = usuarioService.buscarPorId(usuarioId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensajeNoEncontrado)); // Si el
-                                                                                                            // usuario
-                                                                                                            // no
-                                                                                                            // existe,
-                                                                                                            // retorno
-                                                                                                            // que no
-                                                                                                            // está
-                                                                                                            // inscripto,
-                                                                                                            // para no
-                                                                                                            // revelar
-                                                                                                            // si existe
-                                                                                                            // o no el
-                                                                                                            // usuario
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensajeNoEncontrado));
 
         verificarAutorizacion(usuarioLogueado, mensajeNoEncontrado, true, evento.getOrganizador(), usuarioInscripto);
 
@@ -290,7 +279,7 @@ public class EventoController {
             return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(request.getRequestURI())).build();
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist
-        var resultadoInscripcion = inscripcionesService.inscribirOMandarAWaitlist(evento, usuarioAInscribir);
+        inscripcionesService.inscribirOMandarAWaitlist(evento, usuarioAInscribir);
         return ResponseEntity.created(URI.create(request.getRequestURI())).build();
     }
 

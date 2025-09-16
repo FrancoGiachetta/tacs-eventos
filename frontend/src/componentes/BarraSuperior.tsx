@@ -34,7 +34,10 @@ export default function BarraSuperior() {
                         <Link to="/eventos" className="hover:underline">
                             Eventos
                         </Link>
-                        <Link to="/organizador/new" className="hover:underline">
+                        <Link
+                            to="/organizador/eventos/nuevo"
+                            className="hover:underline"
+                        >
                             Crear evento
                         </Link>
                         <Link
