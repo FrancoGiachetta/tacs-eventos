@@ -7,3 +7,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8080:8080"
+  eventos-frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"
