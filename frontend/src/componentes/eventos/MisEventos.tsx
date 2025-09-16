@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../../lib/api'
-import type { Evento } from "../../types/evento"
-import type { Inscripcion, ItemWaitlist } from "../../types/inscripciones"
+import type { Evento } from '../../types/evento'
+import type { Inscripcion, ItemWaitlist } from '../../types/inscripciones'
 import { formatDate } from '../../lib/utils'
 import EventoActionMenu from './EventoActionMenu'
 
@@ -9,7 +9,9 @@ export default function MisEventos() {
     let [eventos, setEventos] = useState<Evento[]>([])
 
     useEffect(() => {
-        api.get('/api/v1/usuario/mis-eventos').then((r) => {setEventos(r.data)})
+        api.get('/api/v1/usuario/mis-eventos').then((r) => {
+            setEventos(r.data)
+        })
     }, [])
 
     return (
