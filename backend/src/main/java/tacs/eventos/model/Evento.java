@@ -10,6 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 public class Evento {
+    @Setter
     private String id;
     @Setter
     private String titulo;

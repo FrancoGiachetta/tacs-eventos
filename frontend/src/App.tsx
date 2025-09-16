@@ -4,7 +4,6 @@ import ListaEventos from './componentes/eventos/ListaEventos'
 import Login from './componentes/Login'
 import Registro from './componentes/Registro'
 import MisInscripciones from './componentes/inscripciones/MisInscripciones'
-import { useLocation } from 'react-router-dom'
 import MisEventos from './componentes/eventos/MisEventos'
 import CreacionEvento from './componentes/eventos/CreacionEvento'
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { Evento } from '../../tipos'
+import type { Evento } from '../../types/evento'
 
 export default function EventoActionMenu(props: {
     evento: Evento
