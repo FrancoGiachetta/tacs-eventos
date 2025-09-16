@@ -9,11 +9,12 @@ import MisEventos from './componentes/eventos/MisEventos'
 
 function App() {
     const location = useLocation()
-    const hideBar =
+    const isAuthPage =
         location.pathname === '/login' || location.pathname === '/registro'
+
     return (
         <>
-            {!hideBar && <BarraSup />}
+            {!isAuthPage && <BarraSup />}
             <Routes>
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="/login" element={<Login />} />

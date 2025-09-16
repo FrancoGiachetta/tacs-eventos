@@ -99,28 +99,31 @@ public class EventoController {
             @RequestParam(value = "fechaInicioMin", required = false) LocalDate fechaMinParam,
             @RequestParam(value = "fechaInicioMax", required = false) LocalDate fechaMaxParam,
             @RequestParam(value = "categoria", required = false) String categoriaParam,
-            @RequestParam(value = "palabrasClave", required = false) List<String> palabrasClaveParam) {
+            @RequestParam(value = "palabrasClave", required = false) String palabrasClaveParam) {
         if (precioMinimoParam == null && precioMaximoParam == null && fechaMinParam == null && fechaMaxParam == null
                 && categoriaParam == null && palabrasClaveParam == null) {
             return eventoService.listarEventos().stream().map((Evento e) -> modelMapper.map(e, EventoResponseDTO.class))
                     .toList();
         } else {
-            LocalDate fechaMinima = fechaMinParam != null ? fechaMinParam : LocalDate.now();
-            LocalDate fechaMaxima = fechaMaxParam != null ? fechaMaxParam : LocalDate.MAX;
-            Double precioMinimoPesos = precioMinimoParam != null ? precioMinimoParam : 0.0;
-            Double precioMaximoPesos = precioMaximoParam != null ? precioMaximoParam : Double.MAX_VALUE;
-
             List<FiltroBusqueda<Evento>> filtros = new ArrayList<>();
 
-            filtros.add(new FiltradoPorFechaInicio(fechaMinima, fechaMaxima));
-            filtros.add(new FiltradoPorPrecio(precioMinimoPesos, precioMaximoPesos));
+            // Solo agregar filtros si los parámetros están presentes
+            if (fechaMinParam != null || fechaMaxParam != null) {
+                LocalDate fechaMinima = fechaMinParam != null ? fechaMinParam : LocalDate.now();
+                LocalDate fechaMaxima = fechaMaxParam != null ? fechaMaxParam : LocalDate.MAX;
+                filtros.add(new FiltradoPorFechaInicio(fechaMinima, fechaMaxima));
+            }
 
-            if (categoriaParam != null) {
+            if (precioMinimoParam != null || precioMaximoParam != null) {
+                filtros.add(new FiltradoPorPrecio(precioMinimoParam, precioMaximoParam));
+            }
+
+            if (categoriaParam != null && !categoriaParam.trim().isEmpty()) {
                 filtros.add(new FiltradoPorCategoria(categoriaParam));
             }
 
-            if (palabrasClaveParam != null) {
-                filtros.add(new FiltradoPorPalabrasClave(palabrasClaveParam));
+            if (palabrasClaveParam != null && !palabrasClaveParam.trim().isEmpty()) {
+                filtros.add(new FiltradoPorPalabrasClave(Arrays.asList(palabrasClaveParam.split("\\s+"))));
             }
 
             return eventoService.filtrarEventos(filtros).stream().map(e -> modelMapper.map(e, EventoResponseDTO.class))
