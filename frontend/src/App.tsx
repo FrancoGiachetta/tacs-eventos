@@ -6,7 +6,7 @@ import Registro from './componentes/Registro'
 
 import { useLocation } from 'react-router-dom'
 import MisEventos from './componentes/eventos/MisEventos'
-import GestionarEvento from "./componentes/eventos/GestionarEvento";
+import GestionarEvento from './componentes/eventos/GestionarEvento'
 
 function App() {
     const location = useLocation()
@@ -24,7 +24,10 @@ function App() {
                     path="/organizador/mis-eventos"
                     element={<MisEventos />}
                 />
-                <Route path="/organizador/eventos/:id" element={<GestionarEvento />} />
+                <Route
+                    path="/organizador/eventos/:id"
+                    element={<GestionarEvento />}
+                />
                 <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </>

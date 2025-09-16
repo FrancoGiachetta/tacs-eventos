@@ -14,7 +14,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class InscripcionEvento {
     @Getter
-    private String id =  UUID.randomUUID().toString();
+    private String id = UUID.randomUUID().toString();
     @Getter
     private final Usuario participante;
     @Getter

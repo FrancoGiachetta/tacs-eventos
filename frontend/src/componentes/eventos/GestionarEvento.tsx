@@ -60,7 +60,8 @@ export default function GestionarEvento() {
         fetchAll()
 
         const start = () => {
-            if (!pollRef.current) pollRef.current = window.setInterval(fetchAll, POLL_MS)
+            if (!pollRef.current)
+                pollRef.current = window.setInterval(fetchAll, POLL_MS)
         }
         const stop = () => {
             if (pollRef.current) {
@@ -98,22 +99,39 @@ export default function GestionarEvento() {
         try {
             // PATCH /api/v1/evento/:id/inscripciones  body: { abierto: boolean }
             const nuevoEstado = !evento.abierto
-            await api.put(`/api/v1/evento/${id}/estado`, { abierto: nuevoEstado })
+            await api.put(`/api/v1/evento/${id}/estado`, {
+                abierto: nuevoEstado,
+            })
             setEvento({ ...evento, abierto: nuevoEstado })
-            setToast(nuevoEstado ? 'Inscripciones abiertas' : 'Inscripciones cerradas')
+            setToast(
+                nuevoEstado
+                    ? 'Inscripciones abiertas'
+                    : 'Inscripciones cerradas'
+            )
         } catch (e: any) {
-            setError(e?.message ?? 'No se pudo actualizar el estado de inscripciones')
+            setError(
+                e?.message ?? 'No se pudo actualizar el estado de inscripciones'
+            )
         } finally {
             setToggling(false)
         }
     }
 
     const handleQuitar = async (inscripcionId: string) => {
-        if (!window.confirm('¿Quitar a la persona seleccionada? Esto liberará un lugar.')) return
+        if (
+            !window.confirm(
+                '¿Quitar a la persona seleccionada? Esto liberará un lugar.'
+            )
+        )
+            return
         try {
             // DELETE /api/v1/evento/:id/inscripcion/:inscripcionId
-            await api.delete(`/api/v1/evento/${id}/inscripcion/${inscripcionId}`)
-            setToast('Inscripción eliminada. El backend promoverá automáticamente si corresponde.')
+            await api.delete(
+                `/api/v1/evento/${id}/inscripcion/${inscripcionId}`
+            )
+            setToast(
+                'Inscripción eliminada. El backend promoverá automáticamente si corresponde.'
+            )
             await fetchAll()
         } catch (e: any) {
             setError(e?.message ?? 'No se pudo quitar la inscripción')
@@ -157,9 +175,14 @@ export default function GestionarEvento() {
             <div className="rounded-2xl border bg-white shadow p-5">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-semibold">{evento.titulo}</h1>
+                        <h1 className="text-2xl font-semibold">
+                            {evento.titulo}
+                        </h1>
                         <p className="text-gray-600">
-                            {formatDate(new Date(evento.fechaHoraInicio), { withTime: true })} · {evento.ubicacion}
+                            {formatDate(new Date(evento.fechaHoraInicio), {
+                                withTime: true,
+                            })}{' '}
+                            · {evento.ubicacion}
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -167,9 +190,17 @@ export default function GestionarEvento() {
                             onClick={handleToggleInscripciones}
                             disabled={toggling}
                             className={`px-3 py-2 rounded-md text-white ${evento.abierto ? 'bg-rose-600' : 'bg-emerald-600'}`}
-                            title={evento.abierto ? 'Cerrar inscripciones' : 'Abrir inscripciones'}
+                            title={
+                                evento.abierto
+                                    ? 'Cerrar inscripciones'
+                                    : 'Abrir inscripciones'
+                            }
                         >
-                            {toggling ? 'Actualizando…' : evento.abierto ? 'Cerrar inscripciones' : 'Abrir inscripciones'}
+                            {toggling
+                                ? 'Actualizando…'
+                                : evento.abierto
+                                  ? 'Cerrar inscripciones'
+                                  : 'Abrir inscripciones'}
                         </button>
                         <button
                             onClick={handleCopyLink}
@@ -209,7 +240,10 @@ export default function GestionarEvento() {
                 </div>
 
                 {tab === 'inscriptos' ? (
-                    <InscriptosTable inscriptos={inscriptos} onQuitar={handleQuitar} />
+                    <InscriptosTable
+                        inscriptos={inscriptos}
+                        onQuitar={handleQuitar}
+                    />
                 ) : (
                     <WaitlistTable waitlist={waitlist} />
                 )}
@@ -223,16 +257,18 @@ export default function GestionarEvento() {
 function Stat({ label, value }: { label: string; value: string | number }) {
     return (
         <div className="rounded-xl border bg-gray-50 p-4">
-            <div className="text-xs uppercase tracking-wide text-gray-500">{label}</div>
+            <div className="text-xs uppercase tracking-wide text-gray-500">
+                {label}
+            </div>
             <div className="text-xl font-semibold">{value}</div>
         </div>
     )
 }
 
 function InscriptosTable({
-                             inscriptos,
-                             onQuitar,
-                         }: {
+    inscriptos,
+    onQuitar,
+}: {
     inscriptos: Inscripcion[]
     onQuitar: (inscripcionId: string) => void
 }) {
@@ -240,39 +276,46 @@ function InscriptosTable({
         <div className="overflow-x-auto p-4">
             <table className="min-w-full text-sm">
                 <thead>
-                <tr className="bg-gray-100 text-gray-700">
-                    <th className="text-left px-3 py-2">Nombre</th>
-                    <th className="text-left px-3 py-2">Email</th>
-                    <th className="text-left px-3 py-2">Fecha de inscripción</th>
-                    <th className="text-left px-3 py-2">Acciones</th>
-                </tr>
+                    <tr className="bg-gray-100 text-gray-700">
+                        <th className="text-left px-3 py-2">Nombre</th>
+                        <th className="text-left px-3 py-2">Email</th>
+                        <th className="text-left px-3 py-2">
+                            Fecha de inscripción
+                        </th>
+                        <th className="text-left px-3 py-2">Acciones</th>
+                    </tr>
                 </thead>
                 <tbody>
-                {inscriptos.map((i) => (
-                    <tr key={i.id} className="odd:bg-white even:bg-gray-50">
-                        <td className="px-3 py-2">{i.email ?? '—'}</td>
-                        <td className="px-3 py-2">
-                            {i.fechaInscripcion
-                                ? formatDate(new Date(i.fechaInscripcion), { withTime: true })
-                                : '—'}
-                        </td>
-                        <td className="px-3 py-2">
-                            <button
-                                onClick={() => onQuitar(i.id)}
-                                className="px-2 py-1 rounded-md bg-rose-600 text-white hover:bg-rose-700"
+                    {inscriptos.map((i) => (
+                        <tr key={i.id} className="odd:bg-white even:bg-gray-50">
+                            <td className="px-3 py-2">{i.email ?? '—'}</td>
+                            <td className="px-3 py-2">
+                                {i.fechaInscripcion
+                                    ? formatDate(new Date(i.fechaInscripcion), {
+                                          withTime: true,
+                                      })
+                                    : '—'}
+                            </td>
+                            <td className="px-3 py-2">
+                                <button
+                                    onClick={() => onQuitar(i.id)}
+                                    className="px-2 py-1 rounded-md bg-rose-600 text-white hover:bg-rose-700"
+                                >
+                                    Quitar
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                    {inscriptos.length === 0 && (
+                        <tr>
+                            <td
+                                colSpan={4}
+                                className="px-3 py-6 text-center text-gray-500"
                             >
-                                Quitar
-                            </button>
-                        </td>
-                    </tr>
-                ))}
-                {inscriptos.length === 0 && (
-                    <tr>
-                        <td colSpan={4} className="px-3 py-6 text-center text-gray-500">
-                            No hay inscriptos.
-                        </td>
-                    </tr>
-                )}
+                                No hay inscriptos.
+                            </td>
+                        </tr>
+                    )}
                 </tbody>
             </table>
         </div>
@@ -284,30 +327,38 @@ function WaitlistTable({ waitlist }: { waitlist: ItemWaitlist[] }) {
         <div className="overflow-x-auto p-4">
             <table className="min-w-full text-sm">
                 <thead>
-                <tr className="bg-gray-100 text-gray-700">
-                    <th className="text-left px-3 py-2">Posición</th>
-                    <th className="text-left px-3 py-2">Nombre</th>
-                    <th className="text-left px-3 py-2">Fecha de alta</th>
-                </tr>
+                    <tr className="bg-gray-100 text-gray-700">
+                        <th className="text-left px-3 py-2">Posición</th>
+                        <th className="text-left px-3 py-2">Nombre</th>
+                        <th className="text-left px-3 py-2">Fecha de alta</th>
+                    </tr>
                 </thead>
                 <tbody>
-                {waitlist.map((w, idx) => (
-                    <tr key={w.usuario.id ?? `${w.usuario.email}-${idx}`} className="odd:bg-white even:bg-gray-50">
-                        <td className="px-3 py-2">{(idx + 1)}</td>
-                        <td className="px-3 py-2">
-                            {w.fechaIngreso
-                                ? formatDate(new Date(w.fechaIngreso), { withTime: true })
-                                : '—'}
-                        </td>
-                    </tr>
-                ))}
-                {waitlist.length === 0 && (
-                    <tr>
-                        <td colSpan={3} className="px-3 py-6 text-center text-gray-500">
-                            No hay personas en espera.
-                        </td>
-                    </tr>
-                )}
+                    {waitlist.map((w, idx) => (
+                        <tr
+                            key={w.usuario.id ?? `${w.usuario.email}-${idx}`}
+                            className="odd:bg-white even:bg-gray-50"
+                        >
+                            <td className="px-3 py-2">{idx + 1}</td>
+                            <td className="px-3 py-2">
+                                {w.fechaIngreso
+                                    ? formatDate(new Date(w.fechaIngreso), {
+                                          withTime: true,
+                                      })
+                                    : '—'}
+                            </td>
+                        </tr>
+                    ))}
+                    {waitlist.length === 0 && (
+                        <tr>
+                            <td
+                                colSpan={3}
+                                className="px-3 py-6 text-center text-gray-500"
+                            >
+                                No hay personas en espera.
+                            </td>
+                        </tr>
+                    )}
                 </tbody>
             </table>
         </div>
