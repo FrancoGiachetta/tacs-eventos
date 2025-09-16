@@ -3,6 +3,8 @@ import BarraSup from './componentes/BarraSuperior'
 import ListaEventos from './componentes/eventos/ListaEventos'
 import Login from './componentes/Login'
 import Registro from './componentes/Registro'
+import MisInscripciones from './componentes/inscripciones/MisInscripciones'
+import { useLocation } from 'react-router-dom'
 import MisEventos from './componentes/eventos/MisEventos'
 import GestionarEvento from './componentes/eventos/GestionarEvento'
 import CreacionEvento from './componentes/eventos/CreacionEvento'
@@ -21,6 +23,10 @@ function App() {
                 <Route path="/registro" element={<Registro />} />
                 <Route path="/eventos" element={<ListaEventos />} />
                 <Route
+                    path="/mis-inscripciones"
+                    element={<MisInscripciones />}
+                />
+                <Route
                     path="/organizador/eventos/nuevo"
                     element={<CreacionEvento />}
                 />
@@ -32,7 +38,7 @@ function App() {
                     path="/organizador/eventos/:id"
                     element={<GestionarEvento />}
                 />
-                <Route path="*" element={<Navigate to="/login" replace />} />
+                <Route path="*" element={<Navigate to="/eventos" replace />} />
             </Routes>
         </>
     )
