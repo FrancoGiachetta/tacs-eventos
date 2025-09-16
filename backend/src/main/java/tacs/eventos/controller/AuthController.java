@@ -50,27 +50,55 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "Login que devuelve token de sesión y expiración")
     public ResponseEntity<SessionResponse> login(@Valid @RequestBody LoginRequest req) {
-        return sesiones.login(req.email(), req.password())
-                .map(s -> ResponseEntity.ok(new SessionResponse(s.getToken(), s.getExpiresAt())))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+        System.out.println("Login attempt for " + req.email());
+
+        return sesiones.login(req.email(), req.password()).map(s -> {
+            System.out.println("Login successful for " + req.email() + ", token: " + s.getToken());
+            return ResponseEntity.ok(new SessionResponse(s.getToken(), s.getExpiresAt()));
+        }).orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 
     /**
      * Cierra la sesión de un usuario.
      *
-     * @param token
-     *            token asociado a una sesión.
+     * @param authorization
+     *            token en header Authorization: Bearer (token)
+     *
+     * @param xSessionToken
+     *            token en header X-Session-Token
+     *
      * @param body
      *            información sobre la sesión a cerrar. Contiene el token y tiempo de expiración.
      */
     @PostMapping("/logout")
     @Operation(summary = "Invalidar el token de sesión actual (enviar por header o body)")
-    public ResponseEntity<Void> logout(@RequestHeader(value = "X-Session-Token", required = false) String token,
+    public ResponseEntity<Void> logout(@RequestHeader(value = "Authorization", required = false) String authorization,
+            @RequestHeader(value = "X-Session-Token", required = false) String xSessionToken,
             @RequestBody(required = false) SessionResponse body) {
-        String t = token != null ? token : (body != null ? body.token() : null);
-        if (t != null)
+        String t = extractSessionToken(authorization, xSessionToken, body);
+
+        if (t != null) {
             sesiones.logout(t);
-        System.out.println("Logout realizado con token: " + t);
+        }
+        // hacer logout idempotente
         return ResponseEntity.noContent().build();
+    }
+
+    private static String extractSessionToken(String authHeader, String xHeader, SessionResponse body) {
+        if (authHeader != null) {
+            String prefix = "Bearer ";
+            if (authHeader.regionMatches(true, 0, prefix, 0, prefix.length())) {
+                String candidate = authHeader.substring(prefix.length()).trim();
+                if (!candidate.isEmpty())
+                    return candidate;
+            }
+        }
+        if (xHeader != null && !xHeader.isBlank()) {
+            return xHeader.trim();
+        }
+        if (body != null && body.token() != null && !body.token().isBlank()) {
+            return body.token().trim();
+        }
+        return null;
     }
 }
