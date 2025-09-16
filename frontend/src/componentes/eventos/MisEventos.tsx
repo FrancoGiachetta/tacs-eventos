@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../../lib/api'
-import { type Inscripcion, type Evento, type ItemWaitlist } from '../../tipos'
+import type { Evento } from "../../types/evento"
+import type { Inscripcion, ItemWaitlist } from "../../types/inscripciones"
 import { formatDate } from '../../lib/utils'
 import EventoActionMenu from './EventoActionMenu'
 
