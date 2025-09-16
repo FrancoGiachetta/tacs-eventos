@@ -79,8 +79,7 @@ export default function ListaEventos() {
                             key={evento.id}
                             evento={evento}
                             onVerDetalle={(eventoId) => {
-                                // TODO: Implementar navegación al detalle
-                                console.log('Ver detalle del evento:', eventoId)
+                                location.href = `/eventos/${eventoId}`
                             }}
                         />
                     ))

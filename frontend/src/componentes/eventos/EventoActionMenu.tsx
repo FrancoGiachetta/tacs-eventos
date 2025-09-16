@@ -48,7 +48,6 @@ export default function EventoActionMenu(props: {
                             href={`/eventos/${evento.id}`}
                         >
                             {' '}
-                            {/* TODO: Cambiar cuando esté esta ruta definida*/}
                             Ver detalle
                         </a>
                     </li>
