@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import api from '../../lib/api'
 import InscripcionItem from './InscripcionItem'
-import type { Inscripcion, Evento } from '../../tipos'
+import type { Inscripcion } from '../../types/inscripciones'
+import type { Evento } from '../../types/evento'
 
 export default function MisInscripciones() {
     const [inscripciones, setInscripciones] = useState<Inscripcion[]>([])
