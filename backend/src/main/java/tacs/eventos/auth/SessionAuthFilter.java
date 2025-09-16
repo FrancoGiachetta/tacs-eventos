@@ -25,15 +25,19 @@ public class SessionAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+        System.out.println("Filter");
         String token = extractToken(request);
         if (token != null) {
-            sessions.validate(token).ifPresent(u -> {
-                System.out.println("Authenticated user: " + u.getEmail());
+            sessions.validate(token).ifPresentOrElse(u -> {
                 var authorities = u.getRoles().stream().map(r -> new SimpleGrantedAuthority("ROLE_" + r.name()))
                         .toList();
 
                 var auth = new UsernamePasswordAuthenticationToken(u, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(auth);
+            }, () -> {
+                System.out.println("Token inválido o expirado");
+                SecurityContextHolder.clearContext();
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             });
         }
         chain.doFilter(request, response);
