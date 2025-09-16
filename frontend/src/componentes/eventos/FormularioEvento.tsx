@@ -9,9 +9,10 @@ import ContainerDeToast from '../ContainerDeToast'
 interface Props {
     id?: String
     valoresPorDefecto?: Partial<InputCrearEvento>
+    visualizar?: boolean
 }
 
-export default function FormularioEvento({ id, valoresPorDefecto }: Props) {
+export default function FormularioEvento({ id, valoresPorDefecto, visualizar = false }: Props) {
     const {
         register,
         handleSubmit,
@@ -46,9 +47,15 @@ export default function FormularioEvento({ id, valoresPorDefecto }: Props) {
     // TODO: si me dan ganas, hacer que se valide al cambiar de campo
     return (
         <div className="mx-auto max-w-6xl px-4 py-6">
-            <h1 className="text-xl font-semibold text-slate-900">
-                Crear evento
-            </h1>
+            {visualizar ? (
+                <h1 className="text-xl font-semibold text-slate-900">
+                    {getValues('titulo')}
+                </h1>
+            ) : (
+                <h1 className="text-xl font-semibold text-slate-900">
+                    Crear evento
+                </h1>
+            )}
             <form
                 onSubmit={handleSubmit(onSubmit)}
                 className="mt-4 rounded-lg bg-white p-4"
@@ -72,29 +79,31 @@ export default function FormularioEvento({ id, valoresPorDefecto }: Props) {
                         </div>
                     )}
 
-                    <div className="flex flex-col gap-1">
-                        <label
-                            htmlFor="titulo"
-                            className="text-sm font-medium text-slate-700"
-                        >
-                            Título
-                        </label>
-                        <input
-                            type="text"
-                            id="titulo"
-                            {...register('titulo')}
-                            className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                            placeholder="Título"
-                        />
-                        {
-                            <p
-                                className="mt-1 text-sm text-red-600"
-                                role="alert"
+                    {!visualizar && (
+                        <div className="flex flex-col gap-1">
+                            <label
+                                htmlFor="titulo"
+                                className="text-sm font-medium text-slate-700"
                             >
-                                {errors.titulo?.message}
-                            </p>
-                        }
-                    </div>
+                                Título
+                            </label>
+                            <input
+                                type="text"
+                                id="titulo"
+                                {...register('titulo')}
+                                className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                                placeholder="Título"
+                            />
+                            {
+                                <p
+                                    className="mt-1 text-sm text-red-600"
+                                    role="alert"
+                                >
+                                    {errors.titulo?.message}
+                                </p>
+                            }
+                        </div>
+                    )}
 
                     <div className="flex flex-col gap-1">
                         <label
@@ -109,6 +118,7 @@ export default function FormularioEvento({ id, valoresPorDefecto }: Props) {
                             {...register('descripcion')}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 resize-y min-h-32"
                             placeholder="Descripción"
+                            readOnly={visualizar}
                         />
                         {
                             <p
@@ -132,6 +142,7 @@ export default function FormularioEvento({ id, valoresPorDefecto }: Props) {
                             id="fechaHoraInicio"
                             {...register('fechaHoraInicio')}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                            disabled={visualizar}
                         />
                         {
                             <p
@@ -158,6 +169,7 @@ export default function FormularioEvento({ id, valoresPorDefecto }: Props) {
                             })}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                             placeholder="Duración (minutos)"
+                            disabled={visualizar}
                         />
                         {
                             <p
@@ -182,6 +194,7 @@ export default function FormularioEvento({ id, valoresPorDefecto }: Props) {
                             {...register('ubicacion')}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                             placeholder="Ubicación"
+                            disabled={visualizar}
                         />
                         {
                             <p
@@ -206,6 +219,7 @@ export default function FormularioEvento({ id, valoresPorDefecto }: Props) {
                             {...register('cupoMaximo', { valueAsNumber: true })}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                             placeholder="Cupo máximo"
+                            disabled={visualizar}
                         />
                         {
                             <p
@@ -230,6 +244,7 @@ export default function FormularioEvento({ id, valoresPorDefecto }: Props) {
                             {...register('precio', { valueAsNumber: true })}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                             placeholder="Precio"
+                            disabled={visualizar}
                         />
                         {
                             <p
@@ -254,6 +269,7 @@ export default function FormularioEvento({ id, valoresPorDefecto }: Props) {
                             {...register('categoria')}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                             placeholder="Categoría"
+                            disabled={visualizar}
                         />
                         {
                             <p
@@ -267,14 +283,16 @@ export default function FormularioEvento({ id, valoresPorDefecto }: Props) {
 
                     <ContainerDeToast />
 
-                    <div className="mt-2 flex justify-end">
-                        <button
-                            type="submit"
-                            className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            Crear
-                        </button>
-                    </div>
+                    {!visualizar && (
+                        <div className="mt-2 flex justify-end">
+                            <button
+                                type="submit"
+                                className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                Crear
+                            </button>
+                        </div>
+                    )}
                 </div>
             </form>
         </div>

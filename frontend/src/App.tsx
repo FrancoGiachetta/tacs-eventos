@@ -8,6 +8,7 @@ import MisInscripciones from './componentes/inscripciones/MisInscripciones'
 import MisEventos from './componentes/eventos/MisEventos'
 import GestionarEvento from './componentes/eventos/GestionarEvento'
 import FormularioEvento from './componentes/eventos/FormularioEvento'
+import DetalleEvento from './componentes/eventos/DetalleEvento'
 
 function App() {
     const location = useLocation()
@@ -31,18 +32,28 @@ function App() {
                     element={<FormularioEvento />}
                 />
                 <Route
+                    path="/eventos/:eventoId"
+                    element={<DetalleEvento />}
+                />
+                <Route
                     path="/organizador/mis-eventos"
                     element={<MisEventos />}
                 />
                 <Route path="/admin" element={<Admin />} />
                 <Route
                     path="/organizador/eventos/:id"
-                    element={<GestionarEvento />}
+                    element={<GestionarEventoConId />}
                 />
                 <Route path="*" element={<Navigate to="/eventos" replace />} />
+
             </Routes>
         </>
     )
+}
+
+function GestionarEventoConId() {
+    const id = window.location.pathname.split('/').pop() || ''
+    return <GestionarEvento id={id} />
 }
 
 export default App
