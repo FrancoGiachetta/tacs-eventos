@@ -22,12 +22,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()
-                /*
-                 * .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/auth/**", "/swagger").permitAll()
-                 * .anyRequest().authenticated()
-                 */ // todo: activar cuando termine el desarrollo de la API
-                ).addFilterBefore(sessionFilter, UsernamePasswordAuthenticationFilter.class);
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/swagger-ui/**", "/swagger", "/api/v1/auth/**")
+                        .permitAll().anyRequest().authenticated())
+                .addFilterBefore(sessionFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
