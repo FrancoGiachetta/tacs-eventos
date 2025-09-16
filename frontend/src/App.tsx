@@ -3,6 +3,8 @@ import BarraSup from './componentes/BarraSuperior'
 import ListaEventos from './componentes/eventos/ListaEventos'
 import Login from './componentes/Login'
 import Registro from './componentes/Registro'
+import Admin from './componentes/admin/Admin'
+import { useLocation } from 'react-router-dom'
 import MisInscripciones from './componentes/inscripciones/MisInscripciones'
 import MisEventos from './componentes/eventos/MisEventos'
 import CreacionEvento from './componentes/eventos/CreacionEvento'
@@ -32,6 +34,7 @@ function App() {
                     path="/organizador/mis-eventos"
                     element={<MisEventos />}
                 />
+                <Route path="/admin" element={<Admin />} />
                 <Route path="*" element={<Navigate to="/eventos" replace />} />
             </Routes>
         </>
