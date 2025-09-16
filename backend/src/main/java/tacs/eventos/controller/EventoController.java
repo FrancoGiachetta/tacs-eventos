@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/evento")
@@ -53,6 +54,7 @@ public class EventoController {
     public ResponseEntity<Void> crearEvento(@AuthenticationPrincipal Usuario usuario,
             @Valid @RequestBody CreacionEventoRequest dto, HttpServletRequest request) {
         Evento evento = modelMapper.map(dto, Evento.class);
+        evento.setId(UUID.randomUUID().toString()); // No se estaba creando
         evento.setOrganizador(usuario);
         eventoService.crearEvento(evento);
         return ResponseEntity.created(URI.create(request.getRequestURI())).build();

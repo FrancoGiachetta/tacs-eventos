@@ -9,7 +9,7 @@ export default function MisEventos() {
     let [eventos, setEventos] = useState<Evento[]>([])
 
     useEffect(() => {
-        api.get('/api/v1/usuario/mis-eventos').then((r) => [setEventos(r.data)])
+        api.get('/api/v1/usuario/mis-eventos').then((r) => {setEventos(r.data)})
     }, [])
 
     return (
