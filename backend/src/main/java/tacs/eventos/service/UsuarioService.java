@@ -34,7 +34,7 @@ public class UsuarioService {
             throw new IllegalArgumentException("Email ya registrado");
         var u = new Usuario(email, encoder.encode(password), Set.of(RolUsuario.USUARIO));
         repo.guardar(u);
-        System.out.println("usuario ID: "+ u.getId());
+        System.out.println("usuario ID: " + u.getId());
         return u;
     }
 

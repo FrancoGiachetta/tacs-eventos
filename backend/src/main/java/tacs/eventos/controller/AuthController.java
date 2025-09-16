@@ -36,8 +36,7 @@ public class AuthController {
     @Operation(summary = "Registra un usuario")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "El usuario se registro satifactoriamente"),
-            @ApiResponse(responseCode = "401", description = "No se pudo regisrar al usuario"),
-    })
+            @ApiResponse(responseCode = "401", description = "No se pudo regisrar al usuario"), })
     public ResponseEntity<SessionResponse> register(@Valid @RequestBody RegistroRequest req) {
         usuarios.registrar(req.email(), req.password());
         return sesiones.login(req.email(), req.password())
@@ -55,10 +54,8 @@ public class AuthController {
      */
     @PostMapping("/login")
     @Operation(summary = "Login que devuelve token de sesión y expiración")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Se pudo genera token de sesión"),
-            @ApiResponse(responseCode = "401", description = "No se pudo regisrar al usuario"),
-    })
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Se pudo genera token de sesión"),
+            @ApiResponse(responseCode = "401", description = "No se pudo regisrar al usuario"), })
     public ResponseEntity<SessionResponse> login(@Valid @RequestBody LoginRequest req) {
         return sesiones.login(req.email(), req.password())
                 .map(s -> ResponseEntity.ok(new SessionResponse(s.getToken(), s.getExpiresAt())))

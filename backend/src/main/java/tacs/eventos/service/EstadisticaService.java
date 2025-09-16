@@ -20,8 +20,8 @@ public class EstadisticaService {
     private final WaitlistRepository waitlistRepository;
 
     public EstadisticaService(@Qualifier("eventosInMemoryRepo") EventosRepository eventosRepository,
-                              @Qualifier("inscripcionesInMemoryRepo") InscripcionesRepository inscripcionesRepository,
-                              @Qualifier("waitlistsInMemoryRepo") WaitlistRepository waitlistRepository) {
+            @Qualifier("inscripcionesInMemoryRepo") InscripcionesRepository inscripcionesRepository,
+            @Qualifier("waitlistsInMemoryRepo") WaitlistRepository waitlistRepository) {
         this.eventosRepository = eventosRepository;
         this.inscripcionesRepository = inscripcionesRepository;
         this.waitlistRepository = waitlistRepository;
@@ -36,7 +36,6 @@ public class EstadisticaService {
     public int cantidadEventos() throws Exception {
         //
 
-
         try {
 
             return this.eventosRepository.cantidaEventos();
@@ -50,7 +49,6 @@ public class EstadisticaService {
     public int calcularTasaConversionWL(String id) {
         Optional<Evento> evento = this.eventosRepository.getEvento(id);
         int calculoTasa = 0;
-
 
         try {
             if (evento.isPresent() && evento.get().isAbierto()) {
@@ -71,4 +69,3 @@ public class EstadisticaService {
     }
 
 }
-

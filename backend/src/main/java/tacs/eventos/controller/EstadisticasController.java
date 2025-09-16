@@ -20,10 +20,8 @@ public class EstadisticasController {
     // TODO: priorizar performance
     @GetMapping("/eventos/total")
     @Operation(summary = "Devuelve la cantidad de eventos registrados en el sistema")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "500", description = "Error interno en servidor"),
-    })
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Error interno en servidor"), })
     public int cantidadEventos() throws Exception {
         return estadisticaService.cantidadEventos();
     }
