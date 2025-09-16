@@ -6,6 +6,7 @@ import Registro from './componentes/Registro'
 import Admin from './componentes/admin/Admin'
 import MisInscripciones from './componentes/inscripciones/MisInscripciones'
 import MisEventos from './componentes/eventos/MisEventos'
+import GestionarEvento from './componentes/eventos/GestionarEvento'
 import FormularioEvento from './componentes/eventos/FormularioEvento'
 
 function App() {
@@ -34,6 +35,10 @@ function App() {
                     element={<MisEventos />}
                 />
                 <Route path="/admin" element={<Admin />} />
+                <Route
+                    path="/organizador/eventos/:id"
+                    element={<GestionarEvento />}
+                />
                 <Route path="*" element={<Navigate to="/eventos" replace />} />
             </Routes>
         </>
