@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import api from '../../lib/api'
-import { type Inscripcion, type Evento, type ItemWaitlist } from '../../tipos'
+import type { Evento } from '../../types/evento'
+import type { Inscripcion, ItemWaitlist } from '../../types/inscripciones'
 import { formatDate } from '../../lib/utils'
 import EventoActionMenu from './EventoActionMenu'
 
@@ -8,14 +9,16 @@ export default function MisEventos() {
     let [eventos, setEventos] = useState<Evento[]>([])
 
     useEffect(() => {
-        api.get('/api/v1/usuario/mis-eventos').then((r) => [setEventos(r.data)])
+        api.get('/api/v1/usuario/mis-eventos').then((r) => {
+            setEventos(r.data)
+        })
     }, [])
 
     return (
         <>
             <div className="mt-5">
                 <h1 className="text-3xl mb-7">Mis eventos</h1>
-                <table className="table-auto border-collapse min-w-full text-sm text-left rounded-lg overflow-hidden">
+                <table className="table-auto border-collapse min-w-full text-sm text-left rounded-lg">
                     <thead>
                         <tr className="table-row font-bold bg-gray-200 text-gray-600">
                             <td className="px-4 py-2">Nombre</td>

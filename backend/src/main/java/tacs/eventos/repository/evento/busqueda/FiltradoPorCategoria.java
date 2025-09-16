@@ -10,6 +10,9 @@ public class FiltradoPorCategoria implements FiltroBusqueda<Evento> {
 
     @Override
     public Boolean aplicarCondicionfiltrado(Evento evento) {
-        return evento.getCategoria().equals(categoria);
+        if (categoria == null || categoria.trim().isEmpty()) {
+            return true;
+        }
+        return evento.getCategoria().equals(categoria.trim());
     }
 }
