@@ -143,7 +143,7 @@ public class EventoController {
     @PutMapping("/{eventoId}/estado")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> actualizarEstadoEvento(@AuthenticationPrincipal Usuario usuario,
-            @PathVariable String eventoId, EventoEstadoDTO estadoDTO) {
+            @PathVariable String eventoId, @Valid @RequestBody EventoEstadoDTO estadoDTO) {
         var evento = this.buscarEvento(eventoId);
         verificarAutorizacion(usuario, "El usuario no es organizador del evento", false, evento.getOrganizador());
 
@@ -175,7 +175,7 @@ public class EventoController {
 
         return this.inscripcionesService.buscarInscripcionesDeEvento(evento).stream()
                 .filter((InscripcionEvento i) -> i.getEstado() == EstadoInscripcion.CONFIRMADA)
-                .map((InscripcionEvento i) -> InscripcionResponse.confirmada(evento.getId())).toList();
+                .map((InscripcionEvento i) -> InscripcionResponse.confirmada(evento.getId(), i)).toList();
     }
 
     /**
