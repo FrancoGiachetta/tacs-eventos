@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { InternalAxiosRequestConfig } from 'axios'
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080',
@@ -16,7 +16,7 @@ function logoutAndRedirect(reason = 'Sesión inválida') {
 const NOT_LOGGED_PATHS = ['/login', '/register', 'logout']
 
 api.interceptors.request.use(
-    (config) => {
+    (config: InternalAxiosRequestConfig) => {
         if (NOT_LOGGED_PATHS.includes(window.location.pathname)) {
             return config
         }
@@ -57,6 +57,7 @@ api.interceptors.response.use(
         console.error('API error:', e?.response?.status, e?.response?.data)
         return Promise.reject(e)
     }
+
 )
 
 export default api
