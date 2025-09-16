@@ -1,13 +1,8 @@
-export interface Evento {
+import { type InputCrearEvento } from '../lib/schemas'
+
+/* Este tipo tiene todos los campos del formulario, sumado a los campos que no se muestran en el formulario porque los completa el back end en forma automática */
+export type Evento = InputCrearEvento & {
     id: string
-    titulo: string
-    descripcion: string
-    fechaHoraInicio: string
-    duracionMinutos: number
-    ubicacion: string
-    cupoMaximo: number
-    precio: number
-    categoria?: string | null
     abierto: boolean
 }
 

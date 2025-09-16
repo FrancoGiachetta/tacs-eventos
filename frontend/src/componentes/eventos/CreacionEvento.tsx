@@ -3,7 +3,7 @@ import { type InputCrearEvento, SchemaCrearEvento } from '../../lib/schemas'
 import api from '../../lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'react-toastify'
-import { type ErrorDelServidor, esErrorDelServidor } from '../../tipos'
+import { type ErrorDelServidor, esErrorDelServidor } from '../../types/errores'
 import ContainerDeToast from '../ContainerDeToast'
 
 export default function CreacionEvento() {
