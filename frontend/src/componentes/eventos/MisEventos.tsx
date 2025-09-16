@@ -16,7 +16,7 @@ export default function MisEventos() {
         <>
             <div className="mt-5">
                 <h1 className="text-3xl mb-7">Mis eventos</h1>
-                <table className="table-auto border-collapse min-w-full text-sm text-left rounded-lg overflow-hidden">
+                <table className="table-auto border-collapse min-w-full text-sm text-left rounded-lg">
                     <thead>
                         <tr className="table-row font-bold bg-gray-200 text-gray-600">
                             <td className="px-4 py-2">Nombre</td>
