@@ -1,38 +1,48 @@
+use std::sync::Arc;
+
 use teloxide::{
     Bot,
-    dispatching::{DefaultKey, UpdateFilterExt},
+    dispatching::{DefaultKey, HandlerExt, UpdateFilterExt},
     dptree,
-    prelude::Dispatcher,
+    prelude::{Dispatcher, LoggingErrorHandler, Requester},
     types::Update,
+    utils::command::BotCommands,
 };
+use tracing::{info, warn};
 
 use crate::{
     command::{Command, handle_command},
     error::BotError,
 };
 
-pub struct TACSEventBot {
-    bot: Bot,
-    dispatcher: Dispatcher<Bot, BotError, DefaultKey>,
-    // db_con
-}
+pub async fn run() -> Result<(), BotError> {
+    let bot = Arc::new(Bot::from_env());
 
-impl TACSEventBot {
-    pub fn new() -> Self {
-        let bot = Bot::from_env();
+    bot.set_my_commands(Command::bot_commands()).await?;
 
-        let dispatcher = {
-            let handler = dptree::entry().branch(Update::filter_message().endpoint(handle_command));
+    let mut dispatcher = {
+        // Set handler. It is configure to only filter the messages, this means
+        // it will only be fired if a message is sent.
+        let handler = Update::filter_message().branch(
+            dptree::entry()
+                .filter_command::<Command>()
+                .endpoint(handle_command),
+        );
 
-            Dispatcher::builder(bot.clone(), handler)
-                .default_handler(|_| async {})
-                .build()
-        };
+        Dispatcher::builder(bot.clone(), handler)
+            // .dependencies(db)
+            .default_handler(|upd| async move {
+                warn!("Unhandled update: {upd:?}");
+            })
+            .error_handler(LoggingErrorHandler::with_custom_text(
+                "An error has occurred with the dispatcher",
+            ))
+            .build()
+    };
 
-        Self { bot, dispatcher }
-    }
+    info!("Initiating tacs-eventos-bot");
 
-    pub async fn run(&mut self) {
-        self.dispatcher.dispatch().await;
-    }
+    dispatcher.dispatch().await;
+
+    Ok(())
 }

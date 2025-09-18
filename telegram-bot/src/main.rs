@@ -1,5 +1,3 @@
-use teloxide::Bot;
-
 use crate::error::BotError;
 
 mod bot;
@@ -13,10 +11,13 @@ async fn main() -> Result<(), BotError> {
     // Load .env vars
     dotenv::dotenv()?;
 
-    // This will panic if TELOXIDE_TOKEN is not found.
-    let bot = Bot::from_env();
+    // Configure logging.
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::INFO)
+        .with_target(false)
+        .init();
 
-    teloxide::repl(bot);
+    bot::run().await?;
 
     Ok(())
 }
