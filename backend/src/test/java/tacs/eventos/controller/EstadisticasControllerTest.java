@@ -24,7 +24,7 @@ class EstadisticasControllerTest {
     }
 
     @Test
-    void testCantidadEventos() {
+    void testCantidadEventos() throws Exception {
         when(estadisticaService.cantidadEventos()).thenReturn(10);
 
         int result = controller.cantidadEventos();

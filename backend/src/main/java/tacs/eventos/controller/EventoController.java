@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/evento")
@@ -50,9 +51,10 @@ public class EventoController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> crearEvento(@AuthenticationPrincipal Usuario usuario, @Valid @RequestBody EventoDTO dto,
-            HttpServletRequest request) {
+    public ResponseEntity<Void> crearEvento(@AuthenticationPrincipal Usuario usuario,
+            @Valid @RequestBody CreacionEventoRequest dto, HttpServletRequest request) {
         Evento evento = modelMapper.map(dto, Evento.class);
+        evento.setId(UUID.randomUUID().toString()); // No se estaba creando
         evento.setOrganizador(usuario);
         eventoService.crearEvento(evento);
         return ResponseEntity.created(URI.create(request.getRequestURI())).build();
@@ -68,9 +70,9 @@ public class EventoController {
      */
     @GetMapping("/{eventoId}")
     @ResponseStatus(HttpStatus.OK)
-    public EventoDTO obtenerEvento(@PathVariable String eventoId) {
+    public EventoResponse obtenerEvento(@PathVariable String eventoId) {
         var evento = this.buscarEvento(eventoId);
-        return modelMapper.map(evento, EventoDTO.class);
+        return modelMapper.map(evento, EventoResponse.class);
     }
 
     /**
@@ -93,37 +95,40 @@ public class EventoController {
      */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<EventoDTO> listarEventos(
+    public List<EventoResponse> listarEventos(
             @RequestParam(value = "precioPesosMin", required = false) Double precioMinimoParam,
             @RequestParam(value = "precioPesosMax", required = false) Double precioMaximoParam,
             @RequestParam(value = "fechaInicioMin", required = false) LocalDate fechaMinParam,
             @RequestParam(value = "fechaInicioMax", required = false) LocalDate fechaMaxParam,
             @RequestParam(value = "categoria", required = false) String categoriaParam,
-            @RequestParam(value = "palabrasClave", required = false) List<String> palabrasClaveParam) {
+            @RequestParam(value = "palabrasClave", required = false) String palabrasClaveParam) {
         if (precioMinimoParam == null && precioMaximoParam == null && fechaMinParam == null && fechaMaxParam == null
                 && categoriaParam == null && palabrasClaveParam == null) {
-            return eventoService.listarEventos().stream().map((Evento e) -> modelMapper.map(e, EventoDTO.class))
+            return eventoService.listarEventos().stream().map((Evento e) -> modelMapper.map(e, EventoResponse.class))
                     .toList();
         } else {
-            LocalDate fechaMinima = fechaMinParam != null ? fechaMinParam : LocalDate.now();
-            LocalDate fechaMaxima = fechaMaxParam != null ? fechaMaxParam : LocalDate.MAX;
-            Double precioMinimoPesos = precioMinimoParam != null ? precioMinimoParam : 0.0;
-            Double precioMaximoPesos = precioMaximoParam != null ? precioMaximoParam : Double.MAX_VALUE;
-
             List<FiltroBusqueda<Evento>> filtros = new ArrayList<>();
 
-            filtros.add(new FiltradoPorFechaInicio(fechaMinima, fechaMaxima));
-            filtros.add(new FiltradoPorPrecio(precioMinimoPesos, precioMaximoPesos));
+            // Solo agregar filtros si los parámetros están presentes
+            if (fechaMinParam != null || fechaMaxParam != null) {
+                LocalDate fechaMinima = fechaMinParam != null ? fechaMinParam : LocalDate.now();
+                LocalDate fechaMaxima = fechaMaxParam != null ? fechaMaxParam : LocalDate.MAX;
+                filtros.add(new FiltradoPorFechaInicio(fechaMinima, fechaMaxima));
+            }
 
-            if (categoriaParam != null) {
+            if (precioMinimoParam != null || precioMaximoParam != null) {
+                filtros.add(new FiltradoPorPrecio(precioMinimoParam, precioMaximoParam));
+            }
+
+            if (categoriaParam != null && !categoriaParam.trim().isEmpty()) {
                 filtros.add(new FiltradoPorCategoria(categoriaParam));
             }
 
-            if (palabrasClaveParam != null) {
-                filtros.add(new FiltradoPorPalabrasClave(palabrasClaveParam));
+            if (palabrasClaveParam != null && !palabrasClaveParam.trim().isEmpty()) {
+                filtros.add(new FiltradoPorPalabrasClave(Arrays.asList(palabrasClaveParam.split("\\s+"))));
             }
 
-            return eventoService.filtrarEventos(filtros).stream().map(e -> modelMapper.map(e, EventoDTO.class))
+            return eventoService.filtrarEventos(filtros).stream().map(e -> modelMapper.map(e, EventoResponse.class))
                     .toList();
         }
     }
@@ -198,20 +203,9 @@ public class EventoController {
         String mensajeNoEncontrado = "El usuario no está inscripto al evento";
 
         var evento = this.buscarEvento(eventoId);
+        // Si el usuario no existe, retorno que no está inscripto para no revelar si existe o no el usuario
         var usuarioInscripto = usuarioService.buscarPorId(usuarioId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensajeNoEncontrado)); // Si el
-                                                                                                            // usuario
-                                                                                                            // no
-                                                                                                            // existe,
-                                                                                                            // retorno
-                                                                                                            // que no
-                                                                                                            // está
-                                                                                                            // inscripto,
-                                                                                                            // para no
-                                                                                                            // revelar
-                                                                                                            // si existe
-                                                                                                            // o no el
-                                                                                                            // usuario
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensajeNoEncontrado));
 
         verificarAutorizacion(usuarioLogueado, mensajeNoEncontrado, true, evento.getOrganizador(), usuarioInscripto);
 
@@ -261,34 +255,22 @@ public class EventoController {
      *            usuario logueado al sistema
      * @param eventoId
      *            id del evento sobre el cual se quiere crear una inscripción
-     * @param usuarioId
-     *            id del usuario que se quiere inscribir
      *
-     * @return ResponseEntity Un body vacío con la ubicación de la inscripción en el location header. Si se creó
-     *         exitosamente, devuelve el código 201 CREATED. Si la inscripción ya existía, devuelve el código 303 SEE
-     *         OTHER.
+     * @return ResponseEntity devuelve el código 201 CREATED y un body vacío
      */
-    @PostMapping("/{eventoId}/inscripcion/{usuarioId}")
+    @PostMapping("/{eventoId}/inscripcion/")
+    @ResponseStatus(HttpStatus.CREATED) // TODO: crear un id de inscripción y retornar el location
     public ResponseEntity<Void> inscribirUsuarioAEvento(@AuthenticationPrincipal Usuario usuarioLogueado,
-            @PathVariable String eventoId, @PathVariable String usuarioId, HttpServletRequest request) {
-        var optUsuarioAInscribir = usuarioService.buscarPorId(usuarioId);
+            @PathVariable String eventoId) {
         var evento = this.buscarEvento(eventoId);
-        // Si el usuario no existe, también retorno FORBIDDEN, para no revelar que existe el usuario
-        if (optUsuarioAInscribir.isEmpty() || !estaEntreLosAutorizados(usuarioLogueado,
-                List.of(evento.getOrganizador(), optUsuarioAInscribir.get()))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Solamente pueden crear una inscripción el usuario que se va a inscribir, o el "
-                            + "organizador del evento");
-        }
-        var usuarioAInscribir = optUsuarioAInscribir.get();
         // Si el usuario ya está inscripto o en la waitlist, no hace nada y devuelve la inscripción existente con el
         // código 200 OK
-        if (inscripcionesService.inscripcionConfirmadaOEnWaitlist(evento, usuarioAInscribir))
-            return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(request.getRequestURI())).build();
+        if (inscripcionesService.inscripcionConfirmadaOEnWaitlist(evento, usuarioLogueado))
+            return ResponseEntity.status(HttpStatus.CREATED).build(); // TODO: retornar SEE_OTHER y redigirir
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist
-        var resultadoInscripcion = inscripcionesService.inscribirOMandarAWaitlist(evento, usuarioAInscribir);
-        return ResponseEntity.created(URI.create(request.getRequestURI())).build();
+        inscripcionesService.inscribirOMandarAWaitlist(evento, usuarioLogueado);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
