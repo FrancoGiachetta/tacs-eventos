@@ -148,7 +148,7 @@ public class EventoController {
     @PutMapping("/{eventoId}/estado")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> actualizarEstadoEvento(@AuthenticationPrincipal Usuario usuario,
-            @PathVariable String eventoId, @Valid @RequestBody EventoEstadoDTO estadoDTO) {
+            @PathVariable String eventoId, EventoEstadoDTO estadoDTO) {
         var evento = this.buscarEvento(eventoId);
         verificarAutorizacion(usuario, "El usuario no es organizador del evento", false, evento.getOrganizador());
 
@@ -180,7 +180,7 @@ public class EventoController {
 
         return this.inscripcionesService.buscarInscripcionesDeEvento(evento).stream()
                 .filter((InscripcionEvento i) -> i.getEstado() == EstadoInscripcion.CONFIRMADA)
-                .map((InscripcionEvento i) -> InscripcionResponse.confirmada(evento.getId(), i)).toList();
+                .map((InscripcionEvento i) -> InscripcionResponse.confirmada(evento.getId())).toList();
     }
 
     /**
@@ -255,34 +255,22 @@ public class EventoController {
      *            usuario logueado al sistema
      * @param eventoId
      *            id del evento sobre el cual se quiere crear una inscripción
-     * @param usuarioId
-     *            id del usuario que se quiere inscribir
      *
-     * @return ResponseEntity Un body vacío con la ubicación de la inscripción en el location header. Si se creó
-     *         exitosamente, devuelve el código 201 CREATED. Si la inscripción ya existía, devuelve el código 303 SEE
-     *         OTHER.
+     * @return ResponseEntity devuelve el código 201 CREATED y un body vacío
      */
-    @PostMapping("/{eventoId}/inscripcion/{usuarioId}")
+    @PostMapping("/{eventoId}/inscripcion/")
+    @ResponseStatus(HttpStatus.CREATED) // TODO: crear un id de inscripción y retornar el location
     public ResponseEntity<Void> inscribirUsuarioAEvento(@AuthenticationPrincipal Usuario usuarioLogueado,
-            @PathVariable String eventoId, @PathVariable String usuarioId, HttpServletRequest request) {
-        var optUsuarioAInscribir = usuarioService.buscarPorId(usuarioId);
+            @PathVariable String eventoId) {
         var evento = this.buscarEvento(eventoId);
-        // Si el usuario no existe, también retorno FORBIDDEN, para no revelar que existe el usuario
-        if (optUsuarioAInscribir.isEmpty() || !estaEntreLosAutorizados(usuarioLogueado,
-                List.of(evento.getOrganizador(), optUsuarioAInscribir.get()))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Solamente pueden crear una inscripción el usuario que se va a inscribir, o el "
-                            + "organizador del evento");
-        }
-        var usuarioAInscribir = optUsuarioAInscribir.get();
         // Si el usuario ya está inscripto o en la waitlist, no hace nada y devuelve la inscripción existente con el
         // código 200 OK
-        if (inscripcionesService.inscripcionConfirmadaOEnWaitlist(evento, usuarioAInscribir))
-            return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(request.getRequestURI())).build();
+        if (inscripcionesService.inscripcionConfirmadaOEnWaitlist(evento, usuarioLogueado))
+            return ResponseEntity.status(HttpStatus.CREATED).build(); // TODO: retornar SEE_OTHER y redigirir
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist
-        inscripcionesService.inscribirOMandarAWaitlist(evento, usuarioAInscribir);
-        return ResponseEntity.created(URI.create(request.getRequestURI())).build();
+        inscripcionesService.inscribirOMandarAWaitlist(evento, usuarioLogueado);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
