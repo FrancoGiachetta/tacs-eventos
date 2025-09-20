@@ -31,9 +31,9 @@ public class EventosApplication {
     @Bean
     CommandLineRunner seedAdmin(UsuarioRepository users, PasswordEncoder pe) {
         return args -> {
-            users.obtenerPorEmail("admin@events.local").orElseGet(() -> {
+            users.findByEmail("admin@events.local").orElseGet(() -> {
                 Usuario u = new Usuario("admin@events.local", pe.encode("Admin1234"), Set.of(RolUsuario.ADMIN));
-                users.guardar(u);
+                users.save(u);
                 return u;
             });
         };

@@ -29,25 +29,25 @@ public class UsuarioService {
     private final PasswordEncoder encoder;
 
     public Usuario registrar(String email, String password) {
-        Optional<Usuario> existente = repo.obtenerPorEmail(email);
+        Optional<Usuario> existente = repo.findByEmail(email);
         if (existente.isPresent())
             throw new IllegalArgumentException("Email ya registrado");
         var u = new Usuario(email, encoder.encode(password), Set.of(RolUsuario.USUARIO));
-        repo.guardar(u);
+        repo.save(u);
         System.out.println("usuario ID: " + u.getId());
         return u;
     }
 
     public Optional<Usuario> buscarPorEmail(String email) {
-        return repo.obtenerPorEmail(email);
+        return repo.findByEmail(email);
     }
 
     public Optional<Usuario> buscarPorId(String id) {
-        return repo.obtenerPorId(id);
+        return repo.findById(id);
     }
 
     public List<InscripcionResponse> obtenerInscripcionesNoCanceladas(String usuarioId) {
-        Usuario usuario = repo.obtenerPorId(usuarioId)
+        Usuario usuario = repo.findById(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         List<InscripcionEvento> inscripciones = inscripcionesRepository
                 .getInscripcionesConfirmadasPorParticipante(usuario);

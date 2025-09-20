@@ -29,7 +29,7 @@ public class SessionService {
     }
 
     public Optional<Session> login(String email, String rawPassword) {
-        return usuarios.obtenerPorEmail(email.toLowerCase())
+        return usuarios.findByEmail(email.toLowerCase())
                 .flatMap(u -> encoder.matches(rawPassword, u.getPasswordHash()) ? Optional.of(createSession(u))
                         : Optional.empty());
     }
@@ -41,7 +41,7 @@ public class SessionService {
 
     public Optional<Usuario> validate(String token) {
         return sesiones.findByToken(token).filter(s -> s.isActive() && s.getExpiresAt().isAfter(Instant.now()))
-                .flatMap(s -> usuarios.obtenerPorId(s.getUserId()));
+                .flatMap(s -> usuarios.findById(s.getUserId()));
     }
 
     private Session createSession(Usuario u) {

@@ -1,11 +1,13 @@
 package tacs.eventos.model;
 
 import lombok.Getter;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
+@Document(collection = "usuarios")
 public class Usuario {
     @Getter
     private String id;
