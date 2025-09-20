@@ -249,28 +249,37 @@ public class EventoController {
     }
 
     /**
-     * Inscribe a un usuario a un evento. El único usuario que puede inscribirse es él mismo.
+     * Inscribe a un usuario a un evento. Solo el mismo usuario o el organizador del evento pueden crear una inscripción.
      *
      * @param usuarioLogueado
      *            usuario logueado al sistema
      * @param eventoId
      *            id del evento sobre el cual se quiere crear una inscripción
+     * @param usuarioId
+     *            id del usuario que se quiere inscribir
      *
-     * @return ResponseEntity devuelve el código 201 CREATED y un body vacío
+     * @return ResponseEntity devuelve el código 201 CREATED y un body vacío, o 303 SEE_OTHER si ya existe la inscripción
      */
-    @PostMapping("/{eventoId}/inscripcion/")
-    @ResponseStatus(HttpStatus.CREATED) // TODO: crear un id de inscripción y retornar el location
+    @PostMapping("/{eventoId}/inscripcion/{usuarioId}")
     public ResponseEntity<Void> inscribirUsuarioAEvento(@AuthenticationPrincipal Usuario usuarioLogueado,
-            @PathVariable String eventoId) {
+            @PathVariable String eventoId, @PathVariable String usuarioId) {
         var evento = this.buscarEvento(eventoId);
-        // Si el usuario ya está inscripto o en la waitlist, no hace nada y devuelve la inscripción existente con el
-        // código 200 OK
-        if (inscripcionesService.inscripcionConfirmadaOEnWaitlist(evento, usuarioLogueado))
-            return ResponseEntity.status(HttpStatus.CREATED).build(); // TODO: retornar SEE_OTHER y redigirir
+        var usuario = usuarioService.buscarPorId(usuarioId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "Solamente pueden crear una inscripción el usuario que se va a inscribir, o el organizador del evento"));
+
+        verificarAutorizacion(usuarioLogueado, "Solamente pueden crear una inscripción el usuario que se va a inscribir, o el organizador del evento",
+                false, evento.getOrganizador(), usuario);
+
+        String location = "/api/v1/evento/" + eventoId + "/inscripcion/" + usuarioId;
+
+        // Si el usuario ya está inscripto o en la waitlist, devuelve SEE_OTHER y redirige a la inscripción existente
+        if (inscripcionesService.inscripcionConfirmadaOEnWaitlist(evento, usuario))
+            return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(location)).build();
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist
-        inscripcionesService.inscribirOMandarAWaitlist(evento, usuarioLogueado);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        inscripcionesService.inscribirOMandarAWaitlist(evento, usuario);
+        return ResponseEntity.created(URI.create(location)).build();
     }
 
     /**

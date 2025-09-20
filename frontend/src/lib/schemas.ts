@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { es } from 'zod/locales'
 
 function mensajeDeErrorMinimoCaracteres(cantidadMinima: number) {
     return `Ingrese al menos ${cantidadMinima} caracteres`
@@ -12,7 +11,6 @@ let mensajeDeErrorNumeroNoEntero = 'Ingrese un número entero'
 let mensajeDeErrorNumeroNegativo = 'El valor no puede ser negativo'
 let mensajeDeErrorNumeroInvalido = 'Ingrese un número'
 
-z.config(es())
 // Schema para la creacion de un evento, aseguro que tiene el formato correcto
 export const SchemaCrearEvento = z.object({
     titulo: z
