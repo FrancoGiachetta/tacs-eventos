@@ -16,7 +16,7 @@ public class EventoService {
     private final EventosRepository eventosRepository;
 
     public Evento crearEvento(Evento evento) {
-        eventosRepository.guardarEvento(evento);
+        eventosRepository.save(evento);
         return evento;
     }
 
@@ -24,7 +24,7 @@ public class EventoService {
      * @return todos los eventos
      */
     public List<Evento> listarEventos() {
-        return this.eventosRepository.todos();
+        return this.eventosRepository.findAll();
     }
 
     /**
@@ -33,7 +33,7 @@ public class EventoService {
      * @return el evento con ese id u Optional.empty() si no existe
      */
     public Optional<Evento> buscarEventoPorId(String id) {
-        return this.eventosRepository.getEvento(id);
+        return this.eventosRepository.findById(id);
     }
 
     /**
@@ -43,21 +43,21 @@ public class EventoService {
      * @return lista de eventos que cumplen con todos los filtros de búsqueda
      */
     public List<Evento> filtrarEventos(List<FiltroBusqueda<Evento>> filtros) {
-        return this.eventosRepository.filtrarEventos(filtros);
+        return this.eventosRepository.findByFiltroBusqueda(filtros);
     }
 
     public List<Evento> buscarEventosOrganizadosPor(Usuario organizador) {
-        return this.eventosRepository.getEventosPorOrganizador(organizador.getId());
+        return this.eventosRepository.findByOrganizador(organizador.getId());
     }
 
     public void cerrarEvento(Usuario organizador, Evento evento) {
         evento.cerrarEvento();
-        this.eventosRepository.guardarEvento(evento);
+        this.eventosRepository.save(evento);
     }
 
     public void abrirEvento(Usuario organizador, Evento evento) {
         evento.abrirEvento();
-        this.eventosRepository.guardarEvento(evento);
+        this.eventosRepository.save(evento);
     }
 
 }

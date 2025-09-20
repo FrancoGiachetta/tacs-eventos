@@ -3,12 +3,14 @@ package tacs.eventos.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @NoArgsConstructor
 @Getter
+@Document(collection = "eventos")
 public class Evento {
     @Setter
     private String id;
@@ -35,8 +37,22 @@ public class Evento {
     @Setter
     private Usuario organizador;
 
+    public Evento(String id, String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos, String ubicacion, int cupoMaximo, double precio, String categoria, boolean abierto, Usuario organizador) {
+        this.id = id;
+        this.titulo = titulo;
+        this.descripcion = descripcion;
+        this.fechaHoraInicio = fechaHoraInicio;
+        this.duracionMinutos = duracionMinutos;
+        this.ubicacion = ubicacion;
+        this.cupoMaximo = cupoMaximo;
+        this.precio = precio;
+        this.categoria = categoria;
+        this.abierto = abierto;
+        this.organizador = organizador;
+    }
+
     public Evento(String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
-            String ubicacion, int cupoMaximo, double precio, String categoria) {
+                  String ubicacion, int cupoMaximo, double precio, String categoria) {
 
         this.id = UUID.randomUUID().toString();
         this.titulo = titulo;
@@ -47,6 +63,9 @@ public class Evento {
         this.cupoMaximo = cupoMaximo;
         this.precio = precio;
         this.categoria = categoria;
+    }
+
+    public Evento(Evento evento) {
     }
 
     /**

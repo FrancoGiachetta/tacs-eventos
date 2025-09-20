@@ -38,7 +38,7 @@ public class EstadisticaService {
 
         try {
 
-            return this.eventosRepository.cantidaEventos();
+            return Math.toIntExact(this.eventosRepository.count());
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno en servidor", e);
         }
@@ -47,7 +47,7 @@ public class EstadisticaService {
 
     // TODO: falta chequear si esta bien aplicado esta logica que pide de tasa de conversion de waitList
     public int calcularTasaConversionWL(String id) {
-        Optional<Evento> evento = this.eventosRepository.getEvento(id);
+        Optional<Evento> evento = this.eventosRepository.findById(id);
         int calculoTasa = 0;
 
         try {

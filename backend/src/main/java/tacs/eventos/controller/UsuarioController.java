@@ -46,7 +46,7 @@ public class UsuarioController {
      */
     @GetMapping("/mis-eventos")
     public List<EventoResponse> getMisEventos(@AuthenticationPrincipal Usuario usuario) {
-        return eventosRepository.getEventosPorOrganizador(usuario.getId()).stream()
+        return eventosRepository.findByOrganizador(usuario.getId()).stream()
                 .map(e -> this.modelMapper.map(e, EventoResponse.class)).toList();
     }
 }
