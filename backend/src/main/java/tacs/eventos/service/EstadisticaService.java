@@ -38,7 +38,7 @@ public class EstadisticaService {
     // TODO: falta chequear si esta bien aplicado esta logica que pide de tasa de conversion de waitList
     public int calcularTasaConversionWL(String id) {
         Evento evento = this.eventosRepository.getEvento(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se pudo encontrar el evento"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
         int calculoTasa = 0;
 
         if (evento.isAbierto()) {

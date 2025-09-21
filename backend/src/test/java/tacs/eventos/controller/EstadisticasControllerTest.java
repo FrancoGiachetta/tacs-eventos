@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
+
 import tacs.eventos.service.EstadisticaService;
 
 class EstadisticasControllerTest {
@@ -37,9 +39,9 @@ class EstadisticasControllerTest {
     void testCantidadInscripciones() {
         when(estadisticaService.cantidadInscribiciones()).thenReturn(20);
 
-        int result = controller.cantidadInscripciones();
+        ResponseEntity<Integer> result = controller.cantidadInscripciones();
 
-        assertEquals(20, result);
+        assertEquals(ResponseEntity.ok(20), result);
         verify(estadisticaService).cantidadInscribiciones();
     }
 
@@ -48,9 +50,9 @@ class EstadisticasControllerTest {
         String eventoId = "123";
         when(estadisticaService.calcularTasaConversionWL(eventoId)).thenReturn(50);
 
-        int result = controller.tasaConversionWL(eventoId);
+        ResponseEntity<Integer> result = controller.tasaConversionWL(eventoId);
 
-        assertEquals(50, result);
+        assertEquals(ResponseEntity.ok(50), result);
         verify(estadisticaService).calcularTasaConversionWL(eventoId);
     }
 }
