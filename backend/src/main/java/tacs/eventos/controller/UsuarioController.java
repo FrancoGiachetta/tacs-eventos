@@ -2,6 +2,7 @@ package tacs.eventos.controller;
 
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,8 +33,8 @@ public class UsuarioController {
      * @return las inscripciones del usuario.
      */
     @GetMapping("/mis-inscripciones")
-    public List<InscripcionResponse> getMisInscripciones(@AuthenticationPrincipal Usuario usuario) {
-        return usuarioService.obtenerInscripcionesNoCanceladas(usuario.getId());
+    public ResponseEntity<List<InscripcionResponse>> getMisInscripciones(@AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(usuarioService.obtenerInscripcionesNoCanceladas(usuario.getId()));
     }
 
     /**
@@ -45,8 +46,8 @@ public class UsuarioController {
      * @return los eventos organizados por el usuario.
      */
     @GetMapping("/mis-eventos")
-    public List<EventoResponse> getMisEventos(@AuthenticationPrincipal Usuario usuario) {
-        return eventosRepository.getEventosPorOrganizador(usuario.getId()).stream()
-                .map(e -> this.modelMapper.map(e, EventoResponse.class)).toList();
+    public ResponseEntity<List<EventoResponse>> getMisEventos(@AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(eventosRepository.getEventosPorOrganizador(usuario.getId()).stream()
+                .map(e -> this.modelMapper.map(e, EventoResponse.class)).toList());
     }
 }
