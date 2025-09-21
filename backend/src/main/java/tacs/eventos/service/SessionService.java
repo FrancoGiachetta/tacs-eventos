@@ -29,9 +29,8 @@ public class SessionService {
     }
 
     public Optional<Session> login(String email, String rawPassword) {
-        return usuarios.findByEmail(email.toLowerCase())
-                .flatMap(u -> encoder.matches(rawPassword, u.getPasswordHash()) ? Optional.of(createSession(u))
-                        : Optional.empty());
+        return usuarios.findByEmail(email.toLowerCase()).flatMap(u -> encoder.matches(rawPassword, u.getPasswordHash())
+                ? Optional.of(createSession(u)) : Optional.empty());
     }
 
     public void logout(String token) {

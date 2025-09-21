@@ -37,7 +37,8 @@ public class Evento {
     @Setter
     private Usuario organizador;
 
-    public Evento(String id, String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos, String ubicacion, int cupoMaximo, double precio, String categoria, boolean abierto, Usuario organizador) {
+    public Evento(String id, String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
+            String ubicacion, int cupoMaximo, double precio, String categoria, boolean abierto, Usuario organizador) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -52,7 +53,7 @@ public class Evento {
     }
 
     public Evento(String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
-                  String ubicacion, int cupoMaximo, double precio, String categoria) {
+            String ubicacion, int cupoMaximo, double precio, String categoria) {
 
         this.id = UUID.randomUUID().toString();
         this.titulo = titulo;

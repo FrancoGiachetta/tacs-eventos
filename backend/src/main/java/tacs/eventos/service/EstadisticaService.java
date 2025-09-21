@@ -1,5 +1,6 @@
 package tacs.eventos.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,21 +14,12 @@ import java.util.Optional;
 import org.apache.logging.log4j.*;
 
 @Service
+@AllArgsConstructor
 public class EstadisticaService {
 
     private final EventosRepository eventosRepository;
     private final InscripcionesRepository inscripcionesRepository;
     private final WaitlistRepository waitlistRepository;
-
-    public EstadisticaService(@Qualifier("eventosInMemoryRepo") EventosRepository eventosRepository,
-            @Qualifier("inscripcionesInMemoryRepo") InscripcionesRepository inscripcionesRepository,
-            @Qualifier("waitlistsInMemoryRepo") WaitlistRepository waitlistRepository) {
-        this.eventosRepository = eventosRepository;
-        this.inscripcionesRepository = inscripcionesRepository;
-        this.waitlistRepository = waitlistRepository;
-    }
-
-    // TODO: la query deberia ir a la base count sobre inscripciones para tener una mejor performance
 
     public int cantidadInscribiciones() {
         return this.inscripcionesRepository.todos().size();

@@ -2,11 +2,12 @@ package tacs.eventos.repository.evento;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import tacs.eventos.model.Evento;
+import tacs.eventos.repository.FiltroBusqueda;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface EventosRepository extends MongoRepository<Evento, String>,EventosRepositoryCustom {
+public interface EventosRepository {
 
     /**
      * @return todos los eventos
@@ -29,17 +30,12 @@ public interface EventosRepository extends MongoRepository<Evento, String>,Event
      */
     List<Evento> findByOrganizador(String organizadorId);
 
-
-    //List<Evento> findByFiltroBusqueda(List<FiltroBusqueda<Evento>> filtrosBusqueda);
-
     /**
      * @param categoria
      *
      * @return los eventos que pertenecen a esa cateogoria
      */
     List<Evento> findByCategoria(String categoria);
-
-
 
     /**
      * Elimina el evento, si es que existe
@@ -49,5 +45,9 @@ public interface EventosRepository extends MongoRepository<Evento, String>,Event
     void delete(Evento evento);
 
     long count();
+
+    void save(Evento evento);
+
+    List<Evento> findByFiltroBusqueda(List<FiltroBusqueda<Evento>> filtrosBusqueda);
 
 }

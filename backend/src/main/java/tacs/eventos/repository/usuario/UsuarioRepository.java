@@ -9,7 +9,7 @@ public interface UsuarioRepository extends MongoRepository<Usuario, String> {
     /**
      * @return todos los usuarios.
      */
-    //List<Usuario> obtenerTodos();
+    // List<Usuario> obtenerTodos();
 
     /**
      * @param email
@@ -25,7 +25,7 @@ public interface UsuarioRepository extends MongoRepository<Usuario, String> {
      *
      * @return el usuario al que le corresponde el id.
      */
-  //  Optional<Usuario> obtenerPorId(String id);
+    // Optional<Usuario> obtenerPorId(String id);
 
     /**
      * Guarda un usuario.
@@ -33,7 +33,7 @@ public interface UsuarioRepository extends MongoRepository<Usuario, String> {
      * @param usuario
      *            usuario a guardar.
      */
-   // void guardar(Usuario usuario);
+    // void guardar(Usuario usuario);
 
     /**
      * Elimina un usuario.
@@ -41,5 +41,5 @@ public interface UsuarioRepository extends MongoRepository<Usuario, String> {
      * @param usuario
      *            usuario a eliminar.
      */
-    //void eliminar(Usuario usuario);
+    // void eliminar(Usuario usuario);
 }
