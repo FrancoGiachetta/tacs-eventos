@@ -66,8 +66,6 @@ public class Evento {
         this.categoria = categoria;
     }
 
-    public Evento(Evento evento) {
-    }
 
     /**
      * Verifica si el evento permite nuevas inscripciones.
