@@ -69,8 +69,8 @@ public class InscripcionesTest {
     @BeforeEach
     void setUp() {
         e1.setOrganizador(organizador);
-        when(usuarioRepository.obtenerPorId(u1.getId())).thenReturn(Optional.of(u1));
-        when(eventosRepository.getEvento(e1.getId())).thenReturn(Optional.of(e1));
+        when(usuarioRepository.findById(u1.getId())).thenReturn(Optional.of(u1));
+        when(eventosRepository.findById(e1.getId())).thenReturn(Optional.of(e1));
         Authentication auth = new UsernamePasswordAuthenticationToken(u1, null);
         SecurityContextHolder.getContext().setAuthentication(auth);
     }

@@ -21,7 +21,7 @@ public class Usuario {
     private Instant fechaCreacion = Instant.now();
 
     public Usuario(String email, String passwordHash, Set<RolUsuario> roles) {
-        this.id = java.util.UUID.randomUUID().toString(); // Generar un ID único todo: que la base de datos lo genere /
+        this.id = java.util.UUID.randomUUID().toString();
         // que se genere en funcion de los ids existentes
         this.email = email.toLowerCase(); // Normalizar a minúsculas
         this.passwordHash = passwordHash;

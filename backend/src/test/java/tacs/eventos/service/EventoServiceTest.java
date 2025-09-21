@@ -1,5 +1,6 @@
 package tacs.eventos.service;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import tacs.eventos.model.Evento;
 import tacs.eventos.repository.FiltroBusqueda;
+import tacs.eventos.repository.evento.EventosRepository;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorCategoria;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorFechaInicio;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorPalabrasClave;
@@ -26,6 +28,9 @@ public class EventoServiceTest {
     @Autowired
     EventoService eventoService;
 
+    @Autowired
+    private EventosRepository repo;
+
     private Evento e1;
     private Evento e2;
     private Evento e3;
@@ -42,6 +47,13 @@ public class EventoServiceTest {
         eventoService.crearEvento(this.e1);
         eventoService.crearEvento(this.e2);
         eventoService.crearEvento(this.e3);
+    }
+
+    @AfterEach
+    void setUp2() {
+        this.repo.delete(e1);
+        this.repo.delete(e2);
+        this.repo.delete(e3);
     }
 
     @Test

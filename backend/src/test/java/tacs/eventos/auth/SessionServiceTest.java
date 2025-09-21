@@ -38,7 +38,7 @@ class SessionServiceTest {
     @Test
     void login_ok_creaSessionYGuarda() {
         var u = new Usuario("user@mail.com", "hash", Set.of(RolUsuario.USUARIO));
-        when(usuarios.obtenerPorEmail("user@mail.com")).thenReturn(Optional.of(u));
+        when(usuarios.findByEmail("user@mail.com")).thenReturn(Optional.of(u));
         when(encoder.matches("pass", "hash")).thenReturn(true);
         when(sesiones.save(any(Session.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -52,7 +52,7 @@ class SessionServiceTest {
 
     @Test
     void login_mailInexistente_vacio() {
-        when(usuarios.obtenerPorEmail("user@mail.com")).thenReturn(Optional.empty());
+        when(usuarios.findByEmail("user@mail.com")).thenReturn(Optional.empty());
         var out = service.login("user@mail.com", "pass");
         assertTrue(out.isEmpty());
         verifyNoInteractions(sesiones);
@@ -61,7 +61,7 @@ class SessionServiceTest {
     @Test
     void login_contraseniaIncorrecta_vacio() {
         var usuario = new Usuario("user@mail.com", "otraClave", Set.of()); // la clave real es "otraClave"
-        when(usuarios.obtenerPorEmail("user@mail.com")).thenReturn(Optional.of(usuario));
+        when(usuarios.findByEmail("user@mail.com")).thenReturn(Optional.of(usuario));
 
         var out = service.login("user@mail.com", "pass"); // intento con clave "pass"
 
@@ -76,7 +76,7 @@ class SessionServiceTest {
         var s = new Session("tok", u.getId(), Instant.now().plusSeconds(300));
 
         when(sesiones.findByToken("tok")).thenReturn(Optional.of(s));
-        when(usuarios.obtenerPorId(u.getId())).thenReturn(Optional.of(u));
+        when(usuarios.findById(u.getId())).thenReturn(Optional.of(u));
 
         var out = service.validate("tok");
         assertTrue(out.isPresent());
@@ -100,7 +100,7 @@ class SessionServiceTest {
         var s = new Session("t1", usuario.getId(), Instant.now().plusSeconds(300));
 
         when(sesiones.findByToken("t1")).thenReturn(Optional.of(s));
-        when(usuarios.obtenerPorId(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(usuarios.findById(usuario.getId())).thenReturn(Optional.of(usuario));
 
         // Comprobar que es válida
         assertTrue(service.validate("t1").isPresent());
