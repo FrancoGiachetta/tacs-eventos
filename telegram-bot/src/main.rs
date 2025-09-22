@@ -3,7 +3,7 @@ use crate::error::BotError;
 mod bot;
 pub mod command;
 mod error;
-mod reques_client;
+mod request_client;
 mod schemas;
 
 #[tokio::main]

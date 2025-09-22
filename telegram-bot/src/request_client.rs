@@ -1,11 +1,11 @@
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
 
 use lazy_static::lazy_static;
 use reqwest::{Client, Response};
 use serde_json::Value;
 use thiserror::Error;
 
-use crate::{command::EventFilter, schemas::Event};
+use crate::schemas::evento::{Event, EventFilter};
 
 lazy_static! {
     static ref CLIENT_TIMEOUT_SECS: u64 = 90;
@@ -22,7 +22,9 @@ pub enum RequestClientError {
     #[error(transparent)]
     ReqwestError(#[from] reqwest::Error),
     #[error("request has failed with due to timeout")]
-    TimeOut,
+    TimeOutError,
+    #[error(transparent)]
+    JsonParseError(#[from] serde_json::Error),
 }
 
 pub enum RequestMethod<'req> {
@@ -35,6 +37,7 @@ pub enum RequestMethod<'req> {
 
 impl RequestClient {
     pub fn new() -> Result<Self, RequestClientError> {
+        // Create a client with a custom timeout for every request.
         let client = Client::builder()
             .timeout(Duration::from_secs(*CLIENT_TIMEOUT_SECS))
             .build()?;
@@ -64,21 +67,21 @@ impl RequestClient {
         if let Some(category) = filters.category {
             filter_query.push(("categoria", category));
         }
-        // TODO: add palabrasClave query
+        // TODO: add palabrasClave query.
 
         let response = self
-            .send_request_with_retry(url, RequestMethod::Get(filter_query))
+            .send_request_with_retry(url, Arc::new(RequestMethod::Get(filter_query)))
             .await?;
 
-        Ok(response)
+        Ok(serde_json::from_value(response)?)
     }
 
     async fn send_request_with_retry<'req>(
         &self,
         url: String,
-        method: RequestMethod<'req>,
+        method: Arc<RequestMethod<'req>>,
     ) -> Result<Value, RequestClientError> {
-        Self::retry(async || self.send_request(&url, &method).await).await
+        Self::retry(|| self.send_request(&url, &method)).await
     }
 
     async fn send_request<'req>(
@@ -95,17 +98,26 @@ impl RequestClient {
         request.send().await
     }
 
-    /// Retries sending a request
+    /// Retries sending a request.
     ///
     /// Whenever the request return a timeout, this function will retry sending
     /// it. If the maximum number of attempts has been reached or if another
     /// error (different from a timeout) is returned, it will stop retrying.
-    async fn retry(
-        request: impl AsyncFn() -> Result<Response, reqwest::Error>,
-    ) -> Result<Value, RequestClientError> {
+    async fn retry<F, Fut>(request: F) -> Result<Value, RequestClientError>
+    where
+        F: Fn() -> Fut,
+        Fut: Future<Output = Result<Response, reqwest::Error>>,
+    {
         for attempt in 0..(*MAX_RETRIES) {
-            match request().await {
-                Ok(r) => r.json::<Value>(),
+            let response = request().await;
+
+            match response {
+                Ok(r) => {
+                    return r
+                        .json::<Value>()
+                        .await
+                        .map_err(|err| RequestClientError::ReqwestError(err));
+                }
                 Err(e) if e.is_timeout() => {
                     tracing::warn!(
                         "Retrying request, remaining tries: {}",
@@ -116,13 +128,14 @@ impl RequestClient {
                         let backoff_timeout = rand::random_range(0..2u64.pow(attempt as u32));
                         Duration::from_secs(backoff_timeout)
                     };
-                    std::thread::sleep(backoff_timeout);
+
+                    tokio::time::sleep(backoff_timeout).await;
 
                     continue;
                 }
                 Err(err) => return Err(RequestClientError::ReqwestError(err)),
-            };
+            }
         }
-        Err(RequestClientError::TimeOut)
+        Err(RequestClientError::TimeOutError)
     }
 }

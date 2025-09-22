@@ -1,7 +1,7 @@
 use thiserror::Error;
 use tracing::subscriber::SetGlobalDefaultError;
 
-use crate::reques_client::RequestClientError;
+use crate::request_client::RequestClientError;
 
 #[derive(Debug, Error)]
 pub enum BotError {

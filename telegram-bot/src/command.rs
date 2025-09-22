@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use chrono::NaiveDate;
 use teloxide::{
     Bot,
     prelude::Requester,
@@ -9,7 +8,7 @@ use teloxide::{
 };
 use tracing::info;
 
-use crate::{error::BotError, reques_client::RequestClient};
+use crate::{error::BotError, request_client::RequestClient, schemas::evento::EventFilter};
 
 #[derive(BotCommands, Clone)]
 #[command(rename_rule = "lowercase")]
@@ -27,16 +26,6 @@ pub enum Command {
     ListEvents(EventFilter),
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct EventFilter {
-    pub max_price: Option<f32>,
-    pub min_price: Option<f32>,
-    pub max_date: Option<NaiveDate>,
-    pub min_date: Option<NaiveDate>,
-    pub category: Option<String>,
-    pub key_words: Option<Vec<String>>,
-}
-
 pub async fn handle_command(
     msg: Message,
     bot: Arc<Bot>,
@@ -45,11 +34,12 @@ pub async fn handle_command(
 ) -> Result<(), BotError> {
     match cmd {
         Command::ListEvents(filters) => {
-            info!("Listing events!");
+            info!("Listing list_events!");
 
-            let events_list = req_client.send_get_events_list_request(filters);
+            let events_list = req_client.send_get_events_list_request(filters).await?;
 
-            todo!()
+            bot.send_message(msg.chat.id, format!("{events_list:?}"))
+                .await?;
         }
         Command::Register => {
             info!("Execution /register!");

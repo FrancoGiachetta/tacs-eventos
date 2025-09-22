@@ -13,7 +13,7 @@ use tracing::{info, warn};
 use crate::{
     command::{Command, handle_command},
     error::BotError,
-    reques_client::RequestClient,
+    request_client::RequestClient,
 };
 
 pub async fn run() -> Result<(), BotError> {
