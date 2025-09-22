@@ -4,6 +4,7 @@ mod bot;
 pub mod command;
 mod error;
 mod reques_client;
+mod schemas;
 
 #[tokio::main]
 async fn main() -> Result<(), BotError> {

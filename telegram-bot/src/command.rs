@@ -47,7 +47,7 @@ pub async fn handle_command(
         Command::ListEvents(filters) => {
             info!("Listing events!");
 
-            req_client.send_get_events_list_request(filters);
+            let events_list = req_client.send_get_events_list_request(filters);
 
             todo!()
         }
@@ -64,9 +64,10 @@ pub async fn handle_command(
                 .await?;
         }
     }
+
     Ok(())
 }
 
-fn parse_event_filters(input: String) -> Result<EventFilter, ParseError> {
+fn parse_event_filters(input: String) -> Result<(EventFilter,), ParseError> {
     todo!()
 }

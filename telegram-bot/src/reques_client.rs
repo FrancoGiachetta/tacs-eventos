@@ -5,7 +5,7 @@ use reqwest::{Client, Response};
 use serde_json::Value;
 use thiserror::Error;
 
-use crate::command::EventFilter;
+use crate::{command::EventFilter, schemas::Event};
 
 lazy_static! {
     static ref CLIENT_TIMEOUT_SECS: u64 = 90;
@@ -45,7 +45,7 @@ impl RequestClient {
     pub async fn send_get_events_list_request(
         &self,
         filters: EventFilter,
-    ) -> Result<Value, RequestClientError> {
+    ) -> Result<Vec<Event>, RequestClientError> {
         let url = format!("{}/evento", *URL_BASE);
         let mut filter_query = Vec::new();
 
@@ -64,6 +64,7 @@ impl RequestClient {
         if let Some(category) = filters.category {
             filter_query.push(("categoria", category));
         }
+        // TODO: add palabrasClave query
 
         let response = self
             .send_request_with_retry(url, RequestMethod::Get(filter_query))
@@ -71,7 +72,7 @@ impl RequestClient {
 
         Ok(response)
     }
-    
+
     async fn send_request_with_retry<'req>(
         &self,
         url: String,
