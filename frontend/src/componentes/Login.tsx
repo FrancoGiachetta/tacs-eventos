@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import api from '../lib/api'
 import { useNavigate, Link } from 'react-router-dom'
+import PasswordInput from './PasswordInput'
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('')
@@ -46,14 +47,14 @@ const Login: React.FC = () => {
                     className="w-full p-2 mb-4 border rounded"
                     required
                 />
-                <input
-                    type="password"
-                    placeholder="Contraseña"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-2 mb-4 border rounded"
-                    required
-                />
+                <div className="mb-4">
+                    <PasswordInput
+                        placeholder="Contraseña"
+                        value={password}
+                        onChange={setPassword}
+                        required
+                    />
+                </div>
                 <button
                     type="submit"
                     className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 mb-2"
