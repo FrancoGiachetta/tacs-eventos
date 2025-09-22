@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import api from '../lib/api'
 import { useNavigate, Link } from 'react-router-dom'
+import PasswordInput from './PasswordInput'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,72}$/
@@ -65,22 +66,22 @@ const Registro: React.FC = () => {
                     className="w-full p-2 mb-4 border rounded"
                     required
                 />
-                <input
-                    type="password"
-                    placeholder="Contraseña"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-2 mb-4 border rounded"
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Confirmar Contraseña"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full p-2 mb-4 border rounded"
-                    required
-                />
+                <div className="mb-4">
+                    <PasswordInput
+                        placeholder="Contraseña"
+                        value={password}
+                        onChange={setPassword}
+                        required
+                    />
+                </div>
+                <div className="mb-4">
+                    <PasswordInput
+                        placeholder="Confirmar Contraseña"
+                        value={confirmPassword}
+                        onChange={setConfirmPassword}
+                        required
+                    />
+                </div>
                 <button
                     type="submit"
                     className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700"

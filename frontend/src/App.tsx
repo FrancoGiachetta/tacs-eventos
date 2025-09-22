@@ -48,8 +48,7 @@ function App() {
 }
 
 function GestionarEventoConId() {
-    const id = window.location.pathname.split('/').pop() || ''
-    return <GestionarEvento id={id} />
+    return <GestionarEvento />
 }
 
 export default App

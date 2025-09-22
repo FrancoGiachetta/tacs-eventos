@@ -1,4 +1,5 @@
 import { type InputCrearEvento } from '../lib/schemas'
+import { type CategoriaEvento } from './categorias'
 
 /* Este tipo tiene todos los campos del formulario, sumado a los campos que no se muestran en el formulario porque los completa el back end en forma automática */
 export type Evento = InputCrearEvento & {
@@ -12,7 +13,7 @@ export interface EventoFiltros {
     precioPesosMax?: number
     fechaInicioMin?: string
     fechaInicioMax?: string
-    categoria?: string
+    categoria?: CategoriaEvento
     page?: number
 }
 

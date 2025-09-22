@@ -3,8 +3,7 @@ import api from '../../lib/api'
 import BarraSuperior from '../BarraSuperior'
 import { Evento } from '../../types/evento'
 import FormularioEvento from './FormularioEvento'
-import { toast } from 'react-toastify'
-import ContainerDeToast from '../ContainerDeToast'
+import { toast } from '../../lib/simpleToast'
 import { useParams } from 'react-router-dom'
 
 export default function DetalleEvento() {
@@ -47,7 +46,6 @@ export default function DetalleEvento() {
                     </button>
                 </div>
             </div>
-            <ContainerDeToast />
         </>
     ) : null
 }

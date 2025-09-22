@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { EventoFiltros } from '../types/evento'
+import { CATEGORIAS_EVENTO, type CategoriaEvento } from '../types/categorias'
 
 interface EventFiltersProps {
     onFilterChange: (filtros: EventoFiltros) => void
@@ -78,16 +79,16 @@ export default function EventFilters({
                             const value = e.target.value
                             setFiltros((prev) => ({
                                 ...prev,
-                                categoria: value === '' ? undefined : value,
+                                categoria: value === '' ? undefined : (value as CategoriaEvento),
                             }))
                         }}
                     >
                         <option value="">Todas las categorías</option>
-                        <option value="Música">Música</option>
-                        <option value="Deportes">Deportes</option>
-                        <option value="Teatro">Teatro</option>
-                        <option value="Arte">Arte</option>
-                        <option value="Gastronomía">Gastronomía</option>
+                        {CATEGORIAS_EVENTO.map((categoria) => (
+                            <option key={categoria} value={categoria}>
+                                {categoria}
+                            </option>
+                        ))}
                     </select>
                 </div>
 

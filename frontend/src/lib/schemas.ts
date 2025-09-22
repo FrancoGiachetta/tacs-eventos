@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { CATEGORIAS_EVENTO, type CategoriaEvento } from '../types/categorias'
 
 function mensajeDeErrorMinimoCaracteres(cantidadMinima: number) {
     return `Ingrese al menos ${cantidadMinima} caracteres`
@@ -39,8 +40,9 @@ export const SchemaCrearEvento = z.object({
         .positive(mensajeDeErrorNumeroNegativo),
     precio: z.number(mensajeDeErrorNumeroInvalido).min(0),
     categoria: z
-        .string()
-        .max(100, mensajeDeErrorMaximoCaracteres(100))
+        .enum(CATEGORIAS_EVENTO, {
+            message: 'Selecciona una categoría válida'
+        })
         .optional()
         .nullable(),
 })
