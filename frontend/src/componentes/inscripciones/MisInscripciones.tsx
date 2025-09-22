@@ -23,7 +23,7 @@ export default function MisInscripciones() {
         <div className="mt-10 w-[90%] mx-auto">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-4xl">Mis inscripciones</h1>
-                <a 
+                <a
                     href="/organizador/mis-eventos"
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
                 >
@@ -33,9 +33,11 @@ export default function MisInscripciones() {
             <div className="mt-5 w-full mx-auto rounded-lg bg-gray-100 p-10 flex flex-col gap-4">
                 {loaded &&
                     (inscripciones.length > 0 ? (
-                        inscripciones.map((inscripcion: Inscripcion, index: number) => (
-                            <InscripcionItem key={index} {...inscripcion} />
-                        ))
+                        inscripciones.map(
+                            (inscripcion: Inscripcion, index: number) => (
+                                <InscripcionItem key={index} {...inscripcion} />
+                            )
+                        )
                     ) : (
                         <h3 className="text-3xl text-gray-600 font-bold text-center m-auto my-20">
                             No est{'á'}s inscripto a ning{'ú'}n evento

@@ -41,7 +41,7 @@ export const SchemaCrearEvento = z.object({
     precio: z.number(mensajeDeErrorNumeroInvalido).min(0),
     categoria: z
         .enum(CATEGORIAS_EVENTO, {
-            message: 'Selecciona una categoría válida'
+            message: 'Selecciona una categoría válida',
         })
         .optional()
         .nullable(),

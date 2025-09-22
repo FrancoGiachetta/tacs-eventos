@@ -15,5 +15,5 @@ export const toast = {
     warning: (message: string) => {
         console.warn('WARNING:', message)
         alert(`⚠️ ${message}`)
-    }
+    },
 }

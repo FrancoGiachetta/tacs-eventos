@@ -17,8 +17,10 @@ export default function InscripcionItem(props: Inscripcion): ReactNode {
             // Obtener el ID del usuario actual desde el token o contexto
             const userResponse = await api.get('/api/v1/usuario/me')
             const userId = userResponse.data.id
-            
-            const res = await api.delete(`/api/v1/evento/${eventoId}/inscripcion/${userId}`)
+
+            const res = await api.delete(
+                `/api/v1/evento/${eventoId}/inscripcion/${userId}`
+            )
             document.location.reload()
         } catch (e: any) {
             alert('No fue posible cancelar la inscripción')

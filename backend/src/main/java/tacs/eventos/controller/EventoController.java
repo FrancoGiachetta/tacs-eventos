@@ -249,7 +249,8 @@ public class EventoController {
     }
 
     /**
-     * Inscribe a un usuario a un evento. Solo el mismo usuario o el organizador del evento pueden crear una inscripción.
+     * Inscribe a un usuario a un evento. Solo el mismo usuario o el organizador del evento pueden crear una
+     * inscripción.
      *
      * @param usuarioLogueado
      *            usuario logueado al sistema
@@ -258,17 +259,19 @@ public class EventoController {
      * @param usuarioId
      *            id del usuario que se quiere inscribir
      *
-     * @return ResponseEntity devuelve el código 201 CREATED y un body vacío, o 303 SEE_OTHER si ya existe la inscripción
+     * @return ResponseEntity devuelve el código 201 CREATED y un body vacío, o 303 SEE_OTHER si ya existe la
+     *         inscripción
      */
     @PostMapping("/{eventoId}/inscripcion/{usuarioId}")
     public ResponseEntity<Void> inscribirUsuarioAEvento(@AuthenticationPrincipal Usuario usuarioLogueado,
             @PathVariable String eventoId, @PathVariable String usuarioId) {
         var evento = this.buscarEvento(eventoId);
-        var usuario = usuarioService.buscarPorId(usuarioId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "Solamente pueden crear una inscripción el usuario que se va a inscribir, o el organizador del evento"));
+        var usuario = usuarioService.buscarPorId(usuarioId).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "Solamente pueden crear una inscripción el usuario que se va a inscribir, o el organizador del evento"));
 
-        verificarAutorizacion(usuarioLogueado, "Solamente pueden crear una inscripción el usuario que se va a inscribir, o el organizador del evento",
+        verificarAutorizacion(usuarioLogueado,
+                "Solamente pueden crear una inscripción el usuario que se va a inscribir, o el organizador del evento",
                 false, evento.getOrganizador(), usuario);
 
         String location = "/api/v1/evento/" + eventoId + "/inscripcion/" + usuarioId;

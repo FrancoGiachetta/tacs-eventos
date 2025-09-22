@@ -35,7 +35,9 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
                 type="button"
                 onClick={togglePasswordVisibility}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800"
-                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                aria-label={
+                    showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                }
             >
                 {showPassword ? (
                     <svg

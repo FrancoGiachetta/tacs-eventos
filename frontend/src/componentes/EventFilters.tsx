@@ -79,7 +79,10 @@ export default function EventFilters({
                             const value = e.target.value
                             setFiltros((prev) => ({
                                 ...prev,
-                                categoria: value === '' ? undefined : (value as CategoriaEvento),
+                                categoria:
+                                    value === ''
+                                        ? undefined
+                                        : (value as CategoriaEvento),
                             }))
                         }}
                     >
