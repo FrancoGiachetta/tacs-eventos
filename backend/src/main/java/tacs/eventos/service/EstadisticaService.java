@@ -9,8 +9,8 @@ import tacs.eventos.model.Waitlist;
 import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.evento.EventosRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
+
 import java.util.Optional;
-import org.apache.logging.log4j.*;
 
 @Service
 public class EstadisticaService {
@@ -57,7 +57,7 @@ public class EstadisticaService {
                 int totalInscripcionesEnWaitlist;
                 TotalInscripcionesEvento = this.inscripcionesRepository.getInscripcionesPorEvento(evento.get()).size();
                 eventoWaitlist = this.waitlistRepository.waitlist(evento.get());
-                totalInscripcionesEnWaitlist = eventoWaitlist.getItems().size();
+                totalInscripcionesEnWaitlist = eventoWaitlist.cantidadEnCola();
                 calculoTasa = (TotalInscripcionesEvento / totalInscripcionesEnWaitlist) * 100;
             }
         } catch (Exception e) {

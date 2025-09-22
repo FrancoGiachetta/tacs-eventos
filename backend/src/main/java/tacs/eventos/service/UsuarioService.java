@@ -3,12 +3,9 @@ package tacs.eventos.service;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import tacs.eventos.dto.EstadoInscripcionResponse;
 import tacs.eventos.dto.InscripcionResponse;
-import tacs.eventos.model.Evento;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
-import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
@@ -17,8 +14,8 @@ import tacs.eventos.repository.usuario.UsuarioRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static tacs.eventos.dto.EstadoInscripcionMapper.mapEstado;
 
 @Service
 @AllArgsConstructor
@@ -49,23 +46,9 @@ public class UsuarioService {
     public List<InscripcionResponse> obtenerInscripcionesNoCanceladas(String usuarioId) {
         Usuario usuario = repo.obtenerPorId(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-        List<InscripcionEvento> inscripciones = inscripcionesRepository
-                .getInscripcionesConfirmadasPorParticipante(usuario);
+        List<InscripcionEvento> inscripciones = inscripcionesRepository.getInscripcionesNoCanceladasPorParticipante(usuario);
         List<InscripcionResponse> inscripcionResponses = inscripciones.stream()
                 .map(insc -> new InscripcionResponse(insc.getEvento().getId(), mapEstado(insc.getEstado()))).toList();
-
-        List<Evento> eventosEnWaitlist = waitlistRepository.eventosEnCuyasWaitlistEsta(usuario);
-        List<InscripcionResponse> waitlistResponses = eventosEnWaitlist.stream()
-                .map(evento -> new InscripcionResponse(evento.getId(), EstadoInscripcionResponse.PENDIENTE)).toList();
-
-        return Stream.concat(inscripcionResponses.stream(), waitlistResponses.stream()).collect(Collectors.toList());
-    }
-
-    private EstadoInscripcionResponse mapEstado(EstadoInscripcion estado) {
-        return switch (estado) {
-        case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
-        case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
-        case PENDIENTE -> EstadoInscripcionResponse.PENDIENTE;
-        };
+        return inscripcionResponses;
     }
 }

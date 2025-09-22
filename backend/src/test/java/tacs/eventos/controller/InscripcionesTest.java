@@ -80,7 +80,7 @@ public class InscripcionesTest {
         @Test
         void unUsuarioPuedeVerSuInscripcionConfirmada() throws Exception {
             // Deja al usuario inscripto
-            InscripcionEvento i1 = InscripcionFactory.directa(u1, e1);
+            InscripcionEvento i1 = InscripcionFactory.confirmada(u1, e1);
             when(inscripcionesRepository.getInscripcionConfirmada(u1, e1)).thenReturn(Optional.of(i1));
             // Mockea el pedido GET y verifica que retorne 200 OK y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
@@ -127,7 +127,7 @@ public class InscripcionesTest {
             mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
 
             // Verifica que se haya guardado la inscripción en el repo
-            verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.directa(u1, e1));
+            verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.confirmada(u1, e1));
         }
 
         @Test
@@ -190,7 +190,7 @@ public class InscripcionesTest {
             when(waitlistRepository.waitlist(e1)).thenReturn(w1);
 
             // Deja al usuario inscripto
-            InscripcionEvento i1 = InscripcionFactory.directa(u1, e1);
+            InscripcionEvento i1 = InscripcionFactory.confirmada(u1, e1);
             when(inscripcionesRepository.getInscripcionConfirmada(u1, e1)).thenReturn(Optional.of(i1));
 
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId()));
@@ -209,7 +209,7 @@ public class InscripcionesTest {
             when(waitlistRepository.waitlist(e1)).thenReturn(w1);
 
             // Deja al usuario inscripto
-            InscripcionEvento i1 = InscripcionFactory.directa(u1, e1);
+            InscripcionEvento i1 = InscripcionFactory.confirmada(u1, e1);
             when(inscripcionesRepository.getInscripcionConfirmada(u1, e1)).thenReturn(Optional.of(i1));
 
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId()));
@@ -220,7 +220,7 @@ public class InscripcionesTest {
         @Test
         void unUsuarioNoPuedeCancelarLaInscripcionDeOtroUsuario() throws Exception {
             // Deja al usuario 2 inscripto
-            InscripcionEvento i1 = InscripcionFactory.directa(u2, e1);
+            InscripcionEvento i1 = InscripcionFactory.confirmada(u2, e1);
             when(inscripcionesRepository.getInscripcionConfirmada(u2, e1)).thenReturn(Optional.of(i1));
 
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u2.getId()))
@@ -266,7 +266,7 @@ public class InscripcionesTest {
         @Test
         void alCancelarUnaInscripcionConfirmadaSePromueveAlPrimeroDeLaWaitlist() throws Exception {
             // Deja al usuario 1 inscripto
-            InscripcionEvento i1 = InscripcionFactory.directa(u1, e1);
+            InscripcionEvento i1 = InscripcionFactory.confirmada(u1, e1);
             when(inscripcionesRepository.getInscripcionConfirmada(u1, e1)).thenReturn(Optional.of(i1));
 
             // Crea una waitlist de prueba, en la que está el usuario 2
@@ -282,7 +282,7 @@ public class InscripcionesTest {
             // Chequea que el usuario 2 haya quedado inscripto (chequea con una inscripción directa. En realidad sería
             // una inscripción desde waitlist, no directa, pero como el id de inscripción es (usuario, evento), sirve
             // igual.
-            verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.directa(u2, e1));
+            verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.confirmada(u2, e1));
         }
 
         @Test
@@ -291,7 +291,7 @@ public class InscripcionesTest {
             when(waitlistRepository.waitlist(e1)).thenReturn(new Waitlist(e1));
 
             // Deja al usuario inscripto
-            InscripcionEvento i1 = InscripcionFactory.directa(u1, e1);
+            InscripcionEvento i1 = InscripcionFactory.confirmada(u1, e1);
             when(inscripcionesRepository.getInscripcionConfirmada(u1, e1)).thenReturn(Optional.of(i1));
 
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId()));

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import tacs.eventos.dto.*;
 import tacs.eventos.model.Evento;
-import tacs.eventos.model.InscripcionEnWaitlist;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
@@ -26,10 +25,9 @@ import tacs.eventos.service.UsuarioService;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
+import static tacs.eventos.dto.EstadoInscripcionMapper.mapEstado;
 
 @RestController
 @RequestMapping("/api/v1/evento")
@@ -209,12 +207,11 @@ public class EventoController {
 
         verificarAutorizacion(usuarioLogueado, mensajeNoEncontrado, true, evento.getOrganizador(), usuarioInscripto);
 
-        if (this.inscripcionesService.buscarInscripcionConfirmada(usuarioInscripto, evento).isPresent())
-            return InscripcionResponse.confirmada(evento.getId());
-        else if (this.inscripcionesService.inscripcionEstaEnWaitlist(evento, usuarioInscripto))
-            return InscripcionResponse.enWaitlist(evento.getId());
-        else
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, mensajeNoEncontrado);
+        Optional<InscripcionEvento> inscripcion = inscripcionesService.inscripcionParaUsuarioYEvento(usuarioInscripto,
+                evento);
+        return inscripcion.filter(i -> i.getEstado() != EstadoInscripcion.CANCELADA)
+                .map(i -> new InscripcionResponse(i.getEvento().getId(), mapEstado(i.getEstado())))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, mensajeNoEncontrado));
     }
 
     /**
@@ -290,11 +287,14 @@ public class EventoController {
         var evento = this.buscarEvento(eventoId);
         verificarAutorizacion(usuario, "El usuario no es organizador del evento", false, evento.getOrganizador());
 
-        return this.inscripcionesService.buscarWaitlistDeEvento(evento).getItems().stream()
-                .map((InscripcionEnWaitlist i) -> {
-                    var usuarioResponse = modelMapper.map(i.getCandidato(), UsuarioResponse.class);
-                    return new InscripcionEnWaitlistResponse(usuarioResponse, i.getFechaIngreso());
-                }).toList();
+        return this.inscripcionesService.inscripcionesPendientes(evento).stream().map((InscripcionEvento i) -> {
+            var usuarioResponse = modelMapper.map(i.getParticipante(), UsuarioResponse.class);
+            return new InscripcionEnWaitlistResponse(usuarioResponse, i.getFechaHoraIngresoAWaitlist()
+                    .orElse(null)); /*
+                                     * La fechaHora de ingreso a watilist no debería ser nunca null en este caso, porque
+                                     * estamos buscando las inscripciones pendientes, o sea, las que están en watilist
+                                     */
+        }).toList();
     }
 
     private Evento buscarEvento(String id) {

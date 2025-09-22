@@ -31,7 +31,7 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
     }
 
     @Override
-    public List<InscripcionEvento> getInscripcionesConfirmadasPorParticipante(Usuario participante) {
+    public List<InscripcionEvento> getInscripcionesNoCanceladasPorParticipante(Usuario participante) {
         return this.inscripciones.stream().filter(i -> i.getParticipante().equals(participante))
                 .filter(i -> i.getEstado() != EstadoInscripcion.CANCELADA).toList();
     }
@@ -58,5 +58,22 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
          */
         return (int) this.inscripciones.stream()
                 .filter(i -> i.getEvento().equals(evento) && i.getEstado() == EstadoInscripcion.CONFIRMADA).count();
+    }
+
+    @Override
+    public Optional<InscripcionEvento> getInscripcionParaUsuarioYEvento(Usuario usuarioInscripto, Evento evento) {
+        return this.inscripciones.stream()
+                .filter(i -> i.getEvento().equals(evento) && i.getParticipante().equals(usuarioInscripto)).findFirst();
+    }
+
+    @Override
+    public Optional<InscripcionEvento> getInscripcionPorId(String id) {
+        return this.inscripciones.stream().filter(i -> i.getId().equals(id)).findFirst();
+    }
+
+    @Override
+    public List<InscripcionEvento> getInscripcionesPendientes(Evento evento) {
+        return this.inscripciones.stream().filter(i -> i.getEvento().equals(evento))
+                .filter(InscripcionEvento::estaPendiente).toList();
     }
 }

@@ -86,17 +86,17 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void obtenerInscripcionesRetornaListaDeEventosConInscripcionNoCancelada() {
+    void obtenerInscripcionesNoCanceladasRetornaListaDeEventosConInscripcionNoCancelada() {
         Usuario usuario = new Usuario("asd@mail.com", "asd", Set.of(RolUsuario.USUARIO));
         when(usuarioRepository.obtenerPorId(usuario.getId())).thenReturn(Optional.of(usuario));
         Evento evento1 = new Evento("Evento 1", "Desc 1", null, 60, "Ubicacion", 100, 500, "Categoria");
         Evento evento2 = new Evento("Evento 2", "Desc 2", null, 120, "Ubicacion", 50, 1000, "Categoria");
         Evento evento3 = new Evento("Evento 3", "Desc 3", null, 120, "Ubicacion", 50, 1000, "Categoria");
 
-        List<InscripcionEvento> inscripciones = List.of(InscripcionFactory.directa(usuario, evento1),
-                InscripcionFactory.directa(usuario, evento2));
+        List<InscripcionEvento> inscripciones = List.of(InscripcionFactory.confirmada(usuario, evento1),
+                InscripcionFactory.confirmada(usuario, evento2));
 
-        when(inscripcionesRepository.getInscripcionesConfirmadasPorParticipante(usuario)).thenReturn(inscripciones);
+        when(inscripcionesRepository.getInscripcionesNoCanceladasPorParticipante(usuario)).thenReturn(inscripciones);
         when(waitlistRepository.eventosEnCuyasWaitlistEsta(usuario)).thenReturn(List.of(evento3));
 
         var result = usuarioService.obtenerInscripcionesNoCanceladas(usuario.getId());
