@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tacs.eventos.dto.EventoResponse;
 import tacs.eventos.dto.InscripcionResponse;
+import tacs.eventos.dto.UsuarioDto;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.repository.evento.EventosRepository;
 import tacs.eventos.service.UsuarioService;
@@ -22,6 +23,22 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
     private final EventosRepository eventosRepository;
     private final ModelMapper modelMapper;
+
+    /**
+     * Retorna información del usuario autenticado.
+     *
+     * @param usuario
+     *            datos del usuario autenticado.
+     *
+     * @return información del usuario.
+     */
+    @GetMapping("/me")
+    public UsuarioDto getMe(@AuthenticationPrincipal Usuario usuario) {
+        return new UsuarioDto(usuario.getId(), usuario.getEmail(), usuario.getRoles().iterator().next(), // Asumimos un
+                                                                                                         // rol por
+                                                                                                         // usuario
+                usuario.getFechaCreacion());
+    }
 
     /**
      * Retorna las inscripciones de un usuario según su id.

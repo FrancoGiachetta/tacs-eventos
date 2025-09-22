@@ -84,6 +84,19 @@ mvn net.revelc.code.formatter:formatter-maven-plugin:2.20.0:format
 npm run fmt
 ```
 
+-Usuarios hardcodeados
+🔴 ADMIN
+Email: admin@eventos.com
+Password: admin123
+Permisos: Acceso completo al sistema + Panel de administración
+
+🔵 ORGANIZADOR (Ejemplo)
+Email: organizador@eventos.com  
+Password: org123
+Permisos: Crear y gestionar eventos
+```
+
+
 ## Equipo
 
 Franco Giachetta

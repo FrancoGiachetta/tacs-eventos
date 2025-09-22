@@ -33,7 +33,11 @@ const Registro: React.FC = () => {
             return
         }
         try {
-            await api.post('/api/v1/auth/register', { email, password })
+            await api.post('/api/v1/auth/register', {
+                email,
+                password,
+                tipoUsuario: 'USUARIO', // Solo permitir registro como usuario normal
+            })
             setSuccess('Registro exitoso. Redirigiendo al login...')
             setTimeout(() => navigate('/login'), 1500)
         } catch (err: any) {
@@ -82,11 +86,24 @@ const Registro: React.FC = () => {
                         required
                     />
                 </div>
+                <div className="text-xs text-gray-600 mb-4 bg-blue-50 p-3 rounded">
+                    <p>
+                        <strong>ℹ️ Información:</strong>
+                    </p>
+                    <p>
+                        • Te registrarás como <strong>Usuario Normal</strong>
+                    </p>
+                    <p>• Podrás ver e inscribirte a eventos</p>
+                    <p>
+                        • Si quieres crear eventos, contacta al administrador
+                        para ser promovido a Organizador
+                    </p>
+                </div>
                 <button
                     type="submit"
                     className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700"
                 >
-                    Registrarse
+                    Registrarse como Usuario
                 </button>
                 <div className="text-center mt-2">
                     <span>¿Ya tenés cuenta? </span>

@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -304,7 +305,8 @@ public class EventoController {
 
         return this.inscripcionesService.buscarWaitlistDeEvento(evento).getItems().stream()
                 .map((InscripcionEnWaitlist i) -> {
-                    var usuarioResponse = modelMapper.map(i.getCandidato(), UsuarioResponse.class);
+                    var usuarioResponse = new UsuarioResponse(i.getCandidato().getId(), i.getCandidato().getEmail(),
+                            i.getCandidato().getRoles());
                     return new InscripcionEnWaitlistResponse(usuarioResponse, i.getFechaIngreso());
                 }).toList();
     }
