@@ -1,6 +1,8 @@
 use thiserror::Error;
 use tracing::subscriber::SetGlobalDefaultError;
 
+use crate::reques_client::RequestClientError;
+
 #[derive(Debug, Error)]
 pub enum BotError {
     #[error("Couldn't find TELOXIDE_TOKEN env variable")]
@@ -11,4 +13,6 @@ pub enum BotError {
     TeloxideError(#[from] teloxide::RequestError),
     #[error(transparent)]
     GlobalSubscriberError(#[from] SetGlobalDefaultError),
+    #[error(transparent)]
+    RequestError(#[from] RequestClientError),
 }

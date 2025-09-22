@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use teloxide::{
     Bot,
-    dispatching::{DefaultKey, HandlerExt, UpdateFilterExt},
+    dispatching::{HandlerExt, UpdateFilterExt},
     dptree,
     prelude::{Dispatcher, LoggingErrorHandler, Requester},
     types::Update,
@@ -13,6 +13,7 @@ use tracing::{info, warn};
 use crate::{
     command::{Command, handle_command},
     error::BotError,
+    reques_client::RequestClient,
 };
 
 pub async fn run() -> Result<(), BotError> {
@@ -28,15 +29,17 @@ pub async fn run() -> Result<(), BotError> {
                 .filter_command::<Command>()
                 .endpoint(handle_command),
         );
+        let req_client = RequestClient::new()?;
 
         Dispatcher::builder(bot.clone(), handler)
-            // .dependencies(db)
+            .dependencies(dptree::deps![Arc::new(req_client)])
             .default_handler(|upd| async move {
                 warn!("Unhandled update: {upd:?}");
             })
             .error_handler(LoggingErrorHandler::with_custom_text(
                 "An error has occurred with the dispatcher",
             ))
+            .enable_ctrlc_handler()
             .build()
     };
 

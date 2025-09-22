@@ -2,9 +2,8 @@ use crate::error::BotError;
 
 mod bot;
 pub mod command;
-mod db;
 mod error;
-mod schemas;
+mod reques_client;
 
 #[tokio::main]
 async fn main() -> Result<(), BotError> {
