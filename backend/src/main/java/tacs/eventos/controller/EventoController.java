@@ -15,6 +15,7 @@ import tacs.eventos.controller.validadores.Validador;
 import tacs.eventos.controller.validadores.ValidadorAutorizacionUsuario;
 import tacs.eventos.dto.*;
 import tacs.eventos.model.Evento;
+import tacs.eventos.model.inscripcion.InscripcionEnWaitlist;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
