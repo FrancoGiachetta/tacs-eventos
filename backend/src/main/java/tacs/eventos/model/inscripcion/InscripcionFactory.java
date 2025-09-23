@@ -1,7 +1,6 @@
 package tacs.eventos.model.inscripcion;
 
 import tacs.eventos.model.Evento;
-import tacs.eventos.model.InscripcionEnWaitlist;
 import tacs.eventos.model.Usuario;
 
 import java.util.Optional;

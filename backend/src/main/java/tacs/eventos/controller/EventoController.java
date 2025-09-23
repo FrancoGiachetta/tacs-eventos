@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import tacs.eventos.dto.*;
 import tacs.eventos.model.Evento;
-import tacs.eventos.model.InscripcionEnWaitlist;
+import tacs.eventos.model.inscripcion.InscripcionEnWaitlist;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
