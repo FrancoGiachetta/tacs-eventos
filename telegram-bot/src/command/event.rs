@@ -5,7 +5,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use teloxide::utils::command::ParseError;
 
-use crate::schemas::evento::EventFilter;
+use crate::schemas::event::EventFilter;
 
 /// Parse event filters.
 ///
@@ -81,7 +81,7 @@ pub fn parse_event_filters(input: String) -> Result<(EventFilter,), ParseError> 
 mod tests {
     use chrono::NaiveDate;
 
-    use crate::{command::event::parse_event_filters, schemas::evento::EventFilter};
+    use crate::{command::event::parse_event_filters, schemas::event::EventFilter};
 
     #[test]
     fn empty_filter() {

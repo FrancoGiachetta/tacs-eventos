@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{error::BotError, request_client::RequestClient, schemas::evento::EventFilter};
+use crate::{error::BotError, request_client::RequestClient, schemas::event::EventFilter};
 use event::parse_event_filters;
 use teloxide::{Bot, prelude::Requester, types::Message, utils::command::BotCommands};
 use tracing::info;

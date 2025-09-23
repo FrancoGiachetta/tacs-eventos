@@ -5,7 +5,7 @@ use reqwest::{Client, Response};
 use serde_json::Value;
 use thiserror::Error;
 
-use crate::schemas::evento::{Event, EventFilter};
+use crate::schemas::event::{Event, EventFilter};
 
 lazy_static! {
     static ref CLIENT_TIMEOUT_SECS: u64 = 90;
@@ -92,7 +92,9 @@ impl RequestClient {
         let request = match method {
             RequestMethod::Get(params) => self.client.get(url).query(&params),
             RequestMethod::Post(body) => self.client.post(url).json(&body),
-            _ => todo!(),
+            RequestMethod::Patch(body) => self.client.patch(url).json(&body),
+            RequestMethod::Put(body) => self.client.put(url).json(&body),
+            RequestMethod::Delete(body) => self.client.delete(url).json(&body),
         };
 
         request.send().await
