@@ -3,6 +3,7 @@ package tacs.eventos.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -13,8 +14,10 @@ import java.util.UUID;
 @Document(collection = "eventos")
 public class Evento {
     @Setter
+    @Indexed
     private String id;
     @Setter
+    @Indexed
     private String titulo;
     @Setter
     private String descripcion;
@@ -27,10 +30,12 @@ public class Evento {
     @Setter
     private int cupoMaximo;
     @Setter
+    @Indexed
     private double precio; // TODO: cambiar el tipo de dato. Debería ser un número de precisión fija. Fijarme si no
     // puedo recibir directamente BigDecimal o algo así en el DTO. Si no, que el front mande un
     // String que cumpla la regex correcta, y el back lo transforme manualmente.
     @Setter
+    @Indexed
     private String categoria;
     private boolean abierto = true;
 
