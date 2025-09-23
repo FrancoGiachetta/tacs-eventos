@@ -4,14 +4,14 @@ use chrono::{NaiveDate, NaiveDateTime};
 use serde::Deserialize;
 use serde_json::Value;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct EventFilter {
     pub max_price: Option<f32>,
     pub min_price: Option<f32>,
     pub max_date: Option<NaiveDate>,
     pub min_date: Option<NaiveDate>,
     pub category: Option<String>,
-    pub key_words: Option<Vec<String>>,
+    pub keywords: Option<Vec<String>>,
 }
 
 #[derive(Debug)]

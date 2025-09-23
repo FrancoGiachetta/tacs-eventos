@@ -1,14 +1,11 @@
 use std::sync::Arc;
 
-use teloxide::{
-    Bot,
-    prelude::Requester,
-    types::Message,
-    utils::command::{BotCommands, ParseError},
-};
+use crate::{error::BotError, request_client::RequestClient, schemas::evento::EventFilter};
+use event::parse_event_filters;
+use teloxide::{Bot, prelude::Requester, types::Message, utils::command::BotCommands};
 use tracing::info;
 
-use crate::{error::BotError, request_client::RequestClient, schemas::evento::EventFilter};
+mod event;
 
 #[derive(BotCommands, Clone)]
 #[command(rename_rule = "lowercase")]
@@ -56,8 +53,4 @@ pub async fn handle_command(
     }
 
     Ok(())
-}
-
-fn parse_event_filters(input: String) -> Result<(EventFilter,), ParseError> {
-    todo!()
 }
