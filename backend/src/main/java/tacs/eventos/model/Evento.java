@@ -71,7 +71,6 @@ public class Evento {
         this.categoria = categoria;
     }
 
-
     /**
      * Verifica si el evento permite nuevas inscripciones.
      *
@@ -105,4 +104,3 @@ public class Evento {
         return id.hashCode();
     }
 }
-
