@@ -10,7 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import tacs.eventos.dto.*;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.inscripcion.InscripcionEnWaitlist;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
@@ -145,7 +145,7 @@ public class EventoController {
      *
      * @return Respuesta vacía, con un status code de 204.
      */
-    @PutMapping("/{eventoId}/estado")
+    @PatchMapping("/{eventoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> actualizarEstadoEvento(@AuthenticationPrincipal Usuario usuario,
             @PathVariable String eventoId, EventoEstadoDTO estadoDTO) {

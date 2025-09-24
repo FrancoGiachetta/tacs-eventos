@@ -3,7 +3,7 @@ package tacs.eventos.model.inscripcion;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Usuario;
 
 import java.time.LocalDateTime;

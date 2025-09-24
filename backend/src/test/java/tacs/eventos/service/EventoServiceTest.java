@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorCategoria;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorFechaInicio;

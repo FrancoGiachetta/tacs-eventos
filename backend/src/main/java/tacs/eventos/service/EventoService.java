@@ -2,7 +2,7 @@ package tacs.eventos.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.repository.evento.EventosRepository;

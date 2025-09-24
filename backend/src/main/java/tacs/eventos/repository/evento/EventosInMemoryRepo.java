@@ -1,7 +1,7 @@
 package tacs.eventos.repository.evento;
 
 import org.springframework.stereotype.Repository;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.repository.FiltroBusqueda;
 
 import java.util.ArrayList;

@@ -4,13 +4,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.EstadoEvento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Waitlist;
 import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.evento.EventosRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import java.util.Optional;
-import org.apache.logging.log4j.*;
 
 @Service
 public class EstadisticaService {
@@ -51,7 +51,7 @@ public class EstadisticaService {
         int calculoTasa = 0;
 
         try {
-            if (evento.isPresent() && evento.get().isAbierto()) {
+            if (evento.isPresent() && evento.get().getEstado() == EstadoEvento.ABIERTO) {
                 int TotalInscripcionesEvento;
                 Waitlist eventoWaitlist;
                 int totalInscripcionesEnWaitlist;
