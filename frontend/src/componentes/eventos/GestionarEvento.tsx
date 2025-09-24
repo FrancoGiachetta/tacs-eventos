@@ -100,7 +100,7 @@ export default function GestionarEvento() {
         try {
             // PATCH /api/v1/evento/:id/inscripciones  body: { abierto: boolean }
             const nuevoEstado = !evento.abierto
-            await api.put(`/api/v1/evento/${id}/estado`, {
+            await api.patch(`/api/v1/evento/${id}`, {
                 abierto: nuevoEstado,
             })
             setEvento({ ...evento, abierto: nuevoEstado })
