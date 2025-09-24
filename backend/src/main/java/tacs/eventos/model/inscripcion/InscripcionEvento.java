@@ -8,7 +8,6 @@ import tacs.eventos.model.Usuario;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
@@ -22,16 +21,16 @@ public class InscripcionEvento {
     // TODO: agregar cuando este definido
     // private DatosDePago datosDePago;
     @Getter
-    private final Optional<LocalDateTime> fechaHoraIngresoAWaitlist;
+    private final LocalDateTime fechaHoraIngresoAWaitlist;
     @Getter
     private LocalDateTime fechahoraConfirmacion = LocalDateTime.now();
     @Getter
-    private Optional<LocalDateTime> fechaHoraCancelacion = Optional.empty();
+    private LocalDateTime fechaHoraCancelacion;
     // TODO: agregar cuando este definido
     // private Optional<String> errorDePago;
 
     private void setFechaHoraCancelacion(LocalDateTime fechaHoraCancelacion) {
-        this.fechaHoraCancelacion = Optional.of(fechaHoraCancelacion);
+        this.fechaHoraCancelacion = fechaHoraCancelacion;
     }
 
     /**
@@ -46,7 +45,7 @@ public class InscripcionEvento {
      * @return el estado de la inscripción
      */
     public EstadoInscripcion getEstado() {
-        if (fechaHoraCancelacion.isPresent())
+        if (fechaHoraCancelacion != null)
             return EstadoInscripcion.CANCELADA;
         else
             return EstadoInscripcion.CONFIRMADA;
