@@ -24,7 +24,8 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger")
-                        .permitAll().requestMatchers("/api/v1/auth/**").permitAll().anyRequest().authenticated())
+                        .permitAll().requestMatchers("/api/v1/auth/**").permitAll().requestMatchers("/actuator/health")
+                        .permitAll().anyRequest().authenticated())
                 .addFilterBefore(sessionFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

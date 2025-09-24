@@ -57,14 +57,17 @@ export default function BarraSuperior() {
                             </Link>
                         )}
 
-                        <Link
-                            to="/mis-inscripciones"
-                            className="hover:underline"
-                        >
-                            Mis inscripciones
-                        </Link>
+                        {/* Mis inscripciones solo para usuarios normales */}
+                        {!esOrg && !esSysAdmin && (
+                            <Link
+                                to="/mis-inscripciones"
+                                className="hover:underline"
+                            >
+                                Mis inscripciones
+                            </Link>
+                        )}
 
-                        {/* Solo mostrar mis eventos si es organizador o admin */}
+                        {/* Mis eventos para organizadores, todos los eventos para admin */}
                         {(esOrg || esSysAdmin) && (
                             <Link
                                 to="/organizador/mis-eventos"

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import tacs.eventos.dto.EventoResponse;
 import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.dto.UsuarioDto;
+import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.repository.evento.EventosRepository;
 import tacs.eventos.service.UsuarioService;
@@ -54,15 +55,22 @@ public class UsuarioController {
     }
 
     /**
-     * Retorna los eventos para los cuales el usuario es el organizador.
+     * Retorna los eventos para los cuales el usuario es el organizador. Si el usuario es ADMIN, retorna todos los
+     * eventos del sistema.
      *
      * @param usuario
      *            datos del usuario.
      *
-     * @return los eventos organizados por el usuario.
+     * @return los eventos organizados por el usuario, o todos los eventos si es ADMIN.
      */
     @GetMapping("/mis-eventos")
     public List<EventoResponse> getMisEventos(@AuthenticationPrincipal Usuario usuario) {
+        // Si es ADMIN, devolver todos los eventos
+        if (usuario.getRoles().contains(RolUsuario.ADMIN)) {
+            return eventosRepository.todos().stream().map(e -> this.modelMapper.map(e, EventoResponse.class)).toList();
+        }
+
+        // Si no es ADMIN, devolver solo los eventos que organiza
         return eventosRepository.getEventosPorOrganizador(usuario.getId()).stream()
                 .map(e -> this.modelMapper.map(e, EventoResponse.class)).toList();
     }

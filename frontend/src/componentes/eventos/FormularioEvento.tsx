@@ -5,6 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from '../../lib/simpleToast'
 import { type ErrorDelServidor, esErrorDelServidor } from '../../types/errores'
 import { CATEGORIAS_EVENTO } from '../../types/categorias'
+import { useAuth } from '../../contexts/AuthContext'
+import { esAdmin } from '../../types/usuario'
 
 interface Props {
     id?: String
@@ -17,6 +19,7 @@ export default function FormularioEvento({
     valoresPorDefecto,
     visualizar = false,
 }: Props) {
+    const { usuario } = useAuth()
     const {
         register,
         handleSubmit,
@@ -65,7 +68,7 @@ export default function FormularioEvento({
                 className="mt-4 rounded-lg bg-white p-4"
             >
                 <div className="flex flex-col gap-3">
-                    {id && (
+                    {id && esAdmin(usuario) && (
                         <div className="flex flex-col gap-1">
                             <label
                                 htmlFor="idEvento"

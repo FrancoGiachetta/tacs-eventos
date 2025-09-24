@@ -6,6 +6,7 @@ import FormularioEvento from './FormularioEvento'
 import { toast } from '../../lib/simpleToast'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { esAdmin, esOrganizador } from '../../types/usuario'
 
 export default function DetalleEvento() {
     let eventoId = useParams().eventoId
@@ -68,15 +69,18 @@ export default function DetalleEvento() {
                     visualizar={true}
                 />
 
-                <div className="mt-4 flex justify-end">
-                    <button
-                        type="button"
-                        onClick={onInscribir}
-                        className="rounded bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    >
-                        Inscribirse
-                    </button>
-                </div>
+                {/* Solo mostrar botón de inscribirse para usuarios normales (no organizadores ni admins) */}
+                {!esAdmin(usuario) && !esOrganizador(usuario) && (
+                    <div className="mt-4 flex justify-end">
+                        <button
+                            type="button"
+                            onClick={onInscribir}
+                            className="rounded bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        >
+                            Inscribirse
+                        </button>
+                    </div>
+                )}
             </div>
         </>
     ) : null

@@ -46,23 +46,27 @@ function EventoRow(evento: Evento) {
     let [waitlist, setWaitlist] = useState<ItemWaitlist[]>([])
 
     useEffect(() => {
-        let insAux: Inscripcion[] = []
-        let waitAux: ItemWaitlist[] = []
-        api.get(`/api/v1/evento/${evento.id}/inscripcion`).then((r) => {
-            insAux = r.data
-        })
-        api.get(`/api/v1/evento/${evento.id}/waitlist`).then((r) => {
-            waitAux = r.data
-        })
-        setInscripciones(insAux)
-        setWaitlist(waitAux)
+        const fetchData = async () => {
+            try {
+                const [inscripcionesRes, waitlistRes] = await Promise.all([
+                    api.get(`/api/v1/evento/${evento.id}/inscripcion`),
+                    api.get(`/api/v1/evento/${evento.id}/waitlist`),
+                ])
+                setInscripciones(inscripcionesRes.data)
+                setWaitlist(waitlistRes.data)
+            } catch (error) {
+                console.error('Error fetching event data:', error)
+            }
+        }
+
+        fetchData()
     }, [])
 
     return (
         <tr className="table-row even:bg-gray-100 odd:bg-gray-50">
             <td className="px-4 py-2">{evento.titulo}</td>
             <td className="px-4 py-2">
-                {formatDate(new Date(evento.fechaHoraInicio), {
+                {formatDate(evento.fechaHoraInicio, {
                     withTime: true,
                 })}
             </td>

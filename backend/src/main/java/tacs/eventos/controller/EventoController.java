@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import tacs.eventos.dto.*;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.InscripcionEnWaitlist;
+import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
@@ -181,7 +182,7 @@ public class EventoController {
 
         return this.inscripcionesService.buscarInscripcionesDeEvento(evento).stream()
                 .filter((InscripcionEvento i) -> i.getEstado() == EstadoInscripcion.CONFIRMADA)
-                .map((InscripcionEvento i) -> InscripcionResponse.confirmada(evento.getId())).toList();
+                .map((InscripcionEvento i) -> InscripcionResponse.confirmada(evento.getId(), i)).toList();
     }
 
     /**
@@ -341,6 +342,10 @@ public class EventoController {
     }
 
     private boolean estaEntreLosAutorizados(Usuario autenticado, List<Usuario> autorizados) {
+        // Los ADMIN tienen acceso a todo
+        if (autenticado.getRoles().contains(RolUsuario.ADMIN)) {
+            return true;
+        }
         return autorizados.stream().anyMatch(autenticado::equals);
     }
 }
