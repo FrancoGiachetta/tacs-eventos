@@ -3,7 +3,7 @@ package tacs.eventos.service;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;

@@ -152,7 +152,7 @@ public class EventoController {
      * @return ResponseEntity devuelve el código 204 NO_CONTENT y un body vacio. Si el evento se existe, devuelve
      *         NOT_FOUND 404.
      */
-    @PutMapping("/{eventoId}/estado")
+    @PatchMapping("/{eventoId}")
     @ApiResponse(responseCode = "404", description = "Evento no encontrado")
     public ResponseEntity<Void> actualizarEstadoEvento(@AuthenticationPrincipal Usuario usuario,
             @PathVariable String eventoId, EventoEstadoDTO estadoDTO) {

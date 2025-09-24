@@ -1,7 +1,7 @@
 package tacs.eventos.repository.inscripcion;
 
 import org.springframework.stereotype.Repository;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;

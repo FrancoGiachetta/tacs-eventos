@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import tacs.eventos.dto.InscripcionResponse;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.Waitlist;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;

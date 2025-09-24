@@ -1,6 +1,6 @@
 package tacs.eventos.repository;
 
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Waitlist;
 
 public interface WaitlistRepository {

@@ -1,6 +1,6 @@
 package tacs.eventos.repository.inscripcion;
 
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 

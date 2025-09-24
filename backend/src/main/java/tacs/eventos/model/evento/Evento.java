@@ -1,8 +1,9 @@
-package tacs.eventos.model;
+package tacs.eventos.model.evento;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import tacs.eventos.model.Usuario;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -37,7 +38,8 @@ public class Evento {
     // String que cumpla la regex correcta, y el back lo transforme manualmente.
     @Setter
     private String categoria;
-    private boolean abierto = true;
+
+    private EstadoEvento estado = EstadoEvento.ABIERTO;
 
     @Setter
     private Usuario organizador;
@@ -65,18 +67,18 @@ public class Evento {
      * @return true si el evento está abierto y no ha alcanzado el cupo máximo, false en caso contrario.
      */
     public boolean permiteIncripcion(int inscritos) {
-        return abierto && (inscritos < cupoMaximo);
+        return estado == EstadoEvento.ABIERTO && (inscritos < cupoMaximo);
     }
 
     /**
      * Marca el evento como cerrado, impidiendo nuevas inscripciones.
      */
     public void cerrarEvento() {
-        this.abierto = false;
+        this.estado = EstadoEvento.CERRADO;
     }
 
     public void abrirEvento() {
-        this.abierto = true;
+        this.estado = EstadoEvento.ABIERTO;
     }
 
     @Override
