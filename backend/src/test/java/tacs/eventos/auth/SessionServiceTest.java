@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,13 +34,16 @@ class SessionServiceTest {
         this.sesiones = mock(SessionRepository.class);
         this.encoder = mock(PasswordEncoder.class);
         this.service = new SessionService(usuarios, sesiones, encoder, 30);
+
+        var u = new Usuario("user@mail.com", "hash", Set.of(RolUsuario.USUARIO));
+        when(usuarios.obtenerPorEmail("user@mail.com")).thenReturn(Optional.of(u));
+        when(usuarios.obtenerPorEmail("userNoExiste@mail.com")).thenReturn(Optional.empty());
+        when(encoder.matches("pass", "hash")).thenReturn(true);
+
     }
 
     @Test
     void login_ok_creaSessionYGuarda() {
-        var u = new Usuario("user@mail.com", "hash", Set.of(RolUsuario.USUARIO));
-        when(usuarios.obtenerPorEmail("user@mail.com")).thenReturn(Optional.of(u));
-        when(encoder.matches("pass", "hash")).thenReturn(true);
         when(sesiones.save(any(Session.class))).thenAnswer(inv -> inv.getArgument(0));
 
         var out = service.login("user@mail.com", "pass");
@@ -52,63 +56,57 @@ class SessionServiceTest {
 
     @Test
     void login_mailInexistente_vacio() {
-        when(usuarios.obtenerPorEmail("user@mail.com")).thenReturn(Optional.empty());
-        var out = service.login("user@mail.com", "pass");
+        var out = service.login("userNoExiste@mail.com", "pass");
         assertTrue(out.isEmpty());
         verifyNoInteractions(sesiones);
     }
 
     @Test
     void login_contraseniaIncorrecta_vacio() {
-        var usuario = new Usuario("user@mail.com", "otraClave", Set.of()); // la clave real es "otraClave"
-        when(usuarios.obtenerPorEmail("user@mail.com")).thenReturn(Optional.of(usuario));
-
-        var out = service.login("user@mail.com", "pass"); // intento con clave "pass"
+        var out = service.login("user@mail.com", "otraClave"); // intento con clave "pass"
 
         assertTrue(out.isEmpty());
         // nunca debería intentar guardar una sesión si la clave está mal
         verifyNoInteractions(sesiones);
     }
 
-    @Test
-    void validate_activoYNoExpirado_devuelveUsuario() {
-        var u = new Usuario("a@b.com", "h", Set.of(RolUsuario.USUARIO));
-        var s = new Session("tok", u.getId(), Instant.now().plusSeconds(300));
+    @Nested
+    class TestsSesiones {
 
-        when(sesiones.findByToken("tok")).thenReturn(Optional.of(s));
-        when(usuarios.obtenerPorId(u.getId())).thenReturn(Optional.of(u));
+        @BeforeEach
+        void setUpSessions() {
+            var u2 = new Usuario("a@b.com", "h", Set.of(RolUsuario.USUARIO));
+            var s = new Session("tok", u2.getId(), Instant.now().plusSeconds(300));
+            var sExp = new Session("tokExp", u2.getId(), Instant.now().minusSeconds(1));
 
-        var out = service.validate("tok");
-        assertTrue(out.isPresent());
-        assertEquals("a@b.com", out.get().getEmail());
-    }
+            when(usuarios.obtenerPorId(u2.getId())).thenReturn(Optional.of(u2));
+            when(sesiones.findByToken("tok")).thenReturn(Optional.of(s));
+            when(sesiones.findByToken("tokExp")).thenReturn(Optional.of(sExp));
+        }
 
-    @Test
-    void validate_expirado_vacio() {
-        var u = new Usuario("a@b.com", "h", Set.of(RolUsuario.USUARIO));
-        var s = new Session("tok", u.getId(), Instant.now().minusSeconds(1));
+        @Test
+        void validate_activoYNoExpirado_devuelveUsuario() {
+            var out = service.validate("tok");
+            assertTrue(out.isPresent());
+            assertEquals("a@b.com", out.get().getEmail());
+        }
 
-        when(sesiones.findByToken("tok")).thenReturn(Optional.of(s));
+        @Test
+        void validate_expirado_vacio() {
+            var out = service.validate("tokExp");
+            assertTrue(out.isEmpty());
+        }
 
-        var out = service.validate("tok");
-        assertTrue(out.isEmpty());
-    }
+        @Test
+        void logout_sesionValidaLuegoInvalida_repoReal() {
+            // Comprobar que es válida
+            assertTrue(service.validate("tok").isPresent());
 
-    @Test
-    void logout_sesionValidaLuegoInvalida_repoReal() {
-        var usuario = new Usuario("user@mail.com", "pass", Set.of());
-        var s = new Session("t1", usuario.getId(), Instant.now().plusSeconds(300));
+            // Logout
+            service.logout("tok");
 
-        when(sesiones.findByToken("t1")).thenReturn(Optional.of(s));
-        when(usuarios.obtenerPorId(usuario.getId())).thenReturn(Optional.of(usuario));
-
-        // Comprobar que es válida
-        assertTrue(service.validate("t1").isPresent());
-
-        // Logout
-        service.logout("t1");
-
-        // Ahora debe ser inválida
-        assertTrue(service.validate("t1").isEmpty());
+            // Ahora debe ser inválida
+            assertTrue(service.validate("tok").isEmpty());
+        }
     }
 }

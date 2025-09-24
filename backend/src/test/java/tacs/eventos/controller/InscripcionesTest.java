@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -84,8 +85,10 @@ public class InscripcionesTest {
             when(inscripcionesRepository.getInscripcionConfirmada(u1, e1)).thenReturn(Optional.of(i1));
             // Mockea el pedido GET y verifica que retorne 200 OK y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(get(url)).andExpect(status().isOk()).andExpect(
-                    content().string(objectMapper.writeValueAsString(InscripcionResponse.confirmada(e1.getId()))));
+            assertDoesNotThrow(() ->
+                mockMvc.perform(get(url)).andExpect(status().isOk()).andExpect(
+                    content().string(objectMapper.writeValueAsString(InscripcionResponse.confirmada(e1.getId()))))
+            );
         }
 
         @Test
@@ -97,20 +100,26 @@ public class InscripcionesTest {
 
             // Mockea el pedido GET y verifica que retorne 200 OK y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(get(url)).andExpect(status().isOk()).andExpect(
-                    content().string(objectMapper.writeValueAsString(InscripcionResponse.enWaitlist(e1.getId()))));
+            assertDoesNotThrow(() ->
+                mockMvc.perform(get(url)).andExpect(status().isOk()).andExpect(
+                    content().string(objectMapper.writeValueAsString(InscripcionResponse.enWaitlist(e1.getId()))))
+            );
         }
 
         @Test
         void unUsuarioNoPuedeVerLaInscripcionDeOtroUsuario() throws Exception {
-            mockMvc.perform(get("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u2.getId()))
-                    .andExpect(status().isNotFound());
+            assertDoesNotThrow(() ->
+                mockMvc.perform(get("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u2.getId()))
+                    .andExpect(status().isNotFound())
+            );
         }
 
         @Test
         void siElEventoNoExisteRetorna404() throws Exception {
-            mockMvc.perform(get("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
-                    .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
+            assertDoesNotThrow(() ->
+                mockMvc.perform(get("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
+                    .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"))
+            );
         }
     }
 
@@ -124,10 +133,14 @@ public class InscripcionesTest {
 
             // Mockea el pedido POST y verifica que retorne 201 CREATED y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
+            assertDoesNotThrow(() ->
+                mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url))
+            );
 
             // Verifica que se haya guardado la inscripción en el repo
-            verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.directa(u1, e1));
+            assertDoesNotThrow(() ->
+                verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.directa(u1, e1))
+            );
         }
 
         @Test
@@ -139,7 +152,10 @@ public class InscripcionesTest {
             when(inscripcionesRepository.cantidadInscriptos(e1)).thenReturn(2);
             // Mockea el pedido POST y verifica que retorne 201 CREATED y apunte a la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
+
+            assertDoesNotThrow(() ->
+                mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url))
+            );
 
             assertEquals(List.of(u1), w1.candidatos());
         }
@@ -153,12 +169,17 @@ public class InscripcionesTest {
 
             // Mockea el pedido POST y verifica que retorne SEE OTHER y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(post(url)).andExpect(status().isSeeOther()).andExpect(header().string("Location", url));
+
+            assertDoesNotThrow(() ->
+                mockMvc.perform(post(url)).andExpect(status().isSeeOther()).andExpect(header().string("Location", url))
+            );
 
             // Verifica que la waitlist no haya sido modificada
             assertEquals(List.of(u1), w1.candidatos());
             // Verifica que no se haya creado ninguna inscripción
-            verify(inscripcionesRepository, never()).guardarInscripcion(any());
+            assertDoesNotThrow(() ->
+                verify(inscripcionesRepository, never()).guardarInscripcion(any())
+            );
         }
 
         @Test
@@ -176,7 +197,7 @@ public class InscripcionesTest {
             mockMvc.perform(post("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
                     .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
 
-            verifyNoInteractions(inscripcionesRepository);
+            assertDoesNotThrow(() -> verifyNoInteractions(inscripcionesRepository));
         }
 
     }
@@ -227,7 +248,9 @@ public class InscripcionesTest {
                     .andExpect(status().isNoContent());
 
             assertEquals(EstadoInscripcion.CONFIRMADA, i1.getEstado());
-            verifyNoInteractions(inscripcionesRepository, waitlistRepository);
+            assertDoesNotThrow(() ->
+                verifyNoInteractions(inscripcionesRepository, waitlistRepository)
+            );
         }
 
         @Test
@@ -248,7 +271,9 @@ public class InscripcionesTest {
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + "esteUsuarioNoExiste"))
                     .andExpect(status().isNoContent());
 
-            verifyNoInteractions(inscripcionesRepository, waitlistRepository);
+            assertDoesNotThrow(() ->
+                verifyNoInteractions(inscripcionesRepository, waitlistRepository)
+            );
         }
 
         @Test
@@ -256,7 +281,9 @@ public class InscripcionesTest {
             mockMvc.perform(delete("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
                     .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
 
-            verifyNoInteractions(inscripcionesRepository, waitlistRepository);
+            assertDoesNotThrow(() ->
+                verifyNoInteractions(inscripcionesRepository, waitlistRepository)
+            );
         }
     }
 
@@ -282,7 +309,9 @@ public class InscripcionesTest {
             // Chequea que el usuario 2 haya quedado inscripto (chequea con una inscripción directa. En realidad sería
             // una inscripción desde waitlist, no directa, pero como el id de inscripción es (usuario, evento), sirve
             // igual.
-            verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.directa(u2, e1));
+            assertDoesNotThrow(() ->
+                verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.directa(u2, e1))
+            );
         }
 
         @Test

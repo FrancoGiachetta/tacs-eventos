@@ -30,7 +30,7 @@ class EstadisticasControllerTest {
         int result = controller.cantidadEventos();
 
         assertEquals(10, result);
-        verify(estadisticaService).cantidadEventos();
+        assertDoesNotThrow(() -> verify(estadisticaService).cantidadEventos());
     }
 
     @Test
@@ -40,7 +40,7 @@ class EstadisticasControllerTest {
         int result = controller.cantidadInscripciones();
 
         assertEquals(20, result);
-        verify(estadisticaService).cantidadInscribiciones();
+        assertDoesNotThrow(() -> verify(estadisticaService).cantidadInscribiciones());
     }
 
     @Test
@@ -51,6 +51,6 @@ class EstadisticasControllerTest {
         int result = controller.tasaConversionWL(eventoId);
 
         assertEquals(50, result);
-        verify(estadisticaService).calcularTasaConversionWL(eventoId);
+        assertDoesNotThrow(() -> verify(estadisticaService).calcularTasaConversionWL(eventoId));
     }
 }
