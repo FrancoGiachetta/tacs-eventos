@@ -58,7 +58,7 @@ class EstadisticasControllerTest {
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(10, response.getBody());
-        verify(estadisticaService).cantidadEventos();
+        assertDoesNotThrow(() -> verify(estadisticaService).cantidadEventos());
     }
 
     @Test
@@ -69,7 +69,7 @@ class EstadisticasControllerTest {
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(20, response.getBody());
-        verify(estadisticaService).cantidadInscribiciones();
+        assertDoesNotThrow(() -> verify(estadisticaService).cantidadInscribiciones());
     }
 
     @Test
@@ -81,7 +81,7 @@ class EstadisticasControllerTest {
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(50, response.getBody());
-        verify(estadisticaService).calcularTasaConversionWL(eventoId);
+        assertDoesNotThrow(() -> verify(estadisticaService).calcularTasaConversionWL(eventoId));
     }
 
     @Test
