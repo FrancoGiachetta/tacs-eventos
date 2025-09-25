@@ -9,8 +9,22 @@ import MisEventos from './componentes/eventos/MisEventos'
 import GestionarEvento from './componentes/eventos/GestionarEvento'
 import FormularioEvento from './componentes/eventos/FormularioEvento'
 import DetalleEvento from './componentes/eventos/DetalleEvento'
+import { AuthProvider } from './contexts/AuthContext'
+import {
+    ProtectedRoute,
+    AdminRoute,
+    OrganizadorRoute,
+} from './componentes/ProtectedRoute'
 
 function App() {
+    return (
+        <AuthProvider>
+            <AppContent />
+        </AuthProvider>
+    )
+}
+
+function AppContent() {
     const location = useLocation()
     const isAuthPage =
         location.pathname === '/login' || location.pathname === '/registro'
@@ -22,24 +36,61 @@ function App() {
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/registro" element={<Registro />} />
-                <Route path="/eventos" element={<ListaEventos />} />
+                <Route
+                    path="/eventos"
+                    element={
+                        <ProtectedRoute>
+                            <ListaEventos />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/eventos/:eventoId"
+                    element={
+                        <ProtectedRoute>
+                            <DetalleEvento />
+                        </ProtectedRoute>
+                    }
+                />
                 <Route
                     path="/mis-inscripciones"
-                    element={<MisInscripciones />}
+                    element={
+                        <ProtectedRoute>
+                            <MisInscripciones />
+                        </ProtectedRoute>
+                    }
                 />
                 <Route
                     path="/organizador/eventos/nuevo"
-                    element={<FormularioEvento />}
+                    element={
+                        <OrganizadorRoute>
+                            <FormularioEvento />
+                        </OrganizadorRoute>
+                    }
                 />
-                <Route path="/eventos/:eventoId" element={<DetalleEvento />} />
                 <Route
                     path="/organizador/mis-eventos"
-                    element={<MisEventos />}
+                    element={
+                        <OrganizadorRoute>
+                            <MisEventos />
+                        </OrganizadorRoute>
+                    }
                 />
-                <Route path="/admin" element={<Admin />} />
                 <Route
                     path="/organizador/eventos/:id"
-                    element={<GestionarEventoConId />}
+                    element={
+                        <OrganizadorRoute>
+                            <GestionarEventoConId />
+                        </OrganizadorRoute>
+                    }
+                />
+                <Route
+                    path="/admin"
+                    element={
+                        <AdminRoute>
+                            <Admin />
+                        </AdminRoute>
+                    }
                 />
                 <Route path="*" element={<Navigate to="/eventos" replace />} />
             </Routes>
@@ -48,8 +99,7 @@ function App() {
 }
 
 function GestionarEventoConId() {
-    const id = window.location.pathname.split('/').pop() || ''
-    return <GestionarEvento id={id} />
+    return <GestionarEvento />
 }
 
 export default App

@@ -45,4 +45,7 @@ public class Usuario implements Serializable {
         return this.roles.contains(rol);
     }
 
+    public void setRoles(Set<RolUsuario> roles) {
+        this.roles = roles != null ? roles : new HashSet<>();
+    }
 }

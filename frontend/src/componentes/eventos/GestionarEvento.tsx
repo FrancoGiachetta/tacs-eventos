@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import api from '../../lib/api'
-import { type Evento, type Inscripcion, type ItemWaitlist } from '../../tipos'
+import { type Evento } from '../../types/evento'
+import { type Inscripcion, type ItemWaitlist } from '../../types/inscripciones'
 import { formatDate } from '../../lib/utils'
 
 type Tab = 'inscriptos' | 'waitlist'
@@ -179,7 +180,7 @@ export default function GestionarEvento() {
                             {evento.titulo}
                         </h1>
                         <p className="text-gray-600">
-                            {formatDate(new Date(evento.fechaHoraInicio), {
+                            {formatDate(evento.fechaHoraInicio, {
                                 withTime: true,
                             })}{' '}
                             · {evento.ubicacion}
@@ -277,7 +278,6 @@ function InscriptosTable({
             <table className="min-w-full text-sm">
                 <thead>
                     <tr className="bg-gray-100 text-gray-700">
-                        <th className="text-left px-3 py-2">Nombre</th>
                         <th className="text-left px-3 py-2">Email</th>
                         <th className="text-left px-3 py-2">
                             Fecha de inscripción
@@ -309,7 +309,7 @@ function InscriptosTable({
                     {inscriptos.length === 0 && (
                         <tr>
                             <td
-                                colSpan={4}
+                                colSpan={3}
                                 className="px-3 py-6 text-center text-gray-500"
                             >
                                 No hay inscriptos.

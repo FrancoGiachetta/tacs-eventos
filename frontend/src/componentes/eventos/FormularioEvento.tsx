@@ -2,9 +2,11 @@ import { type SubmitHandler, useForm } from 'react-hook-form'
 import { type InputCrearEvento, SchemaCrearEvento } from '../../lib/schemas'
 import api from '../../lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from 'react-toastify'
+import { toast } from '../../lib/simpleToast'
 import { type ErrorDelServidor, esErrorDelServidor } from '../../types/errores'
-import ContainerDeToast from '../ContainerDeToast'
+import { CATEGORIAS_EVENTO } from '../../types/categorias'
+import { useAuth } from '../../contexts/AuthContext'
+import { esAdmin } from '../../types/usuario'
 
 interface Props {
     id?: String
@@ -17,6 +19,7 @@ export default function FormularioEvento({
     valoresPorDefecto,
     visualizar = false,
 }: Props) {
+    const { usuario } = useAuth()
     const {
         register,
         handleSubmit,
@@ -65,7 +68,7 @@ export default function FormularioEvento({
                 className="mt-4 rounded-lg bg-white p-4"
             >
                 <div className="flex flex-col gap-3">
-                    {id && (
+                    {id && esAdmin(usuario) && (
                         <div className="flex flex-col gap-1">
                             <label
                                 htmlFor="idEvento"
@@ -267,14 +270,19 @@ export default function FormularioEvento({
                         >
                             Categoría
                         </label>
-                        <input
-                            type="text"
+                        <select
                             id="categoria"
                             {...register('categoria')}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                            placeholder="Categoría"
                             disabled={visualizar}
-                        />
+                        >
+                            <option value="">Seleccionar categoría</option>
+                            {CATEGORIAS_EVENTO.map((categoria) => (
+                                <option key={categoria} value={categoria}>
+                                    {categoria}
+                                </option>
+                            ))}
+                        </select>
                         {
                             <p
                                 className="mt-1 text-sm text-red-600"
@@ -284,8 +292,6 @@ export default function FormularioEvento({
                             </p>
                         }
                     </div>
-
-                    <ContainerDeToast />
 
                     {!visualizar && (
                         <div className="mt-2 flex justify-end">
