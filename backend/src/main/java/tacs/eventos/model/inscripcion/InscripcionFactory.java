@@ -21,7 +21,7 @@ public class InscripcionFactory {
      * @return una nueva instancia de InscripcionEvento
      */
     public static InscripcionEvento directa(Usuario participante, Evento evento) {
-        return new InscripcionEvento(participante, evento, Optional.empty());
+        return new InscripcionEvento(participante, evento, null);
     }
 
     /**
@@ -35,6 +35,6 @@ public class InscripcionFactory {
      */
     public static InscripcionEvento desdeWaitlist(Evento evento, InscripcionEnWaitlist inscripcionEnWaitlist) {
         return new InscripcionEvento(inscripcionEnWaitlist.getCandidato(), evento,
-                Optional.of(inscripcionEnWaitlist.getFechaIngreso()));
+                inscripcionEnWaitlist.getFechaIngreso());
     }
 }

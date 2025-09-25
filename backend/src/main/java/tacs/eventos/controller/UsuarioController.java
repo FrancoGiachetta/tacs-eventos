@@ -67,7 +67,8 @@ public class UsuarioController {
     public List<EventoResponse> getMisEventos(@AuthenticationPrincipal Usuario usuario) {
         // Si es ADMIN, devolver todos los eventos
         if (usuario.getRoles().contains(RolUsuario.ADMIN)) {
-            return eventosRepository.findAll().stream().map(e -> this.modelMapper.map(e, EventoResponse.class)).toList();
+            return eventosRepository.findAll().stream().map(e -> this.modelMapper.map(e, EventoResponse.class))
+                    .toList();
         }
 
         // Si no es ADMIN, devolver solo los eventos que organiza
