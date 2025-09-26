@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use chrono::{NaiveDate, NaiveDateTime};
 use serde::Deserialize;
@@ -24,8 +24,24 @@ pub struct Event {
     max_capacity: u32,
     price: f32,
     category: String,
-    is_open: bool,
     organizer: String,
+}
+
+// Defines how to format an Event struct.
+impl Display for Event {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Event: {}", self.title)?;
+        write!(f, "Organized by {}", self.organizer)?;
+        write!(f, "    Description: {}", self.description)?;
+        write!(f, "    Starting date: {}", self.start_date_time)?;
+        write!(f, "    Location: {}", self.location)?;
+        write!(f, "    Maximum Capacity: {}", self.max_capacity)?;
+        write!(f, "    Duration (minutes): {}", self.duration_minutes)?;
+        write!(f, "    Price: {}", self.price)?;
+        write!(f, "    Category: {}", self.category)?;
+
+        Ok(())
+    }
 }
 
 // Implement deserialization for a Event.
@@ -58,7 +74,6 @@ fn derialize_event(json_value: Value) -> serde_json::Result<Event> {
     let max_capacity = json_value["cupoMaximo"].to_string().parse::<u32>().unwrap();
     let price = json_value["precio"].to_string().parse::<f32>().unwrap();
     let category = json_value["categoria"].to_string();
-    let is_open = json_value["abierto"].to_string().parse::<bool>().unwrap();
     let organizer = json_value["organizador"]["nombre"].to_string();
 
     Ok(Event {
@@ -70,7 +85,6 @@ fn derialize_event(json_value: Value) -> serde_json::Result<Event> {
         max_capacity,
         price,
         category,
-        is_open,
         organizer,
     })
 }

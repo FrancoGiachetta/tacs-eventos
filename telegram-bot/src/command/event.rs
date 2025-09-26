@@ -1,11 +1,47 @@
-use std::str::FromStr;
+use std::{str::FromStr, sync::Arc};
 
 use chrono::NaiveDate;
 use lazy_static::lazy_static;
 use regex::Regex;
-use teloxide::utils::command::ParseError;
+use teloxide::{Bot, prelude::Requester, types::Message, utils::command::ParseError};
+use tracing::{error, info};
 
-use crate::schemas::event::EventFilter;
+use crate::{error::BotError, request_client::RequestClient, schemas::event::EventFilter};
+
+/// List open events.
+///
+/// Sends a GET request looking for all the still open events. The command also
+/// allows to pass arguments to filter events.
+pub async fn list_events(
+    bot: Arc<Bot>,
+    msg: &Message,
+    req_client: &RequestClient,
+    filters: EventFilter,
+) -> Result<(), BotError> {
+    info!("Listing list_events!");
+
+    match req_client.send_get_events_list_request(filters).await {
+        Ok(events_list) => {
+            let events_msg = events_list
+                .into_iter()
+                .map(|e| format!("{e}"))
+                .collect::<Vec<String>>()
+                .join("\n");
+
+            bot.send_message(msg.chat.id, events_msg).await?;
+        }
+        Err(e) => {
+            error!("Got an error while performing the request: {e}");
+
+            bot.send_message(
+                msg.chat.id,
+                "There was an error while performing the request command!",
+            )
+            .await?;
+        }
+    }
+    Ok(())
+}
 
 /// Parse event filters.
 ///
@@ -13,8 +49,8 @@ use crate::schemas::event::EventFilter;
 /// provides the parsing for an easier handling.
 pub fn parse_event_filters(input: String) -> Result<(EventFilter,), ParseError> {
     lazy_static! {
-        static ref MIN_PRICE_PREFIX: Regex = Regex::new(r"\bmin_price=(\d+)\b").unwrap();
-        static ref MAX_PRICE_PREFIX: Regex = Regex::new(r"\bmax_price=(\d+)\b").unwrap();
+        static ref MIN_PRICE_PREFIX: Regex = Regex::new(r"\bmin_price=(\d+(\.\d+)?)\b").unwrap();
+        static ref MAX_PRICE_PREFIX: Regex = Regex::new(r"\bmax_price=(\d+(\.\d+)?)\b").unwrap();
         static ref MIN_DATE_PREFIX: Regex =
             Regex::new(r"\bmin_date=(\d{1,2}-\d{1,2}-\d{4})\b").unwrap();
         static ref MAX_DATE_PREFIX: Regex =
@@ -81,7 +117,7 @@ pub fn parse_event_filters(input: String) -> Result<(EventFilter,), ParseError> 
 mod tests {
     use chrono::NaiveDate;
 
-    use crate::{command::event::parse_event_filters, schemas::event::EventFilter};
+    use super::{EventFilter, parse_event_filters};
 
     #[test]
     fn empty_filter() {
@@ -89,6 +125,7 @@ mod tests {
 
         assert_eq!(filter.0, EventFilter::default())
     }
+
     #[test]
     fn filter_with_price_range() {
         let filter = parse_event_filters("min_price=12 max_price=23".to_string()).unwrap();
@@ -105,6 +142,24 @@ mod tests {
             }
         )
     }
+
+    #[test]
+    fn filter_with_price_range_with_decimals() {
+        let filter = parse_event_filters("min_price=12.34 max_price=23.54".to_string()).unwrap();
+
+        assert_eq!(
+            filter.0,
+            EventFilter {
+                min_price: Some(12.34),
+                max_price: Some(23.54),
+                min_date: None,
+                max_date: None,
+                category: None,
+                keywords: None
+            }
+        )
+    }
+
     #[test]
     fn filter_with_date_range() {
         let filter =

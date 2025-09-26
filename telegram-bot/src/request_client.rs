@@ -4,6 +4,7 @@ use lazy_static::lazy_static;
 use reqwest::{Client, Response};
 use serde_json::Value;
 use thiserror::Error;
+use tracing::info;
 
 use crate::schemas::event::{Event, EventFilter};
 
@@ -90,11 +91,26 @@ impl RequestClient {
         method: &RequestMethod<'req>,
     ) -> Result<Response, reqwest::Error> {
         let request = match method {
-            RequestMethod::Get(params) => self.client.get(url).query(&params),
-            RequestMethod::Post(body) => self.client.post(url).json(&body),
-            RequestMethod::Patch(body) => self.client.patch(url).json(&body),
-            RequestMethod::Put(body) => self.client.put(url).json(&body),
-            RequestMethod::Delete(body) => self.client.delete(url).json(&body),
+            RequestMethod::Get(params) => {
+                info!("Sending GET request to {url}");
+                self.client.get(url).query(&params)
+            }
+            RequestMethod::Post(body) => {
+                info!("Sending POST request to {url}");
+                self.client.post(url).json(&body)
+            }
+            RequestMethod::Patch(body) => {
+                info!("Sending PATCH request to {url}");
+                self.client.patch(url).json(&body)
+            }
+            RequestMethod::Put(body) => {
+                info!("Sending PUT request to {url}");
+                self.client.put(url).json(&body)
+            }
+            RequestMethod::Delete(body) => {
+                info!("Sending DELETE request to {url}");
+                self.client.delete(url).json(&body)
+            }
         };
 
         request.send().await

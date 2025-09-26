@@ -18,6 +18,7 @@ pub enum Command {
     Login,
     #[command(
         description = "List the available events",
+        // Tell teloxide how to parse the command's arguments.
         parse_with = parse_event_filters
     )]
     ListEvents(EventFilter),
@@ -30,14 +31,7 @@ pub async fn handle_command(
     req_client: Arc<RequestClient>,
 ) -> Result<(), BotError> {
     match cmd {
-        Command::ListEvents(filters) => {
-            info!("Listing list_events!");
-
-            let events_list = req_client.send_get_events_list_request(filters).await?;
-
-            bot.send_message(msg.chat.id, format!("{events_list:?}"))
-                .await?;
-        }
+        Command::ListEvents(filters) => event::list_events(bot, &msg, &req_client, filters).await?,
         Command::Register => {
             info!("Execution /register!");
         }
