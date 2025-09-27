@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class EventoResponse extends CreacionEventoRequest {
     private String id;
     private boolean abierto;
+    private UsuarioResponse organizador;
 }

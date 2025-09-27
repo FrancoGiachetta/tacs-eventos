@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { es } from 'zod/locales'
+import { CATEGORIAS_EVENTO, type CategoriaEvento } from '../types/categorias'
 
 function mensajeDeErrorMinimoCaracteres(cantidadMinima: number) {
     return `Ingrese al menos ${cantidadMinima} caracteres`
@@ -12,7 +12,6 @@ let mensajeDeErrorNumeroNoEntero = 'Ingrese un número entero'
 let mensajeDeErrorNumeroNegativo = 'El valor no puede ser negativo'
 let mensajeDeErrorNumeroInvalido = 'Ingrese un número'
 
-z.config(es())
 // Schema para la creacion de un evento, aseguro que tiene el formato correcto
 export const SchemaCrearEvento = z.object({
     titulo: z
@@ -23,9 +22,9 @@ export const SchemaCrearEvento = z.object({
         .string()
         .min(10, mensajeDeErrorMinimoCaracteres(10))
         .max(1000, mensajeDeErrorMaximoCaracteres(1000)),
-    fechaHoraInicio: z.iso.datetime({
+    fechaHoraInicio: z.string().datetime({
         local: true,
-        error: 'Ingrese una fecha',
+        message: 'Ingrese una fecha válida',
     }),
     duracionMinutos: z
         .number(mensajeDeErrorNumeroInvalido)
@@ -41,8 +40,9 @@ export const SchemaCrearEvento = z.object({
         .positive(mensajeDeErrorNumeroNegativo),
     precio: z.number(mensajeDeErrorNumeroInvalido).min(0),
     categoria: z
-        .string()
-        .max(100, mensajeDeErrorMaximoCaracteres(100))
+        .enum(CATEGORIAS_EVENTO, {
+            message: 'Selecciona una categoría válida',
+        })
         .optional()
         .nullable(),
 })

@@ -3,7 +3,8 @@ import type { ReactNode } from 'react'
 import api from '../../lib/api'
 import { formatDate } from '../../lib/utils'
 import { DialogoConfirmar } from '../DialogoConfirmar'
-import type { Evento, Inscripcion } from '../../tipos'
+import type { Evento } from '../../types/evento'
+import type { Inscripcion } from '../../types/inscripciones'
 
 export default function InscripcionItem(props: Inscripcion): ReactNode {
     const { eventoId, estado } = props
@@ -13,7 +14,13 @@ export default function InscripcionItem(props: Inscripcion): ReactNode {
 
     const confirmarCancelacion = async () => {
         try {
-            const res = await api.delete(`/api/v1/evento/${eventoId}`)
+            // Obtener el ID del usuario actual desde el token o contexto
+            const userResponse = await api.get('/api/v1/usuario/me')
+            const userId = userResponse.data.id
+
+            const res = await api.delete(
+                `/api/v1/evento/${eventoId}/inscripcion/${userId}`
+            )
             document.location.reload()
         } catch (e: any) {
             alert('No fue posible cancelar la inscripción')
@@ -82,7 +89,7 @@ export default function InscripcionItem(props: Inscripcion): ReactNode {
                             <div className="flex flex-row gap-2">
                                 <button className="rounded-md p-2 h-min hover:bg-blue-500 hover:text-white transition duration-300">
                                     <a
-                                        href={`/api/v1/evento/${eventoId}`}
+                                        href={`/eventos/${eventoId}`}
                                         className="flex flex-col justify-center"
                                     >
                                         <span>

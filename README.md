@@ -1,15 +1,64 @@
 # TACS - Eventos
 
-Proyecto de la materia **TACS** - Gestión de Eventos con **Spring Boot**.
+Proyecto de la materia **TACS** - Gestión de Eventos con **Spring Boot** y **React**.
 
-## Docker
+Sistema completo de gestión de eventos con roles de usuario (Admin, Organizador, Usuario), inscripciones, waitlist y panel de administración.
 
-Para poder ejecutar el proyecto con docker, desde el directorio raíz ejecutar:
+## 🐳 Ejecución con Docker (Recomendado)
 
-```shell
-docker-compose up
+### Prerequisitos
+- [Docker](https://www.docker.com/get-started/) instalado y ejecutándose
+- [Docker Compose](https://docs.docker.com/compose/install/) (incluido con Docker Desktop)
+
+### 1. Construir las imágenes Docker (primera vez o después de cambios)
+```bash
+docker-compose build --no-cache
 ```
-Este comando se encarga de buildear y levantar todos los containers necesarios.
+### 2. Levantar todos los servicios
+```bash
+docker-compose up -d
+```
+### 3. Verificar que los servicios estén funcionando
+```bash
+docker-compose ps
+```
+### 4. Ver logs de los servicios (opcional)
+```bash
+# Ver todos los logs
+docker-compose logs
+
+# Ver logs de un servicio específico
+docker-compose logs eventos-backend
+docker-compose logs eventos-frontend
+```
+
+## 🌐 URLs de acceso
+
+| Servicio | URL | Descripción |
+|----------|-----|-------------|
+| **Frontend** | http://localhost:3000 | Aplicación React |
+| **Backend** | http://localhost:8080 | API REST Spring Boot |
+| **Health Check** | http://localhost:8080/actuator/health | Estado del backend |
+
+## 👥 Usuarios predefinidos
+
+| Email | Contraseña | Rol |
+|-------|-----------|-----|
+| `admin@eventos.com` | `admin123` | **ADMIN** |
+| `organizador@eventos.com` | `org123` | **ORGANIZADOR** |
+
+## 🔧 Comandos útiles
+
+### Reconstruir solo un servicio
+```bash
+# Reconstruir solo el backend
+docker-compose build eventos-backend
+
+# Reconstruir solo el frontend  
+docker-compose build eventos-frontend
+```
+
+## 🔧 Desarrollo Local
 
 ## Backend
 
@@ -83,6 +132,19 @@ mvn net.revelc.code.formatter:formatter-maven-plugin:2.20.0:format
 ```shell
 npm run fmt
 ```
+
+-Usuarios hardcodeados
+🔴 ADMIN
+Email: admin@eventos.com
+Password: admin123
+Permisos: Acceso completo al sistema + Panel de administración
+
+🔵 ORGANIZADOR (Ejemplo)
+Email: organizador@eventos.com  
+Password: org123
+Permisos: Crear y gestionar eventos
+```
+
 
 ## Equipo
 

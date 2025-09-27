@@ -38,7 +38,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "El usuario se registro satifactoriamente"),
             @ApiResponse(responseCode = "401", description = "No se pudo regisrar al usuario"), })
     public ResponseEntity<SessionResponse> register(@Valid @RequestBody RegistroRequest req) {
-        usuarios.registrar(req.email(), req.password());
+        usuarios.registrar(req.email(), req.password(), req.tipoUsuario());
         return sesiones.login(req.email(), req.password())
                 .map(s -> ResponseEntity.ok(new SessionResponse(s.getToken(), s.getExpiresAt())))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
