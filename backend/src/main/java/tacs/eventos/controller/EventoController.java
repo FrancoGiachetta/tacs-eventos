@@ -34,6 +34,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -160,10 +161,12 @@ public class EventoController {
             @PathVariable String eventoId, EventoEstadoDTO estadoDTO) {
         Evento evento = this.buscarEvento(eventoId);
 
-        Validador validador = new ValidadorAutorizacionUsuario(usuario, false, evento.getOrganizador());
+        Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
 
         // Si el usuario no es el organizador, devolver 403.
-        validador.validar();
+        if (!validador.validar()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no está inscripto al evento");
+        };
 
         if (estadoDTO.abierto()) {
             this.eventoService.abrirEvento(usuario, evento);
@@ -192,10 +195,12 @@ public class EventoController {
             @PathVariable String eventoId) {
         Evento evento = this.buscarEvento(eventoId);
 
-        Validador validador = new ValidadorAutorizacionUsuario(usuario, false, evento.getOrganizador());
+        Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
 
         // Si el usuario no es el organizador, devolver 403.
-        validador.validar();
+        if (!validador.validar()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador");
+        }
 
         return ResponseEntity.ok(this.inscripcionesService.buscarInscripcionesDeEvento(evento).stream()
                 .filter((InscripcionEvento i) -> i.getEstado() == EstadoInscripcion.CONFIRMADA)
@@ -222,15 +227,18 @@ public class EventoController {
     public ResponseEntity<InscripcionResponse> getInscripcion(@AuthenticationPrincipal Usuario usuarioLogueado,
             @PathVariable String eventoId, @PathVariable String usuarioId) {
         Evento evento = this.buscarEvento(eventoId);
+        // Si el usuario no existe, retorno que no está inscripto para no revelar si existe o no el usuario
         Usuario usuarioInscripto = usuarioService.buscarPorId(usuarioId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no está inscripto al evento"));
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "El usuario no está inscripto al evento"));
 
         List<Usuario> autorizados = Arrays.asList(evento.getOrganizador(), usuarioInscripto);
 
-        Validador validador = new ValidadorAutorizacionUsuario(usuarioLogueado, true, autorizados);
+        Validador validador = new ValidadorAutorizacionUsuario(usuarioLogueado, autorizados);
 
         // Si el usuario no es el organizador, devolver 404. Devolvemos 404 para no revelar informacion sensible.
-        validador.validar();
+        if (!validador.validar()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
 
         if (this.inscripcionesService.buscarInscripcionConfirmada(usuarioInscripto, evento).isPresent())
             return ResponseEntity.ok(InscripcionResponse.confirmada(evento.getId()));
@@ -259,17 +267,20 @@ public class EventoController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> cancelarInscripcion(@AuthenticationPrincipal Usuario usuarioLogueado,
             @PathVariable String eventoId, @PathVariable String usuarioId) {
-        Usuario usuario = usuarioService.buscarPorId(usuarioId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se pudo encontrar el usuario"));
+        Optional<Usuario> usuario = usuarioService.buscarPorId(usuarioId);
         Evento evento = this.buscarEvento(eventoId);
+        
+        // Si el usuario no existe, también retorno NO_CONTENT, para no revelar que existe el usuario
+        usuario.ifPresent((u) -> {
+            Validador validador = new ValidadorAutorizacionUsuario(usuarioLogueado,
+                    List.of(evento.getOrganizador(), u));
 
-        Validador validador = new ValidadorAutorizacionUsuario(usuarioLogueado, false,
-                List.of(evento.getOrganizador(), usuario));
-
-        // Si el usuario no es el organizador, devolver 403.
-        validador.validar();
-
-        inscripcionesService.cancelarInscripcion(evento, usuario);
+            // Solo hago la acción si el usuario está autorizado. Si no está autorizado, digo igual NO_CONTENT, para no
+            // revelar información sensible (si el usuario existe, si está inscripto, etc)
+            if (validador.validar()) {
+                inscripcionesService.cancelarInscripcion(evento, u);
+            }
+        });
 
         return ResponseEntity.noContent().build();
     }
@@ -293,7 +304,8 @@ public class EventoController {
         // Si el usuario ya está inscripto o en la waitlist, no hace nada y devuelve la inscripción existente con el
         // código 200 OK
         if (inscripcionesService.inscripcionConfirmadaOEnWaitlist(evento, usuarioLogueado))
-            return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(request.getRequestURI())).build();
+            return ResponseEntity.status(HttpStatus.SEE_OTHER)
+                    .location(URI.create(request.getRequestURI().concat(usuarioLogueado.getId()))).build();
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist
         inscripcionesService.inscribirOMandarAWaitlist(evento, usuarioLogueado);
@@ -316,10 +328,12 @@ public class EventoController {
             @AuthenticationPrincipal Usuario usuario, @PathVariable String eventoId) {
         Evento evento = this.buscarEvento(eventoId);
 
-        Validador validador = new ValidadorAutorizacionUsuario(usuario, false, evento.getOrganizador());
+        Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
 
         // Si el usuario no es el organizador, devolver 403.
-        validador.validar();
+        if (!validador.validar()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador");
+        }
 
         return ResponseEntity.ok(this.inscripcionesService.buscarWaitlistDeEvento(evento).getItems().stream()
                 .map((InscripcionEnWaitlist i) -> {

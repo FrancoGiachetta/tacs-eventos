@@ -17,18 +17,16 @@ import tacs.eventos.model.Usuario;
 public class ValidadorAutorizacionUsuario implements Validador {
     private Usuario autenticado;
     private List<Usuario> autorizados;
-    private boolean retornarNotFound;
+    private HttpStatus errorARetornar;
 
-    public ValidadorAutorizacionUsuario(Usuario autenticado, boolean retornarNotFound, Usuario autorizado) {
+    public ValidadorAutorizacionUsuario(Usuario autenticado, Usuario autorizado) {
         this.autenticado = autenticado;
         this.autorizados = Arrays.asList(autorizado);
-        this.retornarNotFound = retornarNotFound;
     }
 
-    public ValidadorAutorizacionUsuario(Usuario autenticado, boolean retornarNotFound, List<Usuario> autorizados) {
+    public ValidadorAutorizacionUsuario(Usuario autenticado, List<Usuario> autorizados) {
         this.autenticado = autenticado;
         this.autorizados = autorizados;
-        this.retornarNotFound = retornarNotFound;
     }
 
     /**
@@ -40,10 +38,8 @@ public class ValidadorAutorizacionUsuario implements Validador {
      *
      */
     @Override
-    public void validar() {
-        if (!estaEntreLosAutorizados(this.autenticado, this.autorizados))
-            throw new ResponseStatusException(this.retornarNotFound ? HttpStatus.NOT_FOUND : HttpStatus.FORBIDDEN,
-                    "El usuario no es organizador del evento");
+    public boolean validar() {
+        return estaEntreLosAutorizados(this.autenticado, this.autorizados);
     }
 
     private boolean estaEntreLosAutorizados(Usuario autenticado, List<Usuario> autorizados) {
