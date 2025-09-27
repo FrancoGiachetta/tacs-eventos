@@ -161,36 +161,6 @@ jobs:
               <!-- thiscommentistofindthisformatfrontendcomment -->
             edit-mode: replace
 
-  check-bot-clippy:
-    name: clippy
-    runs-on: ubuntu-lastest
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.84.1
-        with:
-          components: clippy, rustfmt
-      - uses: Swatinem/rust-cache@v2
-      - name: Check Clippy
-        run:  |
-          cd telegra-bot
-          cargo clippy --all-targets --all-features -- -D warnings
-
-  check-bot-clippy:
-    name: clippy
-    runs-on: ubuntu-lastest
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.84.1
-        with:
-          components: clippy, rustfmt
-      - uses: Swatinem/rust-cache@v2
-      - name: Check Clippy
-        run: |
-          cd telegra-bot
-          cargo fmt --all -- --check
-
   docker-build:
     runs-on: ubuntu-latest
 
