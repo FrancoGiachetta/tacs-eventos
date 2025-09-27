@@ -28,7 +28,7 @@ jobs:
             cargo clippy --all-targets --all-features -- -D warnings
 
     check-bot-fmt:
-      name: clippy
+      name: rustfmt
       runs-on: ubuntu-lastest
 
       steps:
