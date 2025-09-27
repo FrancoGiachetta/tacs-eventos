@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity;
 
 import tacs.eventos.service.EstadisticaService;
 import tacs.eventos.service.SessionService;
@@ -57,7 +56,7 @@ class EstadisticasControllerTest {
 
         ResponseEntity<Integer> response = controller.cantidadEventos(VALID_AUTH_HEADER);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(10, response.getBody());
         verify(estadisticaService).cantidadEventos();
     }
@@ -68,7 +67,7 @@ class EstadisticasControllerTest {
 
         ResponseEntity<Integer> response = controller.cantidadInscripciones(VALID_AUTH_HEADER);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(20, response.getBody());
         verify(estadisticaService).cantidadInscribiciones();
     }
@@ -80,7 +79,7 @@ class EstadisticasControllerTest {
 
         ResponseEntity<Integer> response = controller.tasaConversionWL(eventoId, VALID_AUTH_HEADER);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(50, response.getBody());
         verify(estadisticaService).calcularTasaConversionWL(eventoId);
     }
@@ -92,7 +91,7 @@ class EstadisticasControllerTest {
 
         ResponseEntity<Integer> response = controller.cantidadEventos("Bearer invalid-token");
 
-        assertEquals(403, response.getStatusCodeValue());
+        assertEquals(403, response.getStatusCode().value());
         verify(estadisticaService, never()).cantidadEventos();
     }
 
@@ -104,7 +103,7 @@ class EstadisticasControllerTest {
 
         ResponseEntity<Integer> response = controller.cantidadInscripciones("Bearer regular-token");
 
-        assertEquals(403, response.getStatusCodeValue());
+        assertEquals(403, response.getStatusCode().value());
         verify(estadisticaService, never()).cantidadInscribiciones();
     }
 }

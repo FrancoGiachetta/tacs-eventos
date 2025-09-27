@@ -1,7 +1,6 @@
 package tacs.eventos.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
