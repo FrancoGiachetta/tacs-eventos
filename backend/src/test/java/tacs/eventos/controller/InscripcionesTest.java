@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.model.Evento;
@@ -45,16 +45,16 @@ public class InscripcionesTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
+    @MockBean
     private InscripcionesRepository inscripcionesRepository;
 
-    @MockitoBean
+    @MockBean
     private UsuarioRepository usuarioRepository;
 
-    @MockitoBean
+    @MockBean
     private EventosRepository eventosRepository;
 
-    @MockitoBean
+    @MockBean
     private WaitlistRepository waitlistRepository;
 
     @Autowired

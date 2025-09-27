@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
+import GestionUsuarios from './GestionUsuarios'
+import api from '../../lib/api'
 
 function Admin() {
+    const [vistaActual, setVistaActual] = useState<'estadisticas' | 'usuarios'>(
+        'estadisticas'
+    )
     const [totalInscripciones, setTotalInscripciones] = useState<number | null>(
         null
     )
@@ -42,12 +47,10 @@ function Admin() {
         setLoadingInscripciones(true)
         setErrorInscripciones(null)
         try {
-            const res = await fetch(
-                'http://localhost:8080/api/v1/estadisticas/inscripciones/total'
+            const res = await api.get(
+                '/api/v1/estadisticas/inscripciones/total'
             )
-            if (!res.ok) throw new Error('Error al obtener inscripciones')
-            const data = await res.json()
-            setTotalInscripciones(data.total ?? data)
+            setTotalInscripciones(res.data.total ?? res.data)
         } catch (err: any) {
             setErrorInscripciones(err.message)
         } finally {
@@ -59,12 +62,8 @@ function Admin() {
         setLoadingEventos(true)
         setErrorEventos(null)
         try {
-            const res = await fetch(
-                'http://localhost:8080/api/v1/estadisticas/eventos/total'
-            )
-            if (!res.ok) throw new Error('Error al obtener eventos')
-            const data = await res.json()
-            setTotalEventos(data.total ?? data)
+            const res = await api.get('/api/v1/estadisticas/eventos/total')
+            setTotalEventos(res.data.total ?? res.data)
         } catch (err: any) {
             setErrorEventos(err.message)
         } finally {
@@ -81,12 +80,10 @@ function Admin() {
         setErrorTasa(null)
         setTasaConversionWL(null)
         try {
-            const res = await fetch(
-                `http://localhost:8080/api/v1/estadisticas/eventos/${idEvento}/tasa-conversionwl`
+            const res = await api.get(
+                `/api/v1/estadisticas/eventos/${idEvento}/tasa-conversionwl`
             )
-            if (!res.ok) throw new Error('Error al obtener tasa de conversión')
-            const data = await res.json()
-            setTasaConversionWL(data.tasa ?? data)
+            setTasaConversionWL(res.data.tasa ?? res.data)
         } catch (err: any) {
             setErrorTasa(err.message)
         } finally {
@@ -95,8 +92,127 @@ function Admin() {
     }
 
     return (
+        <div className="container mx-auto px-4 py-8">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <h1 className="text-3xl font-bold text-blue-900 mb-2">
+                    Panel de Administración
+                </h1>
+                <p className="text-blue-700">
+                    <strong>👋 Bienvenido, Admin!</strong> Desde aquí puedes
+                    gestionar usuarios y ver estadísticas del sistema.
+                </p>
+            </div>
+
+            {/* Navegación por pestañas */}
+            <div className="flex border-b border-gray-200 mb-6">
+                <button
+                    onClick={() => setVistaActual('estadisticas')}
+                    className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
+                        vistaActual === 'estadisticas'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                >
+                    📊 Estadísticas
+                </button>
+                <button
+                    onClick={() => setVistaActual('usuarios')}
+                    className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
+                        vistaActual === 'usuarios'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                >
+                    👥 Gestión de Usuarios
+                </button>
+            </div>
+
+            {/* Contenido según la vista actual */}
+            {vistaActual === 'estadisticas' ? (
+                <EstadisticasPanel
+                    totalInscripciones={totalInscripciones}
+                    setTotalInscripciones={setTotalInscripciones}
+                    totalEventos={totalEventos}
+                    setTotalEventos={setTotalEventos}
+                    tasaConversionWL={tasaConversionWL}
+                    setTasaConversionWL={setTasaConversionWL}
+                    loadingInscripciones={loadingInscripciones}
+                    setLoadingInscripciones={setLoadingInscripciones}
+                    loadingEventos={loadingEventos}
+                    setLoadingEventos={setLoadingEventos}
+                    loadingTasa={loadingTasa}
+                    setLoadingTasa={setLoadingTasa}
+                    errorInscripciones={errorInscripciones}
+                    setErrorInscripciones={setErrorInscripciones}
+                    errorEventos={errorEventos}
+                    setErrorEventos={setErrorEventos}
+                    errorTasa={errorTasa}
+                    setErrorTasa={setErrorTasa}
+                    idEvento={idEvento}
+                    setIdEvento={setIdEvento}
+                    fetchInscripciones={fetchInscripciones}
+                    fetchEventos={fetchEventos}
+                    fetchTasaConversionWL={fetchTasaConversionWL}
+                    buttonStyle={buttonStyle}
+                    buttonDisabledStyle={buttonDisabledStyle}
+                />
+            ) : (
+                <GestionUsuarios />
+            )}
+        </div>
+    )
+}
+
+// Componente separado para las estadísticas
+interface EstadisticasPanelProps {
+    totalInscripciones: number | null
+    setTotalInscripciones: (value: number | null) => void
+    totalEventos: number | null
+    setTotalEventos: (value: number | null) => void
+    tasaConversionWL: number | null
+    setTasaConversionWL: (value: number | null) => void
+    loadingInscripciones: boolean
+    setLoadingInscripciones: (value: boolean) => void
+    loadingEventos: boolean
+    setLoadingEventos: (value: boolean) => void
+    loadingTasa: boolean
+    setLoadingTasa: (value: boolean) => void
+    errorInscripciones: string | null
+    setErrorInscripciones: (value: string | null) => void
+    errorEventos: string | null
+    setErrorEventos: (value: string | null) => void
+    errorTasa: string | null
+    setErrorTasa: (value: string | null) => void
+    idEvento: string
+    setIdEvento: (value: string) => void
+    fetchInscripciones: () => Promise<void>
+    fetchEventos: () => Promise<void>
+    fetchTasaConversionWL: () => Promise<void>
+    buttonStyle: React.CSSProperties
+    buttonDisabledStyle: React.CSSProperties
+}
+
+const EstadisticasPanel: React.FC<EstadisticasPanelProps> = ({
+    totalInscripciones,
+    totalEventos,
+    tasaConversionWL,
+    loadingInscripciones,
+    loadingEventos,
+    loadingTasa,
+    errorInscripciones,
+    errorEventos,
+    errorTasa,
+    idEvento,
+    setIdEvento,
+    fetchInscripciones,
+    fetchEventos,
+    fetchTasaConversionWL,
+    buttonStyle,
+    buttonDisabledStyle,
+}) => {
+    return (
         <div>
-            <h1>Panel de Estadisticas</h1>
+            <h2 className="text-2xl font-bold mb-6">Panel de Estadísticas</h2>
             <div>
                 <button
                     onClick={fetchInscripciones}

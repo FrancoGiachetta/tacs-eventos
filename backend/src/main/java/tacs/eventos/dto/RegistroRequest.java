@@ -10,5 +10,8 @@ public record RegistroRequest(
         @Email @NotBlank String email,
 
         // Al menos 8, con letra y número.
-        @NotBlank @Size(min = 8, max = 72) @Pattern(regexp = ".*(?=.*[A-Za-z])(?=.*\\d).*", message = "Debe contener letras y números") String password) {
+        @NotBlank @Size(min = 8, max = 72) @Pattern(regexp = ".*(?=.*[A-Za-z])(?=.*\\d).*", message = "Debe contener letras y números") String password,
+
+        // Tipo de usuario: USUARIO u ORGANIZADOR
+        @NotBlank String tipoUsuario) {
 }

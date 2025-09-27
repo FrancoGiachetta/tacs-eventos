@@ -33,7 +33,7 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
     @Override
     public List<InscripcionEvento> getInscripcionesConfirmadasPorParticipante(Usuario participante) {
         return this.inscripciones.stream().filter(i -> i.getParticipante().equals(participante))
-                .filter(i -> i.getEstado() != EstadoInscripcion.CANCELADA).toList();
+                .filter(i -> i.getEstado() == EstadoInscripcion.CONFIRMADA).toList();
     }
 
     @Override
@@ -43,9 +43,8 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
 
     @Override
     public void guardarInscripcion(InscripcionEvento inscripcion) {
-        if (!this.inscripciones.contains(inscripcion)) {
-            this.inscripciones.add(inscripcion);
-        }
+        // Simplemente agregamos la inscripción - puede haber múltiples estados para el mismo usuario/evento
+        this.inscripciones.add(inscripcion);
     }
 
     @Override
@@ -56,7 +55,10 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
          * de inscriptos en un diccionario, implementado como un hashmap <Evento, cantidad> que se guarde y actualice
          * adentro de este repo.
          */
-        return (int) this.inscripciones.stream()
+        long cantidad = this.inscripciones.stream()
                 .filter(i -> i.getEvento().equals(evento) && i.getEstado() == EstadoInscripcion.CONFIRMADA).count();
+
+        System.out.println("DEBUG cantidadInscriptos - Evento: " + evento.getId() + " | Cantidad: " + cantidad);
+        return (int) cantidad;
     }
 }

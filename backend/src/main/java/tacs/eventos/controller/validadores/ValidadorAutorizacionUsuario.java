@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 
 /**
@@ -43,6 +44,11 @@ public class ValidadorAutorizacionUsuario implements Validador {
     }
 
     private boolean estaEntreLosAutorizados(Usuario autenticado, List<Usuario> autorizados) {
+        // Los ADMIN tienen acceso a todo
+        if (autenticado.getRoles().contains(RolUsuario.ADMIN)) {
+            return true;
+        }
+
         return autorizados.stream().anyMatch(autenticado::equals);
     }
 }
