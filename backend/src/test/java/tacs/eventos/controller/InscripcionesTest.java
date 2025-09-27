@@ -154,7 +154,8 @@ public class InscripcionesTest {
 
             // Mockea el pedido POST y verifica que retorne SEE OTHER y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/";
-            mockMvc.perform(post(url)).andExpect(status().isSeeOther()).andExpect(header().string("Location", url.concat(u1.getId())));
+            mockMvc.perform(post(url)).andExpect(status().isSeeOther())
+                    .andExpect(header().string("Location", url.concat(u1.getId())));
 
             // Verifica que la waitlist no haya sido modificada
             assertEquals(List.of(u1), w1.candidatos());

@@ -168,7 +168,8 @@ public class EventoController {
         // Si el usuario no es el organizador, devolver 403.
         if (!validador.validar()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no está inscripto al evento");
-        };
+        }
+        ;
 
         if (estadoDTO.abierto()) {
             this.eventoService.abrirEvento(usuario, evento);
@@ -271,7 +272,7 @@ public class EventoController {
             @PathVariable String eventoId, @PathVariable String usuarioId) {
         Optional<Usuario> usuario = usuarioService.buscarPorId(usuarioId);
         Evento evento = this.buscarEvento(eventoId);
-        
+
         // Si el usuario no existe, también retorno NO_CONTENT, para no revelar que existe el usuario
         usuario.ifPresent((u) -> {
             Validador validador = new ValidadorAutorizacionUsuario(usuarioLogueado,
@@ -308,9 +309,9 @@ public class EventoController {
         var usuario = usuarioService.buscarPorId(usuarioId).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.FORBIDDEN,
                 "Solamente pueden crear una inscripción el usuario que se va a inscribir, o el organizador del evento"));
-        
+
         Validador validador = new ValidadorAutorizacionUsuario(usuarioLogueado,
-                    List.of(evento.getOrganizador(), usuario));
+                List.of(evento.getOrganizador(), usuario));
 
         validador.validar();
 
