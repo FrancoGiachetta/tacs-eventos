@@ -1,7 +1,6 @@
 package tacs.eventos.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -124,7 +123,7 @@ public class InscripcionesTest {
             when(waitlistRepository.waitlist(e1)).thenReturn(w1);
 
             // Mockea el pedido POST y verifica que retorne 201 CREATED y la inscripción
-            String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/";
+            String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
             mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
 
             // Verifica que se haya guardado la inscripción en el repo
@@ -139,7 +138,7 @@ public class InscripcionesTest {
             // Hace que el evento no tenga cupo
             when(inscripcionesRepository.cantidadInscriptos(e1)).thenReturn(2);
             // Mockea el pedido POST y verifica que retorne 201 CREATED y apunte a la inscripción
-            String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/";
+            String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
             mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
 
             assertEquals(List.of(u1), w1.candidatos());
@@ -153,9 +152,8 @@ public class InscripcionesTest {
             when(waitlistRepository.waitlist(e1)).thenReturn(w1);
 
             // Mockea el pedido POST y verifica que retorne SEE OTHER y la inscripción
-            String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/";
-            mockMvc.perform(post(url)).andExpect(status().isSeeOther())
-                    .andExpect(header().string("Location", url.concat(u1.getId())));
+            String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
+            mockMvc.perform(post(url)).andExpect(status().isSeeOther()).andExpect(header().string("Location", url));
 
             // Verifica que la waitlist no haya sido modificada
             assertEquals(List.of(u1), w1.candidatos());
@@ -164,9 +162,19 @@ public class InscripcionesTest {
         }
 
         @Test
+        void siElUsuarioNoExisteMuestraElErrorYNoRealizaLaInscripcion() throws Exception {
+            mockMvc.perform(post("/api/v1/evento/" + e1.getId() + "/inscripcion/" + "esteUsuarioNoExiste"))
+                    .andExpect(status().isForbidden())
+                    .andExpect(status().reason("Solamente pueden crear una inscripción "
+                            + "el usuario que se va a inscribir, o el organizador del evento"));
+
+            verify(inscripcionesRepository, never()).guardarInscripcion(any());
+        }
+
+        @Test
         void siElEventoNoExisteMuestraElErrorYNoRealizaLaInscripcion() throws Exception {
-            mockMvc.perform(post("/api/v1/evento/EventoNoexiste/inscripcion/")).andExpect(status().isNotFound())
-                    .andExpect(status().reason("Evento no encontrado"));
+            mockMvc.perform(post("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
+                    .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
 
             verifyNoInteractions(inscripcionesRepository);
         }
@@ -291,4 +299,5 @@ public class InscripcionesTest {
             assertEquals(EstadoInscripcion.CANCELADA, i1.getEstado());
         }
     }
+
 }
