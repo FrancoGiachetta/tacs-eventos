@@ -18,8 +18,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Punto de entrada para realizar o cancelar inscripciones, pasando por la
- * waitlist si es necesario, y realizando las
+ * Punto de entrada para realizar o cancelar inscripciones, pasando por la waitlist si es necesario, y realizando las
  * validaciones pertientes.
  */
 @Service
@@ -33,14 +32,12 @@ public class InscripcionesService {
     private final InscripcionAsyncService inscripcionAsyncService;
 
     /**
-     * Intenta inscribir al usuario al evento. Si no hay lugar, lo manda a la
-     * waitlist.
+     * Intenta inscribir al usuario al evento. Si no hay lugar, lo manda a la waitlist.
      *
      * @param evento
      * @param usuario
      *
-     * @return la inscripción generada si pudo inscribirlo, o un Optional vacío si
-     *         lo mandó a la waitlist.
+     * @return la inscripción generada si pudo inscribirlo, o un Optional vacío si lo mandó a la waitlist.
      *
      * @throws ExecutionException
      * @throws InterruptedException
@@ -59,10 +56,8 @@ public class InscripcionesService {
     }
 
     /**
-     * Si el usuario estaba inscripto, cancela su inscripción. Si no estaba
-     * inscripto, lo saca de la waitlist (si es que
-     * estaba). Si se sacó de la waitlist, confirma la incripción del próximo, pero
-     * en forma asincrónica, para no
+     * Si el usuario estaba inscripto, cancela su inscripción. Si no estaba inscripto, lo saca de la waitlist (si es que
+     * estaba). Si se sacó de la waitlist, confirma la incripción del próximo, pero en forma asincrónica, para no
      * demorar la respuesta de este métod0.
      *
      * @param evento
@@ -91,8 +86,7 @@ public class InscripcionesService {
      * @param evento
      * @param usuario
      *
-     * @return si el usuario está en la waitlist o tiene una inscripción confirmada
-     *         para ese evento
+     * @return si el usuario está en la waitlist o tiene una inscripción confirmada para ese evento
      */
     public boolean inscripcionConfirmadaOEnWaitlist(Evento evento, Usuario usuario) {
         return inscripcionEstaConfirmada(evento, usuario) || inscripcionEstaEnWaitlist(evento, usuario);

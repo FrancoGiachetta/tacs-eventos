@@ -29,8 +29,7 @@ public class InscripcionAsyncService {
     }
 
     /**
-     * Promueve al próximo de la waitlist a inscripción, si es que hay alguien en la
-     * waitlist. Este métod0 es
+     * Promueve al próximo de la waitlist a inscripción, si es que hay alguien en la waitlist. Este métod0 es
      * asincrónico.
      *
      * @param evento
@@ -43,14 +42,12 @@ public class InscripcionAsyncService {
     }
 
     /**
-     * Intenta inscribir al usuario directamente al evento (sin pasar por la
-     * waitlist).
+     * Intenta inscribir al usuario directamente al evento (sin pasar por la waitlist).
      *
      * @param inscripcion
-     *                    la inscripción que se quiere intentar realizar
+     *            la inscripción que se quiere intentar realizar
      *
-     * @return la inscripción realizada, o un Optional vacío si no pudo realizar la
-     *         inscripción porque no había lugar
+     * @return la inscripción realizada, o un Optional vacío si no pudo realizar la inscripción porque no había lugar
      */
     @Async
     public Future<Optional<InscripcionEvento>> intentarInscribir(InscripcionEvento inscripcion) {
