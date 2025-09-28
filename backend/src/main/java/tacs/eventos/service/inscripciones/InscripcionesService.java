@@ -1,4 +1,4 @@
-package tacs.eventos.service;
+package tacs.eventos.service.inscripciones;
 
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
@@ -9,6 +9,7 @@ import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
+import tacs.eventos.service.WaitlistService;
 
 import java.util.List;
 import java.util.Optional;
