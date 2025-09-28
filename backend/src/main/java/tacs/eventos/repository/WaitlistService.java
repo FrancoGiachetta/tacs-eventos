@@ -1,7 +1,7 @@
 package tacs.eventos.repository;
 
 import tacs.eventos.model.Evento;
-import tacs.eventos.model.RedisWaitlist;
+import tacs.eventos.model.waitlist.RedisWaitlist;
 
 public interface WaitlistService {
     /**

@@ -1,7 +1,8 @@
-package tacs.eventos.model;
+package tacs.eventos.model.waitlist;
 
 import lombok.Getter;
 import org.redisson.api.RedissonClient;
+import tacs.eventos.model.Evento;
 
 import java.util.Optional;
 import java.util.Queue;

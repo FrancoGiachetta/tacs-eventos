@@ -1,4 +1,4 @@
-package tacs.eventos.model;
+package tacs.eventos.model.waitlist;
 
 import java.util.Optional;
 

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import tacs.eventos.model.Evento;
-import tacs.eventos.model.RedisWaitlist;
+import tacs.eventos.model.waitlist.RedisWaitlist;
 
 @Service
 @RequiredArgsConstructor
