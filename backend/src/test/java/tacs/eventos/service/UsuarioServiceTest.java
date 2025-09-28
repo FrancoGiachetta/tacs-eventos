@@ -2,7 +2,6 @@ package tacs.eventos.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tacs.eventos.dto.EstadoInscripcionResponse;
 import tacs.eventos.dto.InscripcionResponse;
@@ -99,7 +98,7 @@ class UsuarioServiceTest {
         List<InscripcionEvento> inscripciones = List.of(InscripcionFactory.confirmada(usuario, evento1),
                 InscripcionFactory.confirmada(usuario, evento2), InscripcionFactory.pendiente(usuario, evento3));
 
-        when(inscripcionesRepository.getInscripcionesNoCanceladasPorParticipante(usuario)).thenReturn(inscripciones);
+        when(inscripcionesRepository.noCanceladasDeParticipante(usuario)).thenReturn(inscripciones);
 
         var result = usuarioService.obtenerInscripcionesNoCanceladas(usuario.getId());
 

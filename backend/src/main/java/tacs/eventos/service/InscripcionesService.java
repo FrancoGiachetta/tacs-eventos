@@ -5,6 +5,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
 import tacs.eventos.repository.WaitlistRepository;
@@ -37,7 +38,7 @@ public class InscripcionesService {
         // Primero intenta inscribirlo directamente. Si no, lo manda a la waitlist.
         return intentarInscribir(InscripcionFactory.confirmada(usuario, evento)).or(() -> {
             InscripcionEvento inscripcionEvento = InscripcionFactory.pendiente(usuario, evento);
-            inscripcionesRepository.guardarInscripcion(inscripcionEvento);
+            inscripcionesRepository.save(inscripcionEvento);
             waitlistRepository.waitlist(evento).agregar(inscripcionEvento.getId());
             return Optional.empty();
         });
@@ -53,9 +54,9 @@ public class InscripcionesService {
      */
     public void cancelarInscripcion(Evento evento, Usuario usuario) {
         // Si el usuario estaba inscripto, cancela su inscripción. Si no, intenta sacarlo de la waitlist.
-        var inscripcion = inscripcionesRepository.getInscripcionParaUsuarioYEvento(usuario, evento);
-        var estabaConfirmada = inscripcion.map(InscripcionEvento::estaConfirmada).orElse(false);
-        inscripcion.ifPresent(InscripcionEvento::cancelar);
+        var inscripcionNoCancelada = inscripcionNoCancelada(evento, usuario);
+        var estabaConfirmada = inscripcionNoCancelada.map(InscripcionEvento::estaConfirmada).orElse(false);
+        inscripcionNoCancelada.ifPresent(InscripcionEvento::cancelar);
         if (estabaConfirmada) { // Si se eliminó una inscripción confirmada (se liberó un lugar)
             // Promueve al próximo de la waitlist (si hay alguien). Hace esto en forma asincrónica, porque es una acción
             // que
@@ -72,9 +73,8 @@ public class InscripcionesService {
      *
      * @return si el usuario está en la waitlist o tiene una inscripción confirmada para ese evento
      */
-    public boolean inscripcionConfirmadaOEnWaitlist(Evento evento, Usuario usuario) {
-        return inscripcionesRepository.getInscripcionParaUsuarioYEvento(usuario, evento)
-                .map(i -> i.estaConfirmada() || i.estaPendiente()).orElse(false);
+    public Optional<InscripcionEvento> inscripcionNoCancelada(Evento evento, Usuario usuario) {
+        return inscripcionesRepository.noCanceladaParaParticipanteYEvento(usuario, evento);
     }
 
     /**
@@ -82,8 +82,8 @@ public class InscripcionesService {
      *
      * @return todas las inscripciones (confirmadas, canceladas, o pendientes) de ese evento
      */
-    public List<InscripcionEvento> buscarInscripcionesDeEvento(Evento evento) {
-        return inscripcionesRepository.getInscripcionesPorEvento(evento);
+    public List<InscripcionEvento> inscripcionesConfirmadas(Evento evento) {
+        return inscripcionesRepository.findByEventoAndEstado(evento, EstadoInscripcion.CONFIRMADA);
     }
 
     /**
@@ -92,7 +92,7 @@ public class InscripcionesService {
      * @return las inscripciones pendientes de ese evento
      */
     public List<InscripcionEvento> inscripcionesPendientes(Evento evento) {
-        return inscripcionesRepository.getInscripcionesPendientes(evento);
+        return inscripcionesRepository.findByEventoAndEstado(evento, EstadoInscripcion.PENDIENTE);
     }
 
     /**
@@ -113,10 +113,12 @@ public class InscripcionesService {
         // hibernate) o el hash del estado interno del evento (como lo que vimos en la clase de API REST que se hace con
         // el ETag.
         synchronized (inscripcion.getEvento()) {
-            int inscriptos = this.inscripcionesRepository.cantidadInscriptos(inscripcion.getEvento());
+            int inscriptos = this.inscripcionesRepository.countByEvento(inscripcion.getEvento());
             if (!inscripcion.getEvento().permiteIncripcion(inscriptos))
                 return Optional.empty();
-            inscripcionesRepository.guardarInscripcion(inscripcion);
+            inscripcion.confirmar();
+            /* Guarda una inscripción nueva, o la actualiza con el estado CONFIRMADA */
+            inscripcionesRepository.save(inscripcion);
             return Optional.of(inscripcion);
         }
     }
@@ -129,12 +131,8 @@ public class InscripcionesService {
      */
     @Async
     protected void inscribirProximo(Evento evento) {
-        waitlistRepository.waitlist(evento).proximo().flatMap(inscripcionesRepository::getInscripcionPorId)
+        waitlistRepository.waitlist(evento).proximo().flatMap(inscripcionesRepository::findById)
                 .filter(InscripcionEvento::estaPendiente) // Solo inscribo si sigue pendiente
                 .ifPresent(this::intentarInscribir);
-    }
-
-    public Optional<InscripcionEvento> inscripcionParaUsuarioYEvento(Usuario usuarioInscripto, Evento evento) {
-        return inscripcionesRepository.getInscripcionParaUsuarioYEvento(usuarioInscripto, evento);
     }
 }

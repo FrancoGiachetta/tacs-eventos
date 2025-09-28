@@ -89,8 +89,7 @@ public class UsuarioService {
         Usuario usuario = repo.findById(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        List<InscripcionEvento> inscripciones = inscripcionesRepository
-                .getInscripcionesNoCanceladasPorParticipante(usuario);
+        List<InscripcionEvento> inscripciones = inscripcionesRepository.noCanceladasDeParticipante(usuario);
         List<InscripcionResponse> inscripcionResponses = inscripciones.stream()
                 .map(insc -> new InscripcionResponse(insc.getEvento().getId(), mapEstado(insc.getEstado()))).toList();
         return inscripcionResponses;

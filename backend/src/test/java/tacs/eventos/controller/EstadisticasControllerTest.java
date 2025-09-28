@@ -1,23 +1,23 @@
 package tacs.eventos.controller;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-
-import tacs.eventos.service.EstadisticaService;
-import tacs.eventos.service.SessionService;
-import tacs.eventos.service.EventoService;
-import tacs.eventos.service.UsuarioService;
-import tacs.eventos.model.Usuario;
 import tacs.eventos.model.RolUsuario;
+import tacs.eventos.model.Usuario;
+import tacs.eventos.service.EstadisticaService;
+import tacs.eventos.service.EventoService;
+import tacs.eventos.service.SessionService;
+import tacs.eventos.service.UsuarioService;
+
 import java.util.Optional;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 class EstadisticasControllerTest {
 
@@ -63,13 +63,13 @@ class EstadisticasControllerTest {
 
     @Test
     void testCantidadInscripciones() {
-        when(estadisticaService.cantidadInscribiciones()).thenReturn(20);
+        when(estadisticaService.cantidadInscripciones()).thenReturn(20);
 
-        ResponseEntity<Integer> response = controller.cantidadInscripciones(VALID_AUTH_HEADER);
+        ResponseEntity<Long> response = controller.cantidadInscripciones(VALID_AUTH_HEADER);
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(20, response.getBody());
-        verify(estadisticaService).cantidadInscribiciones();
+        verify(estadisticaService).cantidadInscripciones();
     }
 
     @Test
@@ -104,6 +104,6 @@ class EstadisticasControllerTest {
         ResponseEntity<Integer> response = controller.cantidadInscripciones("Bearer regular-token");
 
         assertEquals(403, response.getStatusCode().value());
-        verify(estadisticaService, never()).cantidadInscribiciones();
+        verify(estadisticaService, never()).cantidadInscripciones();
     }
 }

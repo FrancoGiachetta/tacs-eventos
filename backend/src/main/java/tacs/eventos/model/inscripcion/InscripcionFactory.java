@@ -4,7 +4,6 @@ import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 /**
  * Clase usada para crear instancias de InscripcionEvento.
@@ -12,8 +11,7 @@ import java.util.Optional;
 public class InscripcionFactory {
 
     /**
-     * Crea directamtente una inscripción confirmada, sin tomar información del ítem de la waitlist que dió lugar a la
-     * misma.
+     * Crea una inscripción confirmada.
      *
      * @param participante
      * @param evento
@@ -21,12 +19,12 @@ public class InscripcionFactory {
      * @return una nueva instancia de InscripcionEvento
      */
     public static InscripcionEvento confirmada(Usuario participante, Evento evento) {
-        return new InscripcionEvento(participante, evento, Optional.empty(), EstadoInscripcion.CONFIRMADA);
+        return InscripcionEvento.crearNueva(participante, evento, null, LocalDateTime.now(),
+                EstadoInscripcion.CONFIRMADA);
     }
 
     /**
-     * Crea una inscripción creada a partir de un ítem de la waitlist, tomando a partir del mismo la información
-     * necesaria.
+     * Crea una inscripción pendiente.
      *
      * @param participante
      * @param evento
@@ -34,7 +32,7 @@ public class InscripcionFactory {
      * @return una nueva instancia de InscripcionEvento
      */
     public static InscripcionEvento pendiente(Usuario participante, Evento evento) {
-        return new InscripcionEvento(participante, evento, Optional.of(LocalDateTime.now()),
+        return InscripcionEvento.crearNueva(participante, evento, LocalDateTime.now(), null,
                 EstadoInscripcion.PENDIENTE);
     }
 }

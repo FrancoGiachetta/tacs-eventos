@@ -16,7 +16,6 @@ import tacs.eventos.controller.validadores.ValidadorAutorizacionUsuario;
 import tacs.eventos.dto.*;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
-import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorCategoria;
@@ -199,14 +198,13 @@ public class EventoController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador");
         }
 
-        return ResponseEntity.ok(this.inscripcionesService.buscarInscripcionesDeEvento(evento).stream()
-                .filter((InscripcionEvento i) -> i.getEstado() == EstadoInscripcion.CONFIRMADA)
+        return ResponseEntity.ok(this.inscripcionesService.inscripcionesConfirmadas(evento).stream()
                 .map((InscripcionEvento i) -> InscripcionResponse.confirmada(evento.getId(), i)).toList());
     }
 
     /**
-     * Devuelve la infromación sobre una inscripcion especifica. El usuario debe ser organizador del evento para poder
-     * ver esto.
+     * Devuelve la infromación sobre la inscripción no cancelada para ese usuario y evento, si es que esta existe. El
+     * usuario debe ser organizador del evento para poder ver esto.
      *
      * @param usuarioLogueado
      *            usuario logueado al sistema
@@ -237,10 +235,8 @@ public class EventoController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        Optional<InscripcionEvento> inscripcion = inscripcionesService.inscripcionParaUsuarioYEvento(usuarioInscripto,
-                evento);
-        return inscripcion.filter(i -> i.getEstado() != EstadoInscripcion.CANCELADA)
-                .map(i -> new InscripcionResponse(i.getEvento().getId(), mapEstado(i.getEstado())))
+        Optional<InscripcionEvento> inscripcion = inscripcionesService.inscripcionNoCancelada(evento, usuarioInscripto);
+        return inscripcion.map(i -> new InscripcionResponse(i.getEvento().getId(), mapEstado(i.getEstado())))
                 .map(ResponseEntity::ok).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "El usuario no está inscripto al evento"));
     }
@@ -312,7 +308,7 @@ public class EventoController {
         String location = "/api/v1/evento/" + eventoId + "/inscripcion/" + usuarioId;
 
         // Si el usuario ya está inscripto o en la waitlist, devuelve SEE_OTHER y redirige a la inscripción existente
-        if (inscripcionesService.inscripcionConfirmadaOEnWaitlist(evento, usuario))
+        if (inscripcionesService.inscripcionNoCancelada(evento, usuario).isPresent())
             return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(location)).build();
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist

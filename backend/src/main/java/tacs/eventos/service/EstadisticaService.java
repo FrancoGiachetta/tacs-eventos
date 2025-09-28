@@ -1,7 +1,6 @@
 package tacs.eventos.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,8 +18,8 @@ public class EstadisticaService {
     private final InscripcionesRepository inscripcionesRepository;
     private final WaitlistRepository waitlistRepository;
 
-    public int cantidadInscribiciones() {
-        return this.inscripcionesRepository.todos().size();
+    public long cantidadInscripciones() {
+        return this.inscripcionesRepository.count();
     }
 
     public int cantidadEventos() throws Exception {
@@ -37,7 +36,7 @@ public class EstadisticaService {
             int TotalInscripcionesEvento;
             Waitlist eventoWaitlist;
             int totalInscripcionesEnWaitlist;
-            TotalInscripcionesEvento = this.inscripcionesRepository.getInscripcionesPorEvento(evento).size();
+            TotalInscripcionesEvento = this.inscripcionesRepository.countByEvento(evento);
             eventoWaitlist = this.waitlistRepository.waitlist(evento);
             totalInscripcionesEnWaitlist = eventoWaitlist.cantidadEnCola(); // TODO: reemplazar por llamada a repo
             calculoTasa = (TotalInscripcionesEvento / totalInscripcionesEnWaitlist) * 100;

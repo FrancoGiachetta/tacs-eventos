@@ -1,7 +1,9 @@
 package tacs.eventos.repository.inscripcion;
 
+import org.springframework.data.mongodb.repository.MongoRepository;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 
 import java.util.List;
@@ -10,62 +12,37 @@ import java.util.Optional;
 /**
  * Guarda las inscripciones confirmadas o canceladas.
  */
-public interface InscripcionesRepository {
+public interface InscripcionesRepository extends MongoRepository<InscripcionEvento, String> {
 
-    /**
-     * @return todas las inscripciones para todos los eventos, que estén canceladas o confirmadas.
-     */
-    List<InscripcionEvento> todos();
+    List<InscripcionEvento> findByParticipanteAndEstadoNot(Usuario participante, EstadoInscripcion estado);
 
-    /**
-     * @param participante
-     * @param evento
-     *
-     * @return la inscripción (cancelada o confirmada) de un participante a un evento, si es que esta existe
-     */
-    Optional<InscripcionEvento> getInscripcionConfirmada(Usuario participante, Evento evento);
-
-    /**
-     * @param participante
-     *
-     * @return las inscripciones no canceladas de ese participante
-     */
-    List<InscripcionEvento> getInscripcionesNoCanceladasPorParticipante(Usuario participante);
+    Optional<InscripcionEvento> findFirstByParticipanteAndEventoAndEstadoNot(Usuario participante, Evento evento,
+            EstadoInscripcion estado);
 
     /**
      * @param evento
      *
      * @return todas las inscripciones (confirmadas, canceladas, o pendientes) de ese evento
      */
-    List<InscripcionEvento> getInscripcionesPorEvento(Evento evento);
-
-    /**
-     * Guarda una inscripcion si esta todavía no existe. NO USAR DIRECTAMENTE, USAR InscripcionService.
-     */
-    void guardarInscripcion(InscripcionEvento inscripcion);
+    List<InscripcionEvento> findByEventoAndEstado(Evento evento, EstadoInscripcion estado);
 
     /**
      * @param evento
      *
      * @return cantidad de inscripciones confirmadas para ese evento
      */
-    int cantidadInscriptos(Evento evento);
+    int countByEvento(Evento evento);
+
+    default Optional<InscripcionEvento> noCanceladaParaParticipanteYEvento(Usuario usuarioInscripto, Evento evento) {
+        return findFirstByParticipanteAndEventoAndEstadoNot(usuarioInscripto, evento, EstadoInscripcion.CANCELADA);
+    }
 
     /**
-     * @param usuarioInscripto
-     * @param evento
+     * @param participante
      *
-     * @return la única inscripción para ese usuario y evento, si es que existe
+     * @return las inscripciones no canceladas de ese participante
      */
-    Optional<InscripcionEvento> getInscripcionParaUsuarioYEvento(Usuario usuarioInscripto, Evento evento);
-
-    /**
-     * @param id
-     *            el id de la inscripción que se quiere obtener
-     *
-     * @return la inscripción con ese id, si existe
-     */
-    Optional<InscripcionEvento> getInscripcionPorId(String id);
-
-    List<InscripcionEvento> getInscripcionesPendientes(Evento evento);
+    default List<InscripcionEvento> noCanceladasDeParticipante(Usuario participante) {
+        return findByParticipanteAndEstadoNot(participante, EstadoInscripcion.CANCELADA);
+    }
 }

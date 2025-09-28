@@ -6,11 +6,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tacs.eventos.model.RolUsuario;
 import tacs.eventos.service.EstadisticaService;
 import tacs.eventos.service.EventoService;
 import tacs.eventos.service.SessionService;
 import tacs.eventos.service.UsuarioService;
-import tacs.eventos.model.RolUsuario;
 
 @RestController
 @RequestMapping("/api/v1/estadisticas")
@@ -40,12 +40,12 @@ public class EstadisticasController {
     @Operation(summary = "Devuelve la cantidad de de inscripciones registrados en todo sistema")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "403", description = "Acceso denegado - Solo admin") })
-    public ResponseEntity<Integer> cantidadInscripciones(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<Long> cantidadInscripciones(@RequestHeader("Authorization") String authHeader) {
         // Validar que el usuario es admin
         if (!esUsuarioAdmin(authHeader)) {
             return ResponseEntity.status(403).build();
         }
-        return ResponseEntity.ok(estadisticaService.cantidadInscribiciones());
+        return ResponseEntity.ok(estadisticaService.cantidadInscripciones());
     }
 
     @GetMapping("/eventos/{eventoId}/tasa-conversionwl")

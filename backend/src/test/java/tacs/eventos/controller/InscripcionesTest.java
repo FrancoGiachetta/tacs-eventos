@@ -117,7 +117,7 @@ public class InscripcionesTest {
         w1.agregar(i1.getId());
         when(waitlistRepository.waitlist(e)).thenReturn(w1);
         when(inscripcionesRepository.getInscripcionParaUsuarioYEvento(u, e)).thenReturn(Optional.of(i1));
-        when(inscripcionesRepository.getInscripcionPorId(i1.getId())).thenReturn(Optional.of(i1));
+        when(inscripcionesRepository.findById(i1.getId())).thenReturn(Optional.of(i1));
         return w1;
     }
 
@@ -163,7 +163,7 @@ public class InscripcionesTest {
             mockMvc.perform(post(url)).andExpect(status().isSeeOther()).andExpect(header().string("Location", url));
 
             // Verifica que no se haya creado ninguna inscripción
-            verify(inscripcionesRepository, never()).guardarInscripcion(any());
+            verify(inscripcionesRepository, never()).save(any());
         }
 
         @Test
@@ -173,7 +173,7 @@ public class InscripcionesTest {
                     .andExpect(status().reason("Solamente pueden crear una inscripción "
                             + "el usuario que se va a inscribir, o el organizador del evento"));
 
-            verify(inscripcionesRepository, never()).guardarInscripcion(any());
+            verify(inscripcionesRepository, never()).save(any());
         }
 
         @Test
