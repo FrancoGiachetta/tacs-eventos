@@ -54,10 +54,9 @@ export default function EventoActionMenu(props: {
                     <li>
                         <a
                             className="block w-full text-center px-4 py-2 hover:bg-gray-100"
-                            href={`/eventos/${evento.id}/gestionar-inscriptos`}
+                            href={`/organizador/eventos/${evento.id}`}
                         >
                             {' '}
-                            {/* TODO: Cambiar cuando esté esta ruta definida*/}
                             Gestionar inscriptos
                         </a>
                     </li>

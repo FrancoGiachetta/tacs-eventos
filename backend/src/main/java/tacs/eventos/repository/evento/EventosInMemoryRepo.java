@@ -38,8 +38,8 @@ public class EventosInMemoryRepo implements EventosRepository {
 
     @Override
     public List<Evento> getEventosPorOrganizador(String organizadorId) {
-        return this.eventos.stream().filter(e -> true) // TODO: Completar luego cuando este el organizador en el evento
-                .toList();
+        return this.eventos.stream()
+                .filter(e -> e.getOrganizador() != null && e.getOrganizador().getId().equals(organizadorId)).toList();
     }
 
     @Override

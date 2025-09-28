@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import api from '../lib/api'
 import { useNavigate, Link } from 'react-router-dom'
+import PasswordInput from './PasswordInput'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,72}$/
@@ -32,7 +33,11 @@ const Registro: React.FC = () => {
             return
         }
         try {
-            await api.post('/api/v1/auth/register', { email, password })
+            await api.post('/api/v1/auth/register', {
+                email,
+                password,
+                tipoUsuario: 'USUARIO', // Solo permitir registro como usuario normal
+            })
             setSuccess('Registro exitoso. Redirigiendo al login...')
             setTimeout(() => navigate('/login'), 1500)
         } catch (err: any) {
@@ -65,27 +70,40 @@ const Registro: React.FC = () => {
                     className="w-full p-2 mb-4 border rounded"
                     required
                 />
-                <input
-                    type="password"
-                    placeholder="Contraseña"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-2 mb-4 border rounded"
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Confirmar Contraseña"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full p-2 mb-4 border rounded"
-                    required
-                />
+                <div className="mb-4">
+                    <PasswordInput
+                        placeholder="Contraseña"
+                        value={password}
+                        onChange={setPassword}
+                        required
+                    />
+                </div>
+                <div className="mb-4">
+                    <PasswordInput
+                        placeholder="Confirmar Contraseña"
+                        value={confirmPassword}
+                        onChange={setConfirmPassword}
+                        required
+                    />
+                </div>
+                <div className="text-xs text-gray-600 mb-4 bg-blue-50 p-3 rounded">
+                    <p>
+                        <strong>ℹ️ Información:</strong>
+                    </p>
+                    <p>
+                        • Te registrarás como <strong>Usuario Normal</strong>
+                    </p>
+                    <p>• Podrás ver e inscribirte a eventos</p>
+                    <p>
+                        • Si quieres crear eventos, contacta al administrador
+                        para ser promovido a Organizador
+                    </p>
+                </div>
                 <button
                     type="submit"
                     className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700"
                 >
-                    Registrarse
+                    Registrarse como Usuario
                 </button>
                 <div className="text-center mt-2">
                     <span>¿Ya tenés cuenta? </span>

@@ -1,13 +1,39 @@
-version: '3.9'
+networks:
+  eventos-network:
+    driver: bridge
+
 services:
   eventos-backend:
-    build: ./backend
-    env_file: ./backend/.env
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: eventos-backend
+    env_file: .env
     environment:
-      JWT_SECRET: ${JWT_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
+      - SPRING_PROFILES_ACTIVE=docker
     ports:
       - "8080:8080"
+    networks:
+      - eventos-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
   eventos-frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: eventos-frontend
     ports:
-      - "5173:80"
+      - "3000:80"
+    networks:
+      - eventos-network
+    depends_on:
+      eventos-backend:
+        condition: service_healthy
+    environment:
+      - VITE_API_URL=http://localhost:8080
