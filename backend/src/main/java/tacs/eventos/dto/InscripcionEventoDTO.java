@@ -1,13 +1,12 @@
 package tacs.eventos.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 
-@Data
-@AllArgsConstructor
-public class InscripcionEventoDTO {
-    private Evento evento;
-    private EstadoInscripcion estado;
-}
+public record InscripcionEventoDTO(
+    @NotNull
+    Evento evento,
+    @NotNull
+    EstadoInscripcion estado
+) {}

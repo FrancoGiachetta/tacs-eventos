@@ -6,16 +6,12 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 public class Usuario {
-    @Getter
     private String id;
-    @Getter
     private String email; // almacenadr normalizado (lowercase)
-    @Getter
     private String passwordHash; // BCrypt
-    @Getter
     private Set<RolUsuario> roles = new HashSet<>();
-    @Getter
     private Instant fechaCreacion = Instant.now();
 
     public Usuario(String email, String passwordHash, Set<RolUsuario> roles) {
