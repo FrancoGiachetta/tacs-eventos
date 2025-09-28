@@ -1,8 +1,12 @@
 package tacs.eventos.service;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import tacs.eventos.dto.EstadoInscripcionResponse;
 import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.model.Evento;
@@ -90,8 +94,8 @@ public class UsuarioService {
 
     public List<InscripcionResponse> obtenerInscripcionesNoCanceladas(String usuarioId) {
         Usuario usuario = repo.obtenerPorId(usuarioId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "No se pudo encontrar el usuario no encontrado"));
         List<InscripcionEvento> inscripciones = inscripcionesRepository
                 .getInscripcionesConfirmadasPorParticipante(usuario);
         List<InscripcionResponse> inscripcionResponses = inscripciones.stream()
