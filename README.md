@@ -12,18 +12,25 @@ Sistema completo de gestión de eventos con roles de usuario (Admin, Organizador
 - [Docker Compose](https://docs.docker.com/compose/install/) (incluido con Docker Desktop)
 
 ### 1. Construir las imágenes Docker (primera vez o después de cambios)
+
 ```bash
 docker-compose build --no-cache
 ```
+
 ### 2. Levantar todos los servicios
+
 ```bash
 docker-compose up -d
 ```
+
 ### 3. Verificar que los servicios estén funcionando
+
 ```bash
 docker-compose ps
 ```
+
 ### 4. Ver logs de los servicios (opcional)
+
 ```bash
 # Ver todos los logs
 docker-compose logs
@@ -137,9 +144,9 @@ npm run fmt
 
 ## Equipo
 
-Franco Giachetta
-Leonel Lucas Morsella
-Francisco Veiga
-Carlos Renfige
-Marco Rodriguez Melgarejo
-Lucas Thier
+- Carlos Renfige
+- Francisco Veiga
+- Franco Giachetta
+- Leonel Lucas Morsella
+- Lucas Thier
+- Marco Rodriguez Melgarejo
