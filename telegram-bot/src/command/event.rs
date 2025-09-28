@@ -31,7 +31,7 @@ pub async fn list_events(
             bot.send_message(msg.chat.id, events_msg).await?;
         }
         Err(e) => {
-            error!("Got an error while performing the request: {e}");
+            error!("Got an error while performing the request: {}", e);
 
             bot.send_message(
                 msg.chat.id,

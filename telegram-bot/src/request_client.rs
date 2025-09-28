@@ -82,7 +82,12 @@ impl RequestClient {
         url: String,
         method: Arc<RequestMethod<'req>>,
     ) -> Result<Value, RequestClientError> {
-        Self::retry(|| self.send_request(&url, &method)).await
+        let response = Self::retry(|| self.send_request(&url, &method)).await?;
+
+        response
+            .json::<Value>()
+            .await
+            .map_err(RequestClientError::from)
     }
 
     async fn send_request<'req>(
@@ -121,7 +126,7 @@ impl RequestClient {
     /// Whenever the request return a timeout, this function will retry sending
     /// it. If the maximum number of attempts has been reached or if another
     /// error (different from a timeout) is returned, it will stop retrying.
-    async fn retry<F, Fut>(request: F) -> Result<Value, RequestClientError>
+    async fn retry<F, Fut>(request: F) -> Result<Response, RequestClientError>
     where
         F: Fn() -> Fut,
         Fut: Future<Output = Result<Response, reqwest::Error>>,
@@ -130,12 +135,7 @@ impl RequestClient {
             let response = request().await;
 
             match response {
-                Ok(r) => {
-                    return r
-                        .json::<Value>()
-                        .await
-                        .map_err(|err| RequestClientError::ReqwestError(err));
-                }
+                Ok(r) => return r.error_for_status().map_err(RequestClientError::from),
                 Err(e) if e.is_timeout() => {
                     tracing::warn!(
                         "Retrying request, remaining tries: {}",
