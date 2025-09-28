@@ -1,14 +1,13 @@
 package tacs.eventos.model.inscripcion;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import com.mongodb.lang.Nullable;
+import lombok.*;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
@@ -21,22 +20,19 @@ public class InscripcionEvento {
     private final Evento evento;
     // TODO: agregar cuando este definido
     // private DatosDePago datosDePago;
-    @Getter
-    private final LocalDateTime fechaHoraIngresoAWaitlist; // TODO: anotar como nulleable y wrappear en un getter
+    @Nullable
+    private final LocalDateTime fechaHoraIngresoAWaitlist;
     @Getter
     private LocalDateTime fechahoraConfirmacion = LocalDateTime.now();
-    @Getter
-    private LocalDateTime fechaHoraCancelacion; // TODO: anotar como nulleable y wrappear en un getter
+    @Nullable
+    @Setter
+    private LocalDateTime fechaHoraCancelacion;
     // TODO: agregar cuando este definido
     // private Optional<String> errorDePago;
 
     @Getter
     @NonNull
     private EstadoInscripcion estado;
-
-    private void setFechaHoraCancelacion(LocalDateTime fechaHoraCancelacion) {
-        this.fechaHoraCancelacion = fechaHoraCancelacion;
-    }
 
     /**
      * Cancela la inscripción si no está ya cancelada.
@@ -58,6 +54,14 @@ public class InscripcionEvento {
 
     public boolean estaCancelada() {
         return estado.equals(EstadoInscripcion.CANCELADA);
+    }
+
+    public Optional<LocalDateTime> getFechaHoraCancelacion() {
+        return Optional.ofNullable(fechaHoraCancelacion);
+    }
+
+    public Optional<LocalDateTime> getFechaHoraIngresoAWaitlist() {
+        return Optional.ofNullable(fechaHoraIngresoAWaitlist);
     }
 
     @Override
