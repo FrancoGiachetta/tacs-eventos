@@ -148,8 +148,8 @@ public class InscripcionesTest {
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
             mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
 
-            verify(inscripcionesRepository).guardarInscripcion(argThat((InscripcionEvento i)
-                    -> i.getEvento().equals(e1) && i.getParticipante().equals(u1) && i.estaPendiente()));
+            verify(inscripcionesRepository).guardarInscripcion(argThat((InscripcionEvento i) -> i.getEvento().equals(e1)
+                    && i.getParticipante().equals(u1) && i.estaPendiente()));
             verify(w1, times(1)).agregar(any());
         }
 
@@ -245,7 +245,8 @@ public class InscripcionesTest {
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId()))
                     .andExpect(status().isNoContent());
 
-            assertEquals(EstadoInscripcion.CANCELADA, inscripcionesRepository.getInscripcionParaUsuarioYEvento(u1, e1).get().getEstado());
+            assertEquals(EstadoInscripcion.CANCELADA,
+                    inscripcionesRepository.getInscripcionParaUsuarioYEvento(u1, e1).get().getEstado());
         }
 
         @Test

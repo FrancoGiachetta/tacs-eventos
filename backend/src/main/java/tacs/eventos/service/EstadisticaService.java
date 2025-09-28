@@ -18,8 +18,8 @@ public class EstadisticaService {
     private final WaitlistRepository waitlistRepository;
 
     public EstadisticaService(@Qualifier("eventosInMemoryRepo") EventosRepository eventosRepository,
-                              @Qualifier("inscripcionesInMemoryRepo") InscripcionesRepository inscripcionesRepository,
-                              @Qualifier("waitlistsInMemoryRepo") WaitlistRepository waitlistRepository) {
+            @Qualifier("inscripcionesInMemoryRepo") InscripcionesRepository inscripcionesRepository,
+            @Qualifier("waitlistsInMemoryRepo") WaitlistRepository waitlistRepository) {
         this.eventosRepository = eventosRepository;
         this.inscripcionesRepository = inscripcionesRepository;
         this.waitlistRepository = waitlistRepository;

@@ -71,11 +71,11 @@ public class UsuarioService {
 
         // Solo permitir USUARIO u ORGANIZADOR en registro
         switch (tipoUsuario.toUpperCase()) {
-            case "ORGANIZADOR":
-                return Set.of(RolUsuario.ORGANIZADOR);
-            case "USUARIO":
-            default:
-                return Set.of(RolUsuario.USUARIO);
+        case "ORGANIZADOR":
+            return Set.of(RolUsuario.ORGANIZADOR);
+        case "USUARIO":
+        default:
+            return Set.of(RolUsuario.USUARIO);
         }
     }
 
@@ -91,7 +91,8 @@ public class UsuarioService {
         Usuario usuario = repo.obtenerPorId(usuarioId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "No se pudo encontrar el usuario no encontrado"));
-        List<InscripcionEvento> inscripciones = inscripcionesRepository.getInscripcionesNoCanceladasPorParticipante(usuario);
+        List<InscripcionEvento> inscripciones = inscripcionesRepository
+                .getInscripcionesNoCanceladasPorParticipante(usuario);
         List<InscripcionResponse> inscripcionResponses = inscripciones.stream()
                 .map(insc -> new InscripcionResponse(insc.getEvento().getId(), mapEstado(insc.getEstado()))).toList();
         return inscripcionResponses;
@@ -99,9 +100,9 @@ public class UsuarioService {
 
     private EstadoInscripcionResponse mapEstado(EstadoInscripcion estado) {
         return switch (estado) {
-            case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
-            case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
-            case PENDIENTE -> EstadoInscripcionResponse.PENDIENTE;
+        case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
+        case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
+        case PENDIENTE -> EstadoInscripcionResponse.PENDIENTE;
         };
     }
 

@@ -30,6 +30,7 @@ public class InscripcionesService {
      *
      * @param evento
      * @param usuario
+     *
      * @return la inscripción generada si pudo inscribirlo, o un Optional vacío si lo mandó a la waitlist.
      */
     public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario) {
@@ -68,6 +69,7 @@ public class InscripcionesService {
     /**
      * @param evento
      * @param usuario
+     *
      * @return si el usuario está en la waitlist o tiene una inscripción confirmada para ese evento
      */
     public boolean inscripcionConfirmadaOEnWaitlist(Evento evento, Usuario usuario) {
@@ -77,6 +79,7 @@ public class InscripcionesService {
 
     /**
      * @param evento
+     *
      * @return todas las inscripciones (confirmadas, canceladas, o pendientes) de ese evento
      */
     public List<InscripcionEvento> buscarInscripcionesDeEvento(Evento evento) {
@@ -85,6 +88,7 @@ public class InscripcionesService {
 
     /**
      * @param evento
+     *
      * @return las inscripciones pendientes de ese evento
      */
     public List<InscripcionEvento> inscripcionesPendientes(Evento evento) {
@@ -94,7 +98,9 @@ public class InscripcionesService {
     /**
      * Intenta inscribir al usuario directamente al evento (sin pasar por la waitlist).
      *
-     * @param inscripcion la inscripción que se quiere intentar realizar
+     * @param inscripcion
+     *            la inscripción que se quiere intentar realizar
+     *
      * @return la inscripción realizada, o un Optional vacío si no pudo realizar la inscripción porque no había lugar
      */
     private Optional<InscripcionEvento> intentarInscribir(InscripcionEvento inscripcion) {
