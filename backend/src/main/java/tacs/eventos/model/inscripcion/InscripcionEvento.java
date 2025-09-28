@@ -2,6 +2,7 @@ package tacs.eventos.model.inscripcion;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
@@ -21,13 +22,17 @@ public class InscripcionEvento {
     // TODO: agregar cuando este definido
     // private DatosDePago datosDePago;
     @Getter
-    private final LocalDateTime fechaHoraIngresoAWaitlist;
+    private final LocalDateTime fechaHoraIngresoAWaitlist; // TODO: anotar como nulleable y wrappear en un getter
     @Getter
     private LocalDateTime fechahoraConfirmacion = LocalDateTime.now();
     @Getter
-    private LocalDateTime fechaHoraCancelacion;
+    private LocalDateTime fechaHoraCancelacion; // TODO: anotar como nulleable y wrappear en un getter
     // TODO: agregar cuando este definido
     // private Optional<String> errorDePago;
+
+    @Getter
+    @NonNull
+    private EstadoInscripcion estado;
 
     private void setFechaHoraCancelacion(LocalDateTime fechaHoraCancelacion) {
         this.fechaHoraCancelacion = fechaHoraCancelacion;
@@ -37,18 +42,22 @@ public class InscripcionEvento {
      * Cancela la inscripción si no está ya cancelada.
      */
     public void cancelar() {
-        if (!getEstado().equals(EstadoInscripcion.CANCELADA)) // Si no está cancelada
+        if (!estaCancelada()) { // Si no está cancelada
+            estado = EstadoInscripcion.CANCELADA;
             setFechaHoraCancelacion(LocalDateTime.now()); // La cancela
+        }
     }
 
-    /**
-     * @return el estado de la inscripción
-     */
-    public EstadoInscripcion getEstado() {
-        if (fechaHoraCancelacion != null)
-            return EstadoInscripcion.CANCELADA;
-        else
-            return EstadoInscripcion.CONFIRMADA;
+    public boolean estaConfirmada() {
+        return estado.equals(EstadoInscripcion.CONFIRMADA);
+    }
+
+    public boolean estaPendiente() {
+        return estado.equals(EstadoInscripcion.PENDIENTE);
+    }
+
+    public boolean estaCancelada() {
+        return estado.equals(EstadoInscripcion.CANCELADA);
     }
 
     @Override

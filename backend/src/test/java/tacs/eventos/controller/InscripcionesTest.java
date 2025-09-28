@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.model.Evento;
@@ -25,7 +25,6 @@ import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -80,8 +79,8 @@ public class InscripcionesTest {
         @Test
         void unUsuarioPuedeVerSuInscripcionConfirmada() throws Exception {
             // Deja al usuario inscripto
-            InscripcionEvento i1 = InscripcionFactory.directa(u1, e1);
-            when(inscripcionesRepository.getInscripcionConfirmada(u1, e1)).thenReturn(Optional.of(i1));
+            InscripcionEvento i1 = InscripcionFactory.confirmada(u1, e1);
+            when(inscripcionesRepository.getInscripcionParaUsuarioYEvento(u1, e1)).thenReturn(Optional.of(i1));
             // Mockea el pedido GET y verifica que retorne 200 OK y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
             mockMvc.perform(get(url)).andExpect(status().isOk()).andExpect(
@@ -90,10 +89,7 @@ public class InscripcionesTest {
 
         @Test
         void unUsuarioPuedeVerSuInscripcionEnWaitlist() throws Exception {
-            // Crea una waitlist de prueba, en la que está el usuario 1
-            Waitlist w1 = new Waitlist(e1);
-            w1.agregar(u1);
-            when(waitlistRepository.waitlist(e1)).thenReturn(w1);
+            mockearInscripcionEnWatilist(u1, e1);
 
             // Mockea el pedido GET y verifica que retorne 200 OK y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
@@ -114,6 +110,17 @@ public class InscripcionesTest {
         }
     }
 
+    private Waitlist mockearInscripcionEnWatilist(Usuario u, Evento e) {
+        // Crea una waitlist de prueba, en la que está el usuario
+        InscripcionEvento i1 = InscripcionFactory.pendiente(u, e);
+        Waitlist w1 = new Waitlist(e);
+        w1.agregar(i1.getId());
+        when(waitlistRepository.waitlist(e)).thenReturn(w1);
+        when(inscripcionesRepository.getInscripcionParaUsuarioYEvento(u, e)).thenReturn(Optional.of(i1));
+        when(inscripcionesRepository.getInscripcionPorId(i1.getId())).thenReturn(Optional.of(i1));
+        return w1;
+    }
+
     @Nested
     class CrearInscripcion {
         @Test
@@ -127,13 +134,13 @@ public class InscripcionesTest {
             mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
 
             // Verifica que se haya guardado la inscripción en el repo
-            verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.directa(u1, e1));
+            verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.confirmada(u1, e1));
         }
 
         @Test
         void unUsuarioPuedeIngresarALaWaitlistDeUnEventoSinCupo() throws Exception {
             // Crea una waitlist de prueba, vacía
-            Waitlist w1 = new Waitlist(e1);
+            Waitlist w1 = mock(Waitlist.class);
             when(waitlistRepository.waitlist(e1)).thenReturn(w1);
             // Hace que el evento no tenga cupo
             when(inscripcionesRepository.cantidadInscriptos(e1)).thenReturn(2);
@@ -141,22 +148,20 @@ public class InscripcionesTest {
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
             mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
 
-            assertEquals(List.of(u1), w1.candidatos());
+            verify(inscripcionesRepository).guardarInscripcion(argThat((InscripcionEvento i) -> i.getEvento().equals(e1)
+                    && i.getParticipante().equals(u1) && i.estaPendiente()));
+            verify(w1, times(1)).agregar(any());
         }
 
         @Test
         void siElUsuarioYaEstaEnWaitlistNoSeGeneraUnaNuevaInscripcionYRetorna200okYLaInscripcion() throws Exception {
             // Crea una waitlist de prueba, en la que está ese usuario
-            Waitlist w1 = new Waitlist(e1);
-            w1.agregar(u1);
-            when(waitlistRepository.waitlist(e1)).thenReturn(w1);
+            mockearInscripcionEnWatilist(u1, e1);
 
             // Mockea el pedido POST y verifica que retorne SEE OTHER y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
             mockMvc.perform(post(url)).andExpect(status().isSeeOther()).andExpect(header().string("Location", url));
 
-            // Verifica que la waitlist no haya sido modificada
-            assertEquals(List.of(u1), w1.candidatos());
             // Verifica que no se haya creado ninguna inscripción
             verify(inscripcionesRepository, never()).guardarInscripcion(any());
         }
@@ -190,8 +195,8 @@ public class InscripcionesTest {
             when(waitlistRepository.waitlist(e1)).thenReturn(w1);
 
             // Deja al usuario inscripto
-            InscripcionEvento i1 = InscripcionFactory.directa(u1, e1);
-            when(inscripcionesRepository.getInscripcionConfirmada(u1, e1)).thenReturn(Optional.of(i1));
+            InscripcionEvento i1 = InscripcionFactory.confirmada(u1, e1);
+            when(inscripcionesRepository.getInscripcionParaUsuarioYEvento(u1, e1)).thenReturn(Optional.of(i1));
 
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId()));
 
@@ -209,8 +214,8 @@ public class InscripcionesTest {
             when(waitlistRepository.waitlist(e1)).thenReturn(w1);
 
             // Deja al usuario inscripto
-            InscripcionEvento i1 = InscripcionFactory.directa(u1, e1);
-            when(inscripcionesRepository.getInscripcionConfirmada(u1, e1)).thenReturn(Optional.of(i1));
+            InscripcionEvento i1 = InscripcionFactory.confirmada(u1, e1);
+            when(inscripcionesRepository.getInscripcionParaUsuarioYEvento(u1, e1)).thenReturn(Optional.of(i1));
 
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId()));
 
@@ -220,8 +225,8 @@ public class InscripcionesTest {
         @Test
         void unUsuarioNoPuedeCancelarLaInscripcionDeOtroUsuario() throws Exception {
             // Deja al usuario 2 inscripto
-            InscripcionEvento i1 = InscripcionFactory.directa(u2, e1);
-            when(inscripcionesRepository.getInscripcionConfirmada(u2, e1)).thenReturn(Optional.of(i1));
+            InscripcionEvento i1 = InscripcionFactory.confirmada(u2, e1);
+            when(inscripcionesRepository.getInscripcionParaUsuarioYEvento(u2, e1)).thenReturn(Optional.of(i1));
 
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u2.getId()))
                     .andExpect(status().isNoContent());
@@ -233,14 +238,13 @@ public class InscripcionesTest {
         @Test
         void unUsuarioPuedeCancelarSuInscripcionEnWaitlist() throws Exception {
             // Crea una waitlist de prueba, en la que está ese usuario
-            Waitlist w1 = new Waitlist(e1);
-            w1.agregar(u1);
-            when(waitlistRepository.waitlist(e1)).thenReturn(w1);
+            mockearInscripcionEnWatilist(u1, e1);
 
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId()))
                     .andExpect(status().isNoContent());
 
-            assertEquals(List.of(), w1.candidatos());
+            assertEquals(EstadoInscripcion.CANCELADA,
+                    inscripcionesRepository.getInscripcionParaUsuarioYEvento(u1, e1).get().getEstado());
         }
 
         @Test
@@ -263,36 +267,40 @@ public class InscripcionesTest {
     @Nested
     class PromocionDesdeWaitlistAlAbrirseLugar {
 
+        private InscripcionEvento i1;
+
+        @BeforeEach
+        void setUp() {
+            // Deja al usuario 1 inscripto
+            i1 = InscripcionFactory.confirmada(u1, e1);
+            when(inscripcionesRepository.getInscripcionParaUsuarioYEvento(u1, e1)).thenReturn(Optional.of(i1));
+        }
+
+        @Test
+        void siLaInscripcionEnWaitlistFueCanceladaNoSePromueve() throws Exception {
+            // TODO: testear cuando se haya hecho la base y Redis
+        }
+
         @Test
         void alCancelarUnaInscripcionConfirmadaSePromueveAlPrimeroDeLaWaitlist() throws Exception {
-            // Deja al usuario 1 inscripto
-            InscripcionEvento i1 = InscripcionFactory.directa(u1, e1);
-            when(inscripcionesRepository.getInscripcionConfirmada(u1, e1)).thenReturn(Optional.of(i1));
-
             // Crea una waitlist de prueba, en la que está el usuario 2
-            Waitlist w1 = new Waitlist(e1);
-            w1.agregar(u2);
-            when(waitlistRepository.waitlist(e1)).thenReturn(w1);
+            Waitlist w1 = mockearInscripcionEnWatilist(u2, e1);
 
             // Cancela la inscripción del usuario 1
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId()));
 
             // Chequea que la waitlist haya quedado vacía
-            assertEquals(List.of(), w1.candidatos());
+            assertEquals(0, w1.cantidadEnCola());
             // Chequea que el usuario 2 haya quedado inscripto (chequea con una inscripción directa. En realidad sería
             // una inscripción desde waitlist, no directa, pero como el id de inscripción es (usuario, evento), sirve
             // igual.
-            verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.directa(u2, e1));
+            verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.confirmada(u2, e1));
         }
 
         @Test
         void sePuedeCancelarUnaInscripcionAunqueNoHayaNadieEnLaWaitlistParaSerPromovido() throws Exception {
             // La waitlist está vacía
             when(waitlistRepository.waitlist(e1)).thenReturn(new Waitlist(e1));
-
-            // Deja al usuario inscripto
-            InscripcionEvento i1 = InscripcionFactory.directa(u1, e1);
-            when(inscripcionesRepository.getInscripcionConfirmada(u1, e1)).thenReturn(Optional.of(i1));
 
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId()));
 

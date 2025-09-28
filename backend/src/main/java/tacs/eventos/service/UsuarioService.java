@@ -1,29 +1,25 @@
 package tacs.eventos.service;
 
-import lombok.AllArgsConstructor;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tacs.eventos.dto.EstadoInscripcionResponse;
 import tacs.eventos.dto.InscripcionResponse;
-import tacs.eventos.model.Evento;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
-import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
 
-import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UsuarioService {
     private final UsuarioRepository repo;
     private final InscripcionesRepository inscripcionesRepository;
@@ -73,11 +69,11 @@ public class UsuarioService {
 
         // Solo permitir USUARIO u ORGANIZADOR en registro
         switch (tipoUsuario.toUpperCase()) {
-        case "ORGANIZADOR":
-            return Set.of(RolUsuario.ORGANIZADOR);
-        case "USUARIO":
-        default:
-            return Set.of(RolUsuario.USUARIO);
+            case "ORGANIZADOR":
+                return Set.of(RolUsuario.ORGANIZADOR);
+            case "USUARIO":
+            default:
+                return Set.of(RolUsuario.USUARIO);
         }
     }
 
@@ -94,24 +90,17 @@ public class UsuarioService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         List<InscripcionEvento> inscripciones = inscripcionesRepository
-                .getInscripcionesConfirmadasPorParticipante(usuario);
+                .getInscripcionesNoCanceladasPorParticipante(usuario);
         List<InscripcionResponse> inscripcionResponses = inscripciones.stream()
-                .map(inscripcion -> new InscripcionResponse(inscripcion.getEvento().getId(),
-                        mapEstado(inscripcion.getEstado())))
-                .collect(Collectors.toList());
-
-        List<Evento> eventosEnWaitlist = waitlistRepository.eventosEnCuyasWaitlistEsta(usuario);
-        List<InscripcionResponse> waitlistResponses = eventosEnWaitlist.stream()
-                .map(evento -> new InscripcionResponse(evento.getId(), EstadoInscripcionResponse.PENDIENTE)).toList();
-
-        return Stream.concat(inscripcionResponses.stream(), waitlistResponses.stream()).collect(Collectors.toList());
+                .map(insc -> new InscripcionResponse(insc.getEvento().getId(), mapEstado(insc.getEstado()))).toList();
+        return inscripcionResponses;
     }
 
     private EstadoInscripcionResponse mapEstado(EstadoInscripcion estado) {
         return switch (estado) {
-        case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
-        case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
-        case PENDIENTE -> EstadoInscripcionResponse.PENDIENTE;
+            case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
+            case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
+            case PENDIENTE -> EstadoInscripcionResponse.PENDIENTE;
         };
     }
 

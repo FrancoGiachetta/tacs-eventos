@@ -2,6 +2,7 @@ package tacs.eventos.controller;
 
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,51 +29,45 @@ public class UsuarioController {
     /**
      * Retorna información del usuario autenticado.
      *
-     * @param usuario
-     *            datos del usuario autenticado.
-     *
+     * @param usuario datos del usuario autenticado.
      * @return información del usuario.
      */
     @GetMapping("/me")
     public UsuarioDto getMe(@AuthenticationPrincipal Usuario usuario) {
         return new UsuarioDto(usuario.getId(), usuario.getEmail(), usuario.getRoles().iterator().next(), // Asumimos un
-                                                                                                         // rol por
-                                                                                                         // usuario
+                // rol por
+                // usuario
                 usuario.getFechaCreacion());
     }
 
     /**
      * Retorna las inscripciones de un usuario según su id.
      *
-     * @param usuario
-     *            datos del usuario.
-     *
+     * @param usuario datos del usuario.
      * @return las inscripciones del usuario.
      */
     @GetMapping("/mis-inscripciones")
-    public List<InscripcionResponse> getMisInscripciones(@AuthenticationPrincipal Usuario usuario) {
-        return usuarioService.obtenerInscripcionesNoCanceladas(usuario.getId());
+    public ResponseEntity<List<InscripcionResponse>> getMisInscripciones(@AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(usuarioService.obtenerInscripcionesNoCanceladas(usuario.getId()));
     }
 
     /**
      * Retorna los eventos para los cuales el usuario es el organizador. Si el usuario es ADMIN, retorna todos los
      * eventos del sistema.
      *
-     * @param usuario
-     *            datos del usuario.
-     *
+     * @param usuario datos del usuario.
      * @return los eventos organizados por el usuario, o todos los eventos si es ADMIN.
      */
     @GetMapping("/mis-eventos")
-    public List<EventoResponse> getMisEventos(@AuthenticationPrincipal Usuario usuario) {
+    public ResponseEntity<List<EventoResponse>> getMisEventos(@AuthenticationPrincipal Usuario usuario) {
         // Si es ADMIN, devolver todos los eventos
         if (usuario.getRoles().contains(RolUsuario.ADMIN)) {
-            return eventosRepository.findAll().stream().map(e -> this.modelMapper.map(e, EventoResponse.class))
-                    .toList();
+            return ResponseEntity.ok(eventosRepository.findAll().stream().map(e -> this.modelMapper.map(e, EventoResponse.class))
+                    .toList());
         }
 
         // Si no es ADMIN, devolver solo los eventos que organiza
-        return eventosRepository.findByOrganizador(usuario.getId()).stream()
-                .map(e -> this.modelMapper.map(e, EventoResponse.class)).toList();
+        return ResponseEntity.ok(eventosRepository.findByOrganizador(usuario.getId()).stream()
+                .map(e -> this.modelMapper.map(e, EventoResponse.class)).toList());
     }
 }
