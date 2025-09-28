@@ -324,9 +324,10 @@ public class EventoController {
         try {
             inscripcionesService.inscribirOMandarAWaitlist(evento, usuario);
         } catch (InterruptedException | ExecutionException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Hubo un error al intentar crear la inscripcion");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Hubo un error al intentar crear la inscripcion");
         }
-        
+
         return ResponseEntity.created(URI.create(location)).build();
     }
 

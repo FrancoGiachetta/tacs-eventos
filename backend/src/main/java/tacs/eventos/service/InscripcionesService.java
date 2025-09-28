@@ -40,11 +40,14 @@ public class InscripcionesService {
      * @param usuario
      *
      * @return la inscripción generada si pudo inscribirlo, o un Optional vacío si lo mandó a la waitlist.
-     * @throws ExecutionException 
-     * @throws InterruptedException 
+     *
+     * @throws ExecutionException
+     * @throws InterruptedException
      */
-    public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario) throws InterruptedException, ExecutionException {
-        Optional<InscripcionEvento> inscripcion = inscripcionAsyncService.intentarInscribir(InscripcionFactory.directa(usuario, evento)).get();
+    public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario)
+            throws InterruptedException, ExecutionException {
+        Optional<InscripcionEvento> inscripcion = inscripcionAsyncService
+                .intentarInscribir(InscripcionFactory.directa(usuario, evento)).get();
 
         // Primero intenta inscribirlo directamente. Si no, lo manda a la waitlist.
         return inscripcion.or(() -> {
