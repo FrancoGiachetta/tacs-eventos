@@ -1,11 +1,11 @@
-package tacs.eventos.repository;
+package tacs.eventos.service;
 
 import tacs.eventos.model.Evento;
-import tacs.eventos.model.waitlist.RedisWaitlist;
+import tacs.eventos.model.waitlist.Waitlist;
 
 public interface WaitlistService {
     /**
      * Obtiene la waitlist de un evento.
      */
-    RedisWaitlist waitlist(Evento evento);
+    Waitlist waitlist(Evento evento);
 }

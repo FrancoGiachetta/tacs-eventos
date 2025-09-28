@@ -1,6 +1,7 @@
 package tacs.eventos.repository.inscripcion;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
@@ -8,10 +9,12 @@ import tacs.eventos.model.inscripcion.InscripcionEvento;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Guarda las inscripciones confirmadas o canceladas.
  */
+@Repository
 public interface InscripcionesRepository extends MongoRepository<InscripcionEvento, String> {
 
     List<InscripcionEvento> findByParticipanteAndEstadoNot(Usuario participante, EstadoInscripcion estado);
@@ -24,6 +27,8 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
      * @return todas las inscripciones (confirmadas, canceladas, o pendientes) de ese evento
      */
     List<InscripcionEvento> findByEventoAndEstado(Evento evento, EstadoInscripcion estado);
+
+    List<InscripcionEvento> findByEventoAndEstadoOrderByfechaHoraIngresoAWaitlist(Evento evento, EstadoInscripcion estado);
 
     /**
      * @param evento
@@ -44,4 +49,8 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
     }
 
     int countByEventoAndEstado(Evento evento, EstadoInscripcion estadoInscripcion);
+
+    Optional<InscripcionEvento> findFirstByEventoAndEstado(Evento evento, EstadoInscripcion estado);
+
+    Stream<Evento> findDistinctEvento();
 }

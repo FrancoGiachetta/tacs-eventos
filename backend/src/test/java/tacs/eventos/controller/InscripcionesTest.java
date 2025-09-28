@@ -18,11 +18,11 @@ import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
-import tacs.eventos.model.waitlist.RedisWaitlist;
-import tacs.eventos.repository.WaitlistService;
+import tacs.eventos.model.waitlist.WaitlistRedis;
 import tacs.eventos.repository.evento.EventosRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
+import tacs.eventos.service.WaitlistService;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -110,10 +110,10 @@ public class InscripcionesTest {
         }
     }
 
-    private RedisWaitlist mockearInscripcionEnWatilist(Usuario u, Evento e) {
+    private WaitlistRedis mockearInscripcionEnWatilist(Usuario u, Evento e) {
         // Crea una waitlist de prueba, en la que está el usuario
         InscripcionEvento i1 = InscripcionFactory.pendiente(u, e);
-        RedisWaitlist w1 = new RedisWaitlist(e);
+        WaitlistRedis w1 = new WaitlistRedis(e);
         w1.agregar(i1.getId());
         when(waitlistService.waitlist(e)).thenReturn(w1);
         when(inscripcionesRepository.getInscripcionParaUsuarioYEvento(u, e)).thenReturn(Optional.of(i1));
@@ -126,7 +126,7 @@ public class InscripcionesTest {
         @Test
         void unUsuarioSePuedeInscribirDirectamenteAUnEventoConCupo() throws Exception {
             // Waitlist vacía
-            RedisWaitlist w1 = new RedisWaitlist(e1);
+            WaitlistRedis w1 = new WaitlistRedis(e1);
             when(waitlistService.waitlist(e1)).thenReturn(w1);
 
             // Mockea el pedido POST y verifica que retorne 201 CREATED y la inscripción
@@ -140,7 +140,7 @@ public class InscripcionesTest {
         @Test
         void unUsuarioPuedeIngresarALaWaitlistDeUnEventoSinCupo() throws Exception {
             // Crea una waitlist de prueba, vacía
-            RedisWaitlist w1 = mock(RedisWaitlist.class);
+            WaitlistRedis w1 = mock(WaitlistRedis.class);
             when(waitlistService.waitlist(e1)).thenReturn(w1);
             // Hace que el evento no tenga cupo
             when(inscripcionesRepository.cantidadInscriptos(e1)).thenReturn(2);
@@ -191,7 +191,7 @@ public class InscripcionesTest {
         @Test
         void unUsuarioPuedeCancelarSuInscripcionConfirmada() throws Exception {
             // Waitlist vacía
-            RedisWaitlist w1 = new RedisWaitlist(e1);
+            WaitlistRedis w1 = new WaitlistRedis(e1);
             when(waitlistService.waitlist(e1)).thenReturn(w1);
 
             // Deja al usuario inscripto
@@ -210,7 +210,7 @@ public class InscripcionesTest {
             SecurityContextHolder.getContext().setAuthentication(auth);
 
             // Waitlist vacía
-            RedisWaitlist w1 = new RedisWaitlist(e1);
+            WaitlistRedis w1 = new WaitlistRedis(e1);
             when(waitlistService.waitlist(e1)).thenReturn(w1);
 
             // Deja al usuario inscripto
@@ -284,7 +284,7 @@ public class InscripcionesTest {
         @Test
         void alCancelarUnaInscripcionConfirmadaSePromueveAlPrimeroDeLaWaitlist() throws Exception {
             // Crea una waitlist de prueba, en la que está el usuario 2
-            RedisWaitlist w1 = mockearInscripcionEnWatilist(u2, e1);
+            WaitlistRedis w1 = mockearInscripcionEnWatilist(u2, e1);
 
             // Cancela la inscripción del usuario 1
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId()));
@@ -300,7 +300,7 @@ public class InscripcionesTest {
         @Test
         void sePuedeCancelarUnaInscripcionAunqueNoHayaNadieEnLaWaitlistParaSerPromovido() throws Exception {
             // La waitlist está vacía
-            when(waitlistService.waitlist(e1)).thenReturn(new RedisWaitlist(e1));
+            when(waitlistService.waitlist(e1)).thenReturn(new WaitlistRedis(e1));
 
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId()));
 

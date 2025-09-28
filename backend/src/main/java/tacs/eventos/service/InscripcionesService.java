@@ -8,7 +8,6 @@ import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
-import tacs.eventos.repository.WaitlistService;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 
 import java.util.List;
