@@ -12,6 +12,7 @@ use tracing::{info, warn};
 
 use crate::{
     command::{Command, handle_command},
+    controller::MessageController,
     error::BotError,
     request_client::RequestClient,
 };
@@ -24,11 +25,13 @@ pub async fn run() -> Result<(), BotError> {
     let mut dispatcher = {
         // Set handler. It is configure to only filter the messages, this means
         // it will only be fired if a message is sent.
-        let handler = Update::filter_message().branch(
-            dptree::entry()
-                .filter_command::<Command>()
-                .endpoint(handle_command),
-        );
+        let handler = Update::filter_message()
+            .filter_map(|msg, bot, req_client| Some(MessageController::new(msg, bot, req_client)))
+            .branch(
+                dptree::entry()
+                    .filter_command::<Command>()
+                    .endpoint(handle_command),
+            );
         let req_client = RequestClient::new()?;
 
         Dispatcher::builder(bot.clone(), handler)

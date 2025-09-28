@@ -1,8 +1,6 @@
-use std::sync::Arc;
-
-use crate::{error::BotError, request_client::RequestClient, schemas::event::EventFilter};
+use crate::{controller::MessageController, error::BotError, schemas::event::EventFilter};
 use event::parse_event_filters;
-use teloxide::{Bot, prelude::Requester, types::Message, utils::command::BotCommands};
+use teloxide::{prelude::Requester, utils::command::BotCommands};
 use tracing::info;
 
 mod event;
@@ -24,14 +22,9 @@ pub enum Command {
     ListEvents(EventFilter),
 }
 
-pub async fn handle_command(
-    msg: Message,
-    bot: Arc<Bot>,
-    cmd: Command,
-    req_client: Arc<RequestClient>,
-) -> Result<(), BotError> {
+pub async fn handle_command(msg_ctl: MessageController, cmd: Command) -> Result<(), BotError> {
     match cmd {
-        Command::ListEvents(filters) => event::list_events(bot, &msg, &req_client, filters).await?,
+        Command::ListEvents(filters) => event::list_events(msg_ctl, filters).await?,
         Command::Register => {
             info!("Execution /register!");
         }
@@ -41,7 +34,9 @@ pub async fn handle_command(
         Command::Help => {
             info!("Execution /help!");
 
-            bot.send_message(msg.chat.id, Command::descriptions().to_string())
+            msg_ctl
+                .bot
+                .send_message(msg_ctl.chat_id, Command::descriptions().to_string())
                 .await?;
         }
     }

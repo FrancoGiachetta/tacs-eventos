@@ -1,4 +1,4 @@
-use std::{sync::Arc, time::Duration};
+use std::{env, sync::Arc, time::Duration};
 
 use lazy_static::lazy_static;
 use reqwest::{Client, Response};
@@ -9,9 +9,9 @@ use tracing::info;
 use crate::schemas::event::{Event, EventFilter};
 
 lazy_static! {
-    static ref CLIENT_TIMEOUT_SECS: u64 = 90;
     static ref URL_BASE: String = String::from("http://localhost:8080/api/v1");
-    static ref MAX_RETRIES: u8 = 10;
+    static ref CLIENT_TIMEOUT_SECS: u64 = 90;
+    static ref DEFAULT_MAX_RETRIES: u8 = 10;
 }
 
 pub struct RequestClient {
@@ -131,7 +131,12 @@ impl RequestClient {
         F: Fn() -> Fut,
         Fut: Future<Output = Result<Response, reqwest::Error>>,
     {
-        for attempt in 0..(*MAX_RETRIES) {
+        let max_retries = env::var("MAX_RETRIES")
+            .ok()
+            .and_then(|r| r.parse::<u8>().ok())
+            .unwrap_or(*DEFAULT_MAX_RETRIES);
+
+        for attempt in 0..max_retries {
             let response = request().await;
 
             match response {
@@ -139,7 +144,7 @@ impl RequestClient {
                 Err(e) if e.is_timeout() => {
                     tracing::warn!(
                         "Retrying request, remaining tries: {}",
-                        *MAX_RETRIES - attempt
+                        max_retries - attempt
                     );
 
                     let backoff_timeout = {

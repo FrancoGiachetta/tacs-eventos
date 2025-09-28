@@ -3,24 +3,29 @@ use std::{str::FromStr, sync::Arc};
 use chrono::NaiveDate;
 use lazy_static::lazy_static;
 use regex::Regex;
+use reqwest::StatusCode;
 use teloxide::{Bot, prelude::Requester, types::Message, utils::command::ParseError};
 use tracing::{error, info};
 
-use crate::{error::BotError, request_client::RequestClient, schemas::event::EventFilter};
+use crate::{
+    controller::MessageController,
+    error::BotError,
+    request_client::{RequestClient, RequestClientError},
+    schemas::event::EventFilter,
+};
 
 /// List open events.
 ///
 /// Sends a GET request looking for all the still open events. The command also
 /// allows to pass arguments to filter events.
-pub async fn list_events(
-    bot: Arc<Bot>,
-    msg: &Message,
-    req_client: &RequestClient,
-    filters: EventFilter,
-) -> Result<(), BotError> {
+pub async fn list_events(msg_ctl: MessageController, filters: EventFilter) -> Result<(), BotError> {
     info!("Listing list_events!");
 
-    match req_client.send_get_events_list_request(filters).await {
+    match msg_ctl
+        .req_client
+        .send_get_events_list_request(filters)
+        .await
+    {
         Ok(events_list) => {
             let events_msg = events_list
                 .into_iter()
@@ -28,18 +33,30 @@ pub async fn list_events(
                 .collect::<Vec<String>>()
                 .join("\n");
 
-            bot.send_message(msg.chat.id, events_msg).await?;
+            msg_ctl
+                .bot
+                .send_message(msg_ctl.chat_id, events_msg)
+                .await?;
         }
-        Err(e) => {
-            error!("Got an error while performing the request: {}", e);
+        Err(err) => {
+            error!("Got an error while performing the request: {}", err);
 
-            bot.send_message(
-                msg.chat.id,
-                "There was an error while performing the request command!",
-            )
-            .await?;
+            let error_msg = match err {
+                // This command requires the user to be logged in.
+                RequestClientError::ReqwestError(req_err)
+                    if req_err
+                        .status()
+                        .is_some_and(|e| matches!(e, StatusCode::FORBIDDEN)) =>
+                {
+                    "❌ Ese comando requiere que estes logeado!"
+                }
+                _ => "❌ Hubo un error al ejecutar el comando!",
+            };
+
+            msg_ctl.bot.send_message(msg_ctl.chat_id, error_msg).await?;
         }
     }
+
     Ok(())
 }
 

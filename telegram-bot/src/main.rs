@@ -2,6 +2,7 @@ use crate::error::BotError;
 
 mod bot;
 pub mod command;
+mod controller;
 mod error;
 mod request_client;
 mod schemas;
