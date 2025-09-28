@@ -1,16 +1,14 @@
-use std::{str::FromStr, sync::Arc};
+use std::str::FromStr;
 
 use chrono::NaiveDate;
 use lazy_static::lazy_static;
 use regex::Regex;
 use reqwest::StatusCode;
-use teloxide::{Bot, prelude::Requester, types::Message, utils::command::ParseError};
+use teloxide::{prelude::Requester, utils::command::ParseError};
 use tracing::{error, info};
 
 use crate::{
-    controller::MessageController,
-    error::BotError,
-    request_client::{RequestClient, RequestClientError},
+    controller::MessageController, error::BotError, request_client::RequestClientError,
     schemas::event::EventFilter,
 };
 
@@ -43,7 +41,7 @@ pub async fn list_events(msg_ctl: MessageController, filters: EventFilter) -> Re
 
             let error_msg = match err {
                 // This command requires the user to be logged in.
-                RequestClientError::ReqwestError(req_err)
+                RequestClientError::Reqwest(req_err)
                     if req_err
                         .status()
                         .is_some_and(|e| matches!(e, StatusCode::FORBIDDEN)) =>
@@ -107,17 +105,15 @@ pub fn parse_event_filters(input: String) -> Result<(EventFilter,), ParseError> 
     let category = CATEGORY_PREFIX
         .captures(&input)
         .and_then(|c| c.get(1))
-        .and_then(|c| Some(c.as_str().to_string()));
+        .map(|c| c.as_str().to_string());
     let keywords = KEYWORDS_PREFIX
         .captures(&input)
         .and_then(|ks| ks.get(1))
-        .and_then(|ks| {
-            Some(
-                ks.as_str()
-                    .split(",")
-                    .map(String::from)
-                    .collect::<Vec<String>>(),
-            )
+        .map(|ks| {
+            ks.as_str()
+                .split(",")
+                .map(String::from)
+                .collect::<Vec<String>>()
         });
 
     Ok((EventFilter {

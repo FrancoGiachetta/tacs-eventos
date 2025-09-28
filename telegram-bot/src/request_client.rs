@@ -21,11 +21,11 @@ pub struct RequestClient {
 #[derive(Debug, Error)]
 pub enum RequestClientError {
     #[error(transparent)]
-    ReqwestError(#[from] reqwest::Error),
+    Reqwest(#[from] reqwest::Error),
     #[error("request has failed with due to timeout")]
-    TimeOutError,
+    TimeOut,
     #[error(transparent)]
-    JsonParseError(#[from] serde_json::Error),
+    JsonParse(#[from] serde_json::Error),
 }
 
 pub enum RequestMethod<'req> {
@@ -156,9 +156,9 @@ impl RequestClient {
 
                     continue;
                 }
-                Err(err) => return Err(RequestClientError::ReqwestError(err)),
+                Err(err) => return Err(RequestClientError::Reqwest(err)),
             }
         }
-        Err(RequestClientError::TimeOutError)
+        Err(RequestClientError::TimeOut)
     }
 }
