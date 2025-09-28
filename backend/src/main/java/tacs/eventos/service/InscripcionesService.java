@@ -1,6 +1,8 @@
 package tacs.eventos.service;
 
 import lombok.AllArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tacs.eventos.model.Evento;
@@ -13,6 +15,9 @@ import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * Punto de entrada para realizar o cancelar inscripciones, pasando por la waitlist si es necesario, y realizando las
@@ -26,6 +31,8 @@ public class InscripcionesService {
 
     private WaitlistRepository waitlistRepository;
 
+    private static final InscripcionAsyncService inscripcionAsyncService = new InscripcionAsyncService();
+
     /**
      * Intenta inscribir al usuario al evento. Si no hay lugar, lo manda a la waitlist.
      *
@@ -33,10 +40,14 @@ public class InscripcionesService {
      * @param usuario
      *
      * @return la inscripción generada si pudo inscribirlo, o un Optional vacío si lo mandó a la waitlist.
+     * @throws ExecutionException 
+     * @throws InterruptedException 
      */
-    public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario) {
+    public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario) throws InterruptedException, ExecutionException {
+        Optional<InscripcionEvento> inscripcion = inscripcionAsyncService.intentarInscribir(InscripcionFactory.directa(usuario, evento)).get();
+
         // Primero intenta inscribirlo directamente. Si no, lo manda a la waitlist.
-        return intentarInscribir(InscripcionFactory.directa(usuario, evento)).or(() -> {
+        return inscripcion.or(() -> {
             Waitlist waitlist = waitlistRepository.waitlist(evento);
             waitlist.agregar(usuario);
             return Optional.empty();
@@ -62,7 +73,7 @@ public class InscripcionesService {
             // puede tardar (ya que la inscripción está sincronizada por evento), y al usuario que canceló su
             // inscripción le
             // tenemos que devolver en el momento el response confirmandole que su incscipción fue cancelada.
-            inscribirProximo(evento);
+            inscripcionAsyncService.inscribirProximo(evento);
         }
     }
 
@@ -106,44 +117,5 @@ public class InscripcionesService {
 
     public Waitlist buscarWaitlistDeEvento(Evento evento) {
         return waitlistRepository.waitlist(evento);
-    }
-
-    /**
-     * Intenta inscribir al usuario directamente al evento (sin pasar por la waitlist).
-     *
-     * @param inscripcion
-     *            la inscripción que se quiere intentar realizar
-     *
-     * @return la inscripción realizada, o un Optional vacío si no pudo realizar la inscripción porque no había lugar
-     */
-    private Optional<InscripcionEvento> intentarInscribir(InscripcionEvento inscripcion) {
-        // Sincronizo la inscripción por evento. Esto es para evitar que entre el momento en el que se chequeó si había
-        // lugar, y se persistió la inscripción en la base, el evento justo alcance la capacidad máxima. Si eso ocurre,
-        // la cantidad de inscriptos en un evento puede superar el cupo máximo, y eso nunca puede pasar.
-        // TODO: esta forma de lockear en realidad no está del todo OK porque lockea por objeto físico. Nada nos asegura
-        // que no se instance el evento con el mismo id en otro hilo, y no se actualice al mismo tiempo. De todas
-        // formas, capaz deberíamos usar otra estrategia de lockeo más liviana como usar un número de versión (como hace
-        // hibernate) o el hash del estado interno del evento (como lo que vimos en la clase de API REST que se hace con
-        // el ETag.
-        synchronized (inscripcion.getEvento()) {
-            int inscriptos = this.inscripcionesRepository.cantidadInscriptos(inscripcion.getEvento());
-            if (!inscripcion.getEvento().permiteIncripcion(inscriptos))
-                return Optional.empty();
-            inscripcionesRepository.guardarInscripcion(inscripcion);
-            return Optional.of(inscripcion);
-        }
-    }
-
-    /**
-     * Promueve al próximo de la waitlist a inscripción, si es que hay alguien en la waitlist. Este métod0 es
-     * asincrónico.
-     *
-     * @param evento
-     */
-    @Async
-    protected void inscribirProximo(Evento evento) {
-        waitlistRepository.waitlist(evento).proximo()
-                .map(inscripcionEnWaitlist -> InscripcionFactory.desdeWaitlist(evento, inscripcionEnWaitlist))
-                .ifPresent(this::intentarInscribir);
     }
 }

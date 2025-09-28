@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/v1/evento")
@@ -320,7 +321,12 @@ public class EventoController {
             return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(location)).build();
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist
-        inscripcionesService.inscribirOMandarAWaitlist(evento, usuario);
+        try {
+            inscripcionesService.inscribirOMandarAWaitlist(evento, usuario);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Hubo un error al intentar crear la inscripcion");
+        }
+        
         return ResponseEntity.created(URI.create(location)).build();
     }
 
