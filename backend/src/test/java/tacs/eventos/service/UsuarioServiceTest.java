@@ -94,10 +94,9 @@ class UsuarioServiceTest {
         Evento evento3 = new Evento("Evento 3", "Desc 3", null, 120, "Ubicacion", 50, 1000, "Categoria");
 
         List<InscripcionEvento> inscripciones = List.of(InscripcionFactory.confirmada(usuario, evento1),
-                InscripcionFactory.confirmada(usuario, evento2));
+                InscripcionFactory.confirmada(usuario, evento2), InscripcionFactory.pendiente(usuario, evento3));
 
         when(inscripcionesRepository.getInscripcionesNoCanceladasPorParticipante(usuario)).thenReturn(inscripciones);
-        when(waitlistRepository.eventosEnCuyasWaitlistEsta(usuario)).thenReturn(List.of(evento3));
 
         var result = usuarioService.obtenerInscripcionesNoCanceladas(usuario.getId());
 

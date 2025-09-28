@@ -123,18 +123,8 @@ public class InscripcionesService {
      */
     @Async
     protected void inscribirProximo(Evento evento) {
-        /*
-         * Si la
-         * inscripción
-         * había
-         * sido
-         * cancelada,
-         * no
-         * realiza
-         * la
-         * inscripción
-         */
         waitlistRepository.waitlist(evento).proximo().flatMap(inscripcionesRepository::getInscripcionPorId)
+                .filter(InscripcionEvento::estaPendiente) // Solo inscribo si sigue pendiente
                 .ifPresent(this::intentarInscribir);
     }
 
