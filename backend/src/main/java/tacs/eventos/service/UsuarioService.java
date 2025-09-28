@@ -10,7 +10,6 @@ import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
-import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
 
@@ -23,7 +22,6 @@ import java.util.Set;
 public class UsuarioService {
     private final UsuarioRepository repo;
     private final InscripcionesRepository inscripcionesRepository;
-    private final WaitlistRepository waitlistRepository;
     private final PasswordEncoder encoder;
 
     @PostConstruct
@@ -69,11 +67,11 @@ public class UsuarioService {
 
         // Solo permitir USUARIO u ORGANIZADOR en registro
         switch (tipoUsuario.toUpperCase()) {
-        case "ORGANIZADOR":
-            return Set.of(RolUsuario.ORGANIZADOR);
-        case "USUARIO":
-        default:
-            return Set.of(RolUsuario.USUARIO);
+            case "ORGANIZADOR":
+                return Set.of(RolUsuario.ORGANIZADOR);
+            case "USUARIO":
+            default:
+                return Set.of(RolUsuario.USUARIO);
         }
     }
 
@@ -97,9 +95,9 @@ public class UsuarioService {
 
     private EstadoInscripcionResponse mapEstado(EstadoInscripcion estado) {
         return switch (estado) {
-        case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
-        case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
-        case PENDIENTE -> EstadoInscripcionResponse.PENDIENTE;
+            case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
+            case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
+            case PENDIENTE -> EstadoInscripcionResponse.PENDIENTE;
         };
     }
 

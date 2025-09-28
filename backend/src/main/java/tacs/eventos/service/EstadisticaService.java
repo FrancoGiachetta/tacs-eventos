@@ -5,8 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import tacs.eventos.model.Evento;
-import tacs.eventos.model.Waitlist;
-import tacs.eventos.repository.WaitlistRepository;
+import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.repository.evento.EventosRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 
@@ -16,7 +15,6 @@ public class EstadisticaService {
 
     private final EventosRepository eventosRepository;
     private final InscripcionesRepository inscripcionesRepository;
-    private final WaitlistRepository waitlistRepository;
 
     public long cantidadInscripciones() {
         return this.inscripcionesRepository.count();
@@ -34,11 +32,9 @@ public class EstadisticaService {
 
         if (evento.isAbierto()) {
             int TotalInscripcionesEvento;
-            Waitlist eventoWaitlist;
             int totalInscripcionesEnWaitlist;
             TotalInscripcionesEvento = this.inscripcionesRepository.countByEvento(evento);
-            eventoWaitlist = this.waitlistRepository.waitlist(evento);
-            totalInscripcionesEnWaitlist = eventoWaitlist.cantidadEnCola(); // TODO: reemplazar por llamada a repo
+            totalInscripcionesEnWaitlist = this.inscripcionesRepository.countByEventoAndEstado(evento, EstadoInscripcion.PENDIENTE);
             calculoTasa = (TotalInscripcionesEvento / totalInscripcionesEnWaitlist) * 100;
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "El evento ya fue cerrado");

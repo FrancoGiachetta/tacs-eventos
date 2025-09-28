@@ -17,18 +17,16 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
     List<InscripcionEvento> findByParticipanteAndEstadoNot(Usuario participante, EstadoInscripcion estado);
 
     Optional<InscripcionEvento> findFirstByParticipanteAndEventoAndEstadoNot(Usuario participante, Evento evento,
-            EstadoInscripcion estado);
+                                                                             EstadoInscripcion estado);
 
     /**
      * @param evento
-     *
      * @return todas las inscripciones (confirmadas, canceladas, o pendientes) de ese evento
      */
     List<InscripcionEvento> findByEventoAndEstado(Evento evento, EstadoInscripcion estado);
 
     /**
      * @param evento
-     *
      * @return cantidad de inscripciones confirmadas para ese evento
      */
     int countByEvento(Evento evento);
@@ -39,10 +37,11 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
 
     /**
      * @param participante
-     *
      * @return las inscripciones no canceladas de ese participante
      */
     default List<InscripcionEvento> noCanceladasDeParticipante(Usuario participante) {
         return findByParticipanteAndEstadoNot(participante, EstadoInscripcion.CANCELADA);
     }
+
+    int countByEventoAndEstado(Evento evento, EstadoInscripcion estadoInscripcion);
 }

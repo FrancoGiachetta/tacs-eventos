@@ -10,7 +10,6 @@ import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
-import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
 
@@ -28,17 +27,14 @@ class UsuarioServiceTest {
     private InscripcionesRepository inscripcionesRepository;
     private PasswordEncoder passwordEncoder;
     private UsuarioService usuarioService;
-    private WaitlistRepository waitlistRepository;
 
     @BeforeEach
     void setUp() {
         usuarioRepository = mock(UsuarioRepository.class);
         inscripcionesRepository = mock(InscripcionesRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
-        waitlistRepository = mock(WaitlistRepository.class);
 
-        usuarioService = new UsuarioService(usuarioRepository, inscripcionesRepository, waitlistRepository,
-                passwordEncoder);
+        usuarioService = new UsuarioService(usuarioRepository, inscripcionesRepository, passwordEncoder);
     }
 
     @Test

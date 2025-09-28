@@ -8,7 +8,7 @@ import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
-import tacs.eventos.repository.WaitlistRepository;
+import tacs.eventos.repository.WaitlistService;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 
 import java.util.List;
@@ -24,14 +24,13 @@ public class InscripcionesService {
 
     private InscripcionesRepository inscripcionesRepository;
 
-    private WaitlistRepository waitlistRepository;
+    private WaitlistService waitlistService;
 
     /**
      * Intenta inscribir al usuario al evento. Si no hay lugar, lo manda a la waitlist.
      *
      * @param evento
      * @param usuario
-     *
      * @return la inscripción generada si pudo inscribirlo, o un Optional vacío si lo mandó a la waitlist.
      */
     public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario) {
@@ -39,7 +38,7 @@ public class InscripcionesService {
         return intentarInscribir(InscripcionFactory.confirmada(usuario, evento)).or(() -> {
             InscripcionEvento inscripcionEvento = InscripcionFactory.pendiente(usuario, evento);
             inscripcionesRepository.save(inscripcionEvento);
-            waitlistRepository.waitlist(evento).agregar(inscripcionEvento.getId());
+            waitlistService.waitlist(evento).agregar(inscripcionEvento.getId());
             return Optional.empty();
         });
     }
@@ -70,7 +69,6 @@ public class InscripcionesService {
     /**
      * @param evento
      * @param usuario
-     *
      * @return si el usuario está en la waitlist o tiene una inscripción confirmada para ese evento
      */
     public Optional<InscripcionEvento> inscripcionNoCancelada(Evento evento, Usuario usuario) {
@@ -79,7 +77,6 @@ public class InscripcionesService {
 
     /**
      * @param evento
-     *
      * @return todas las inscripciones (confirmadas, canceladas, o pendientes) de ese evento
      */
     public List<InscripcionEvento> inscripcionesConfirmadas(Evento evento) {
@@ -88,7 +85,6 @@ public class InscripcionesService {
 
     /**
      * @param evento
-     *
      * @return las inscripciones pendientes de ese evento
      */
     public List<InscripcionEvento> inscripcionesPendientes(Evento evento) {
@@ -98,9 +94,7 @@ public class InscripcionesService {
     /**
      * Intenta inscribir al usuario directamente al evento (sin pasar por la waitlist).
      *
-     * @param inscripcion
-     *            la inscripción que se quiere intentar realizar
-     *
+     * @param inscripcion la inscripción que se quiere intentar realizar
      * @return la inscripción realizada, o un Optional vacío si no pudo realizar la inscripción porque no había lugar
      */
     private Optional<InscripcionEvento> intentarInscribir(InscripcionEvento inscripcion) {
@@ -131,7 +125,7 @@ public class InscripcionesService {
      */
     @Async
     protected void inscribirProximo(Evento evento) {
-        waitlistRepository.waitlist(evento).proximo().flatMap(inscripcionesRepository::findById)
+        waitlistService.waitlist(evento).proximo().flatMap(inscripcionesRepository::findById)
                 .filter(InscripcionEvento::estaPendiente) // Solo inscribo si sigue pendiente
                 .ifPresent(this::intentarInscribir);
     }
