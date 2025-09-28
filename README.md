@@ -7,22 +7,30 @@ Sistema completo de gestión de eventos con roles de usuario (Admin, Organizador
 ## 🐳 Ejecución con Docker (Recomendado)
 
 ### Prerequisitos
+
 - [Docker](https://www.docker.com/get-started/) instalado y ejecutándose
 - [Docker Compose](https://docs.docker.com/compose/install/) (incluido con Docker Desktop)
 
 ### 1. Construir las imágenes Docker (primera vez o después de cambios)
+
 ```bash
 docker-compose build --no-cache
 ```
+
 ### 2. Levantar todos los servicios
+
 ```bash
 docker-compose up -d
 ```
+
 ### 3. Verificar que los servicios estén funcionando
+
 ```bash
 docker-compose ps
 ```
+
 ### 4. Ver logs de los servicios (opcional)
+
 ```bash
 # Ver todos los logs
 docker-compose logs
@@ -43,13 +51,14 @@ docker-compose logs eventos-frontend
 ## 👥 Usuarios predefinidos
 
 | Email | Contraseña | Rol |
-|-------|-----------|-----|
+|-------|------------|-----|
 | `admin@eventos.com` | `admin123` | **ADMIN** |
 | `organizador@eventos.com` | `org123` | **ORGANIZADOR** |
 
 ## 🔧 Comandos útiles
 
 ### Reconstruir solo un servicio
+
 ```bash
 # Reconstruir solo el backend
 docker-compose build eventos-backend
@@ -70,7 +79,7 @@ Antes de ejecutar el proyecto
 - [Maven 3.9+](https://maven.apache.org/)
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/)
 
-###  Instalación
+### Instalación
 
 ```shell
 cd backend
@@ -99,13 +108,13 @@ Una vez ejecutado el server, dirigirse a: http://localhost:8080/swagger
 
 ### Requisitos Previos
 
-- [Node.js](https://nodejs.org/en)
+- [Node.js](https://nodejs.org)
 
-### Instalación 
+### Instalación (una sola vez) 
 
 ```shell
 cd frontend
-npm install // una sola vez
+npm install
 ```
 
 ### Ejecución
@@ -133,24 +142,11 @@ mvn net.revelc.code.formatter:formatter-maven-plugin:2.20.0:format
 npm run fmt
 ```
 
--Usuarios hardcodeados
-🔴 ADMIN
-Email: admin@eventos.com
-Password: admin123
-Permisos: Acceso completo al sistema + Panel de administración
-
-🔵 ORGANIZADOR (Ejemplo)
-Email: organizador@eventos.com  
-Password: org123
-Permisos: Crear y gestionar eventos
-```
-
-
 ## Equipo
 
-Franco Giachetta
-Leonel Lucas Morsella
-Francisco Veiga
-Carlos Renfige
-Marco Rodriguez Melgarejo
-Lucas Thier
+- Carlos Renfige
+- Francisco Veiga
+- Franco Giachetta
+- Leonel Lucas Morsella
+- Lucas Thier
+- Marco Rodriguez Melgarejo

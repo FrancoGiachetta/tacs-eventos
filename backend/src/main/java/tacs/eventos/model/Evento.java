@@ -7,24 +7,31 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+
 @NoArgsConstructor
 @Getter
 public class Evento {
     @Setter
     private String id;
     @Setter
+    @NotBlank
     private String titulo;
     @Setter
     private String descripcion;
     @Setter
     private LocalDateTime fechaHoraInicio;
     @Setter
+    @Positive
     private int duracionMinutos;
     @Setter
     private String ubicacion;
     @Setter
+    @Positive
     private int cupoMaximo;
     @Setter
+    @Positive
     private double precio; // TODO: cambiar el tipo de dato. Debería ser un número de precisión fija. Fijarme si no
     // puedo recibir directamente BigDecimal o algo así en el DTO. Si no, que el front mande un
     // String que cumpla la regex correcta, y el back lo transforme manualmente.
