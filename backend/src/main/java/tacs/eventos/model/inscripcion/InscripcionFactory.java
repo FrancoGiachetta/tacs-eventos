@@ -21,7 +21,7 @@ public class InscripcionFactory {
      * @return una nueva instancia de InscripcionEvento
      */
     public static InscripcionEvento confirmada(Usuario participante, Evento evento) {
-        return new InscripcionEvento(participante, evento, Optional.empty(), EstadoInscripcion.CONFIRMADA);
+        return new InscripcionEvento(participante, evento, null, EstadoInscripcion.CONFIRMADA);
     }
 
     /**
@@ -34,7 +34,6 @@ public class InscripcionFactory {
      * @return una nueva instancia de InscripcionEvento
      */
     public static InscripcionEvento pendiente(Usuario participante, Evento evento) {
-        return new InscripcionEvento(participante, evento, Optional.of(LocalDateTime.now()),
-                EstadoInscripcion.PENDIENTE);
+        return new InscripcionEvento(participante, evento, LocalDateTime.now(), EstadoInscripcion.PENDIENTE);
     }
 }

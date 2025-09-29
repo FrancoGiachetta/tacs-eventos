@@ -347,11 +347,13 @@ public class EventoController {
                 .ok(this.inscripcionesService.inscripcionesPendientes(evento).stream().map((InscripcionEvento i) -> {
                     var usuarioResponse = new UsuarioResponse(i.getParticipante().getId(),
                             i.getParticipante().getEmail(), i.getParticipante().getRoles());
-                    return new InscripcionEnWaitlistResponse(usuarioResponse, i.getFechaHoraIngresoAWaitlist().orElse(
-                            null)); /*
-                                     * La fechaHora de ingreso a watilist no debería ser nunca null en este caso, porque
-                                     * estamos buscando las inscripciones pendientes, o sea, las que están en watilist
-                                     */
+                    return new InscripcionEnWaitlistResponse(usuarioResponse,
+                            i.getFechaHoraIngresoAWaitlist()); /*
+                                                                * La fechaHora de ingreso a watilist no debería ser
+                                                                * nunca null en este caso, porque estamos buscando las
+                                                                * inscripciones pendientes, o sea, las que están en
+                                                                * watilist
+                                                                */
                 }).toList());
     }
 

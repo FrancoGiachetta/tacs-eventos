@@ -29,7 +29,9 @@ public class UsuarioController {
     /**
      * Retorna información del usuario autenticado.
      *
-     * @param usuario datos del usuario autenticado.
+     * @param usuario
+     *            datos del usuario autenticado.
+     *
      * @return información del usuario.
      */
     @GetMapping("/me")
@@ -43,7 +45,9 @@ public class UsuarioController {
     /**
      * Retorna las inscripciones de un usuario según su id.
      *
-     * @param usuario datos del usuario.
+     * @param usuario
+     *            datos del usuario.
+     *
      * @return las inscripciones del usuario.
      */
     @GetMapping("/mis-inscripciones")
@@ -55,15 +59,17 @@ public class UsuarioController {
      * Retorna los eventos para los cuales el usuario es el organizador. Si el usuario es ADMIN, retorna todos los
      * eventos del sistema.
      *
-     * @param usuario datos del usuario.
+     * @param usuario
+     *            datos del usuario.
+     *
      * @return los eventos organizados por el usuario, o todos los eventos si es ADMIN.
      */
     @GetMapping("/mis-eventos")
     public ResponseEntity<List<EventoResponse>> getMisEventos(@AuthenticationPrincipal Usuario usuario) {
         // Si es ADMIN, devolver todos los eventos
         if (usuario.getRoles().contains(RolUsuario.ADMIN)) {
-            return ResponseEntity.ok(eventosRepository.findAll().stream().map(e -> this.modelMapper.map(e, EventoResponse.class))
-                    .toList());
+            return ResponseEntity.ok(eventosRepository.findAll().stream()
+                    .map(e -> this.modelMapper.map(e, EventoResponse.class)).toList());
         }
 
         // Si no es ADMIN, devolver solo los eventos que organiza
