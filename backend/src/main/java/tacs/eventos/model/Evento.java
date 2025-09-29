@@ -43,7 +43,7 @@ public class Evento {
     private Usuario organizador;
 
     public Evento(String id, String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
-            String ubicacion, int cupoMaximo, double precio, String categoria, boolean abierto, Usuario organizador) {
+                  String ubicacion, int cupoMaximo, double precio, String categoria, boolean abierto, Usuario organizador) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -58,7 +58,7 @@ public class Evento {
     }
 
     public Evento(String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
-            String ubicacion, int cupoMaximo, double precio, String categoria) {
+                  String ubicacion, int cupoMaximo, double precio, String categoria) {
 
         this.id = UUID.randomUUID().toString();
         this.titulo = titulo;
@@ -71,21 +71,6 @@ public class Evento {
         this.categoria = categoria;
     }
 
-    /**
-     * Verifica si el evento permite nuevas inscripciones.
-     *
-     * @param inscritos
-     *            Número actual de inscritos en el evento.
-     *
-     * @return true si el evento está abierto y no ha alcanzado el cupo máximo, false en caso contrario.
-     */
-    public boolean permiteIncripcion(int inscritos) {
-        return abierto && (inscritos < cupoMaximo);
-    }
-
-    /**
-     * Marca el evento como cerrado, impidiendo nuevas inscripciones.
-     */
     public void cerrarEvento() {
         this.abierto = false;
     }

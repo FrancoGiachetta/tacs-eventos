@@ -21,10 +21,9 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class InscripcionesService {
-
     private InscripcionesRepository inscripcionesRepository;
-
     private WaitlistService waitlistService;
+    private CupoEventoService cupoEventoService;
 
     /**
      * Intenta inscribir al usuario al evento. Si no hay lugar, lo manda a la waitlist.
@@ -32,8 +31,11 @@ public class InscripcionesService {
      * @param evento
      * @param usuario
      * @return la inscripción generada si pudo inscribirlo, o un Optional vacío si lo mandó a la waitlist.
+     * @throws EventoCerradoException si el evento está cerrado y ya no recibe inscripciones
      */
-    public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario) {
+    public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario) throws EventoCerradoException {
+        if (!evento.isAbierto())
+            throw new EventoCerradoException(evento);
         // Primero intenta inscribirlo directamente. Si no, lo manda a la waitlist.
         return intentarInscribir(InscripcionFactory.confirmada(usuario, evento)).or(() -> {
             InscripcionEvento inscripcionEvento = InscripcionFactory.pendiente(usuario, evento);
@@ -57,11 +59,10 @@ public class InscripcionesService {
         var estabaConfirmada = inscripcionNoCancelada.map(InscripcionEvento::estaConfirmada).orElse(false);
         inscripcionNoCancelada.ifPresent(InscripcionEvento::cancelar);
         if (estabaConfirmada) { // Si se eliminó una inscripción confirmada (se liberó un lugar)
-            // Promueve al próximo de la waitlist (si hay alguien). Hace esto en forma asincrónica, porque es una acción
-            // que
-            // puede tardar (ya que la inscripción está sincronizada por evento), y al usuario que canceló su
-            // inscripción le
-            // tenemos que devolver en el momento el response confirmandole que su incscipción fue cancelada.
+            /* Promueve al próximo de la waitlist (si hay alguien). Hace esto en forma asincrónica, porque es una acción
+             que puede tardar (ya que la inscripción está sincronizada por evento), y al usuario que canceló su
+             inscripción le tenemos que devolver en el momento el response confirmandole que su incscipción fue
+             cancelada. */
             inscribirProximo(evento);
         }
     }
@@ -95,25 +96,21 @@ public class InscripcionesService {
      * Intenta inscribir al usuario directamente al evento (sin pasar por la waitlist).
      *
      * @param inscripcion la inscripción que se quiere intentar realizar
-     * @return la inscripción realizada, o un Optional vacío si no pudo realizar la inscripción porque no había lugar
+     * @return la inscripción realizada, o un Optional vacío si no pudo realizar la inscripción porque no había lugar o
+     * porque el evento fue cerrado.
      */
     private Optional<InscripcionEvento> intentarInscribir(InscripcionEvento inscripcion) {
-        // Sincronizo la inscripción por evento. Esto es para evitar que entre el momento en el que se chequeó si había
-        // lugar, y se persistió la inscripción en la base, el evento justo alcance la capacidad máxima. Si eso ocurre,
-        // la cantidad de inscriptos en un evento puede superar el cupo máximo, y eso nunca puede pasar.
-        // TODO: esta forma de lockear en realidad no está del todo OK porque lockea por objeto físico. Nada nos asegura
-        // que no se instance el evento con el mismo id en otro hilo, y no se actualice al mismo tiempo. De todas
-        // formas, capaz deberíamos usar otra estrategia de lockeo más liviana como usar un número de versión (como hace
-        // hibernate) o el hash del estado interno del evento (como lo que vimos en la clase de API REST que se hace con
-        // el ETag.
-        synchronized (inscripcion.getEvento()) {
-            int inscriptos = this.inscripcionesRepository.countByEvento(inscripcion.getEvento());
-            if (!inscripcion.getEvento().permiteIncripcion(inscriptos))
-                return Optional.empty();
+        boolean hayCupo = cupoEventoService.obtenerCupo(inscripcion.getEvento());
+        if (!hayCupo)
+            return Optional.empty();
+        try {
             inscripcion.confirmar();
             /* Guarda una inscripción nueva, o la actualiza con el estado CONFIRMADA */
             inscripcionesRepository.save(inscripcion);
             return Optional.of(inscripcion);
+        } catch (Exception e) {
+            cupoEventoService.devolverCupo(inscripcion.getEvento());
+            throw e;
         }
     }
 

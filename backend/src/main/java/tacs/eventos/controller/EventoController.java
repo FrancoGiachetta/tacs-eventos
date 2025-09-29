@@ -24,6 +24,7 @@ import tacs.eventos.repository.evento.busqueda.FiltradoPorPalabrasClave;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorPrecio;
 import tacs.eventos.service.EventoService;
 import tacs.eventos.service.UsuarioService;
+import tacs.eventos.service.inscripciones.EventoCerradoException;
 import tacs.eventos.service.inscripciones.InscripcionesService;
 
 import java.net.URI;
@@ -261,11 +262,12 @@ public class EventoController {
      * @param eventoId        id del evento sobre el cual se quiere crear una inscripción
      * @param usuarioId       id del usuario que se quiere inscribir
      * @return ResponseEntity devuelve el código 201 CREATED y un body vacío, o 303 SEE_OTHER si ya existe la
-     * inscripción
+     * inscripción. Si el evento está cerrado, devuelve el códido 400 BAD REQUEST con una descripción del error.
      */
     @PostMapping("/{eventoId}/inscripcion/{usuarioId}")
     public ResponseEntity<Void> inscribirUsuarioAEvento(@AuthenticationPrincipal Usuario usuarioLogueado,
-                                                        @PathVariable String eventoId, @PathVariable String usuarioId) {
+                                                        @PathVariable String eventoId, @PathVariable String usuarioId)
+            throws EventoCerradoException {
         var evento = this.buscarEvento(eventoId);
         var usuario = usuarioService.buscarPorId(usuarioId).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.FORBIDDEN,

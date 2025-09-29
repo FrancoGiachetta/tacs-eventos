@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import tacs.eventos.dto.errores.Error;
 import tacs.eventos.dto.errores.ErrorResponse;
+import tacs.eventos.service.inscripciones.EventoCerradoException;
+
+import java.util.List;
 
 @RestControllerAdvice
 public class ManejadorExcepciones {
@@ -21,4 +24,12 @@ public class ManejadorExcepciones {
         return new ErrorResponse(excepcion.getBindingResult().getFieldErrors().stream()
                 .map(err -> new Error(err.getField(), err.getDefaultMessage())).toList());
     }
+
+    @ExceptionHandler(EventoCerradoException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleEventoCerrado(EventoCerradoException e) {
+        return new ErrorResponse(List.of(
+                new Error(null, "El evento " + e.evento.getTitulo() + " no permite inscripciones")));
+    }
+
 }
