@@ -1,7 +1,12 @@
 use crate::{controller::MessageController, error::BotError, schemas::event::EventFilter};
 use event::parse_event_filters;
-use teloxide::{prelude::Requester, utils::command::BotCommands};
-use tracing::info;
+use teloxide::{
+    dispatching::{HandlerExt, UpdateFilterExt, UpdateHandler},
+    dptree,
+    prelude::Requester,
+    types::Update,
+    utils::command::BotCommands,
+};
 
 mod event;
 
@@ -16,30 +21,32 @@ pub enum Command {
     Login,
     #[command(
         description = "List the available events",
-        // Tell teloxide how to parse the command's arguments.
+        // Tell teloxide how to parse filters.
         parse_with = parse_event_filters
     )]
     ListEvents(EventFilter),
 }
 
-pub async fn handle_command(msg_ctl: MessageController, cmd: Command) -> Result<(), BotError> {
-    match cmd {
-        Command::ListEvents(filters) => event::list_events(msg_ctl, filters).await?,
-        Command::Register => {
-            info!("Execution /register!");
-        }
-        Command::Login => {
-            info!("Execution /login!");
-        }
-        Command::Help => {
-            info!("Execution /help!");
+/// Creates a handler for commands.
+///
+/// Each branch matches a command, and executes its respective endpoint.
+pub fn create_command_handler() -> UpdateHandler<BotError> {
+    Update::filter_message()
+        .filter_map(|msg, bot, req_client| Some(MessageController::new(msg, bot, req_client)))
+        .branch(
+            dptree::entry()
+                .filter_command::<Command>()
+                .branch(dptree::case![Command::ListEvents(filters)].endpoint(event::list_events))
+                .branch(dptree::case![Command::Register])
+                .branch(dptree::case![Command::Login])
+                .branch(dptree::case![Command::Help].endpoint(handle_help_command)),
+        )
+}
 
-            msg_ctl
-                .bot
-                .send_message(msg_ctl.chat_id, Command::descriptions().to_string())
-                .await?;
-        }
-    }
-
+async fn handle_help_command(msg_ctl: MessageController) -> Result<(), BotError> {
+    msg_ctl
+        .bot
+        .send_message(msg_ctl.chat_id, Command::descriptions().to_string())
+        .await?;
     Ok(())
 }

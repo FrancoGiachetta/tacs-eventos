@@ -1,8 +1,10 @@
 use crate::error::BotError;
 
+mod auth;
 mod bot;
 pub mod command;
 mod controller;
+pub mod dialogue;
 mod error;
 mod request_client;
 mod schemas;
