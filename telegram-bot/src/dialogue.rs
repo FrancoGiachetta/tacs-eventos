@@ -1,5 +1,6 @@
 use teloxide::{
     dispatching::{UpdateFilterExt, UpdateHandler, dialogue::ErasedStorage},
+    dptree,
     prelude::Dialogue,
     types::Update,
 };
@@ -13,6 +14,9 @@ pub type DialogueStorage = ErasedStorage<State>;
 pub enum State {
     #[default]
     Start,
+    RegisterEmail,
+    RegisterPassword,
+    ConfirmPassword,
 }
 
 /// Creates a handler for commands.
@@ -21,4 +25,8 @@ pub enum State {
 pub fn create_dialogue_handler() -> UpdateHandler<BotError> {
     Update::filter_message()
         .filter_map(|msg, bot, req_client| Some(MessageController::new(msg, bot, req_client)))
+        .branch(dptree::case![State::Start])
+        .branch(dptree::case![State::RegisterEmail])
+        .branch(dptree::case![State::RegisterPassword])
+        .branch(dptree::case![State::ConfirmPassword])
 }
