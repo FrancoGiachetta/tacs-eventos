@@ -1,7 +1,7 @@
 use thiserror::Error;
 use tracing::subscriber::SetGlobalDefaultError;
 
-use crate::request_client::RequestClientError;
+use crate::{dialogue::DialogueHandlerError, request_client::RequestClientError};
 
 #[derive(Debug, Error)]
 pub enum BotError {
@@ -15,4 +15,6 @@ pub enum BotError {
     GlobalSubscriberError(#[from] SetGlobalDefaultError),
     #[error(transparent)]
     RequestError(#[from] RequestClientError),
+    #[error(transparent)]
+    DialogueError(#[from] DialogueHandlerError),
 }

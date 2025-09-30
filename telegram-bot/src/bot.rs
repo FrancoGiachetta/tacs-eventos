@@ -17,7 +17,9 @@ use crate::{
     request_client::RequestClient,
 };
 
-pub async fn run() -> Result<(), BotError> {
+pub type BotResult = Result<(), BotError>;
+
+pub async fn run() -> BotResult {
     let bot = Arc::new(Bot::from_env());
 
     bot.set_my_commands(Command::bot_commands()).await?;

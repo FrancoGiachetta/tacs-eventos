@@ -8,15 +8,19 @@ use teloxide::{prelude::Requester, utils::command::ParseError};
 use tracing::{error, info};
 
 use crate::{
-    controller::MessageController, error::BotError, request_client::RequestClientError,
-    schemas::event::EventFilter,
+    bot::BotResult, controller::MessageController, dialogue::MyDialogue,
+    request_client::RequestClientError, schemas::event::EventFilter,
 };
 
 /// List open events.
 ///
 /// Sends a GET request looking for all the still open events. The command also
 /// allows to pass arguments to filter events.
-pub async fn list_events(msg_ctl: MessageController, filters: EventFilter) -> Result<(), BotError> {
+pub async fn handle_list_events(
+    msg_ctl: MessageController,
+    _dialogue: MyDialogue,
+    filters: EventFilter,
+) -> BotResult {
     info!("Listing list_events!");
 
     match msg_ctl

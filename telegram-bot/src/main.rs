@@ -1,4 +1,4 @@
-use crate::error::BotError;
+use crate::bot::BotResult;
 
 mod auth;
 mod bot;
@@ -10,7 +10,7 @@ mod request_client;
 mod schemas;
 
 #[tokio::main]
-async fn main() -> Result<(), BotError> {
+async fn main() -> BotResult {
     // Load .env vars
     dotenv::dotenv()?;
 
