@@ -63,7 +63,7 @@ class EstadisticasControllerTest {
 
     @Test
     void testCantidadInscripciones() {
-        when(estadisticaService.cantidadInscripciones()).thenReturn(20);
+        when(estadisticaService.cantidadInscripciones()).thenReturn(20l);
 
         ResponseEntity<Long> response = controller.cantidadInscripciones(VALID_AUTH_HEADER);
 
@@ -101,7 +101,7 @@ class EstadisticasControllerTest {
         Usuario regularUser = new Usuario("user@test.com", "hashedPassword", Set.of(RolUsuario.USUARIO));
         when(sessionService.validate("regular-token")).thenReturn(Optional.of(regularUser));
 
-        ResponseEntity<Integer> response = controller.cantidadInscripciones("Bearer regular-token");
+        var response = controller.cantidadInscripciones("Bearer regular-token");
 
         assertEquals(403, response.getStatusCode().value());
         verify(estadisticaService, never()).cantidadInscripciones();
