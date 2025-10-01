@@ -19,8 +19,13 @@ pub enum State {
     #[default]
     Start,
     RegisterEmail,
-    RegisterPassword,
-    ConfirmPassword,
+    RegisterPassword {
+        email: String,
+    },
+    ConfirmPassword {
+        email: String,
+        password: String,
+    },
 }
 
 /// Creates a handler for commands.
@@ -31,6 +36,12 @@ pub fn create_dialogue_handler() -> UpdateHandler<BotError> {
         .filter_map(|msg, bot, req_client| Some(MessageController::new(msg, bot, req_client)))
         .branch(dptree::case![State::Start])
         .branch(dptree::case![State::RegisterEmail].endpoint(register::handle_register_email))
-        .branch(dptree::case![State::RegisterPassword])
-        .branch(dptree::case![State::ConfirmPassword])
+        .branch(
+            dptree::case![State::RegisterPassword { email }]
+                .endpoint(register::handle_register_password),
+        )
+        .branch(
+            dptree::case![State::ConfirmPassword { email, password }]
+                .endpoint(register::handle_confirm_password),
+        )
 }

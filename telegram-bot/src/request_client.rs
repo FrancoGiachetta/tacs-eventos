@@ -1,12 +1,15 @@
-use std::{env, sync::Arc, time::Duration};
+use std::{env, time::Duration};
 
 use lazy_static::lazy_static;
 use reqwest::{Client, Response};
-use serde_json::Value;
+use serde_json::{Value, json};
 use thiserror::Error;
 use tracing::info;
 
-use crate::schemas::event::{Event, EventFilter};
+use crate::schemas::{
+    event::{Event, EventFilter},
+    user::{Token, UserOut},
+};
 
 lazy_static! {
     static ref URL_BASE: String = String::from("http://localhost:8080/api/v1");
@@ -71,7 +74,34 @@ impl RequestClient {
         // TODO: add palabrasClave query.
 
         let response = self
-            .send_request_with_retry(url, Arc::new(RequestMethod::Get(filter_query)))
+            .send_request_with_retry(url, RequestMethod::Get(filter_query))
+            .await?;
+
+        Ok(serde_json::from_value(response)?)
+    }
+
+    pub async fn send_user_registration_request(
+        &self,
+        user_data: UserOut,
+    ) -> Result<Token, RequestClientError> {
+        let url = format!("{}/register", *URL_BASE);
+
+        self.send_request_with_retry(url, RequestMethod::Post(serde_json::to_value(&user_data)?))
+            .await?;
+
+        let token = self.send_user_login_request(user_data).await?;
+
+        Ok(token)
+    }
+
+    pub async fn send_user_login_request(
+        &self,
+        user_data: UserOut,
+    ) -> Result<Token, RequestClientError> {
+        let url = format!("{}/login", *URL_BASE);
+
+        let response = self
+            .send_request_with_retry(url, RequestMethod::Post(serde_json::to_value(user_data)?))
             .await?;
 
         Ok(serde_json::from_value(response)?)
@@ -80,7 +110,7 @@ impl RequestClient {
     async fn send_request_with_retry<'req>(
         &self,
         url: String,
-        method: Arc<RequestMethod<'req>>,
+        method: RequestMethod<'req>,
     ) -> Result<Value, RequestClientError> {
         let response = Self::retry(|| self.send_request(&url, &method)).await?;
 
