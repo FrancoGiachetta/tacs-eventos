@@ -8,21 +8,26 @@ export default function ToastNotifications() {
     useEffect(() => {
         if (notificaciones.length > 0) {
             const ultimaNotificacion = notificaciones[0]
-            
+
             // Solo mostrar toast si es nueva (no leída y no está ya visible)
-            if (!ultimaNotificacion.leida && !toastsVisibles.includes(ultimaNotificacion.id)) {
-                setToastsVisibles(prev => [ultimaNotificacion.id, ...prev])
-                
+            if (
+                !ultimaNotificacion.leida &&
+                !toastsVisibles.includes(ultimaNotificacion.id)
+            ) {
+                setToastsVisibles((prev) => [ultimaNotificacion.id, ...prev])
+
                 // Auto-remover después de 5 segundos
                 setTimeout(() => {
-                    setToastsVisibles(prev => prev.filter(id => id !== ultimaNotificacion.id))
+                    setToastsVisibles((prev) =>
+                        prev.filter((id) => id !== ultimaNotificacion.id)
+                    )
                 }, 5000)
             }
         }
     }, [notificaciones, toastsVisibles])
 
     const removerToast = (id: string) => {
-        setToastsVisibles(prev => prev.filter(toastId => toastId !== id))
+        setToastsVisibles((prev) => prev.filter((toastId) => toastId !== id))
     }
 
     const getIconoTipo = (tipo: string) => {
@@ -55,8 +60,10 @@ export default function ToastNotifications() {
 
     return (
         <div className="fixed top-20 right-4 z-50 space-y-2">
-            {toastsVisibles.map(toastId => {
-                const notificacion = notificaciones.find(n => n.id === toastId)
+            {toastsVisibles.map((toastId) => {
+                const notificacion = notificaciones.find(
+                    (n) => n.id === toastId
+                )
                 if (!notificacion) return null
 
                 return (

@@ -14,7 +14,9 @@ export default function EventFilters({
     filtrosActuales = {},
 }: EventFiltersProps) {
     const [filtros, setFiltros] = useState<EventoFiltros>(filtrosActuales)
-    const [esGratis, setEsGratis] = useState(filtrosActuales.precioPesosMax === 0)
+    const [esGratis, setEsGratis] = useState(
+        filtrosActuales.precioPesosMax === 0
+    )
 
     // Sincronizar filtros cuando cambien los valores actuales
     useEffect(() => {
@@ -26,8 +28,6 @@ export default function EventFilters({
         e.preventDefault()
         onFilterChange(filtros)
     }
-
-
 
     const handleReset = () => {
         setFiltros({})

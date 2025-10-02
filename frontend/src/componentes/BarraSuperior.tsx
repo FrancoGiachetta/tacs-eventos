@@ -87,10 +87,10 @@ export default function BarraSuperior() {
                             </Link>
                         )}
                     </nav>
-                    
+
                     <div className="flex items-center gap-4">
                         <NotificationDropdown />
-                        
+
                         <div className="relative">
                             <button
                                 className="ml-2 rounded-full bg-white/15 px-3 py-1 text-sm hover:bg-white/25"

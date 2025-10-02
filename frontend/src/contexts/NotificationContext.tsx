@@ -15,23 +15,33 @@ interface NotificationContextType {
     notificacionesNoLeidas: number
     marcarComoLeida: (id: string) => void
     marcarTodasComoLeidas: () => void
-    agregarNotificacion: (notificacion: Omit<Notificacion, 'id' | 'fechaCreacion' | 'leida'>) => void
+    agregarNotificacion: (
+        notificacion: Omit<Notificacion, 'id' | 'fechaCreacion' | 'leida'>
+    ) => void
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined)
+const NotificationContext = createContext<NotificationContextType | undefined>(
+    undefined
+)
 
-export function NotificationProvider({ children }: { children: React.ReactNode }) {
+export function NotificationProvider({
+    children,
+}: {
+    children: React.ReactNode
+}) {
     const [notificaciones, setNotificaciones] = useState<Notificacion[]>([])
     const { usuario } = useAuth()
 
-    const agregarNotificacion = (notificacion: Omit<Notificacion, 'id' | 'fechaCreacion' | 'leida'>) => {
+    const agregarNotificacion = (
+        notificacion: Omit<Notificacion, 'id' | 'fechaCreacion' | 'leida'>
+    ) => {
         const nueva: Notificacion = {
             ...notificacion,
             id: Date.now().toString(),
             fechaCreacion: new Date().toISOString(),
-            leida: false
+            leida: false,
         }
-        setNotificaciones(prev => [nueva, ...prev])
+        setNotificaciones((prev) => [nueva, ...prev])
     }
 
     // Notificación de bienvenida
@@ -41,7 +51,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             const timer = setTimeout(() => {
                 agregarNotificacion({
                     mensaje: `¡Bienvenido/a ${usuario.email}! 🔔 Las notificaciones están activas. Te avisaremos sobre cambios en tus inscripciones.`,
-                    tipo: 'info'
+                    tipo: 'info',
                 })
             }, 1000)
             return () => clearTimeout(timer)
@@ -58,7 +68,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         const checkPromociones = async () => {
             try {
                 // Obtener mis inscripciones actuales
-                const response = await api.get('/api/v1/usuario/mis-inscripciones')
+                const response = await api.get(
+                    '/api/v1/usuario/mis-inscripciones'
+                )
                 const inscripcionesActuales = response.data
 
                 // Si es la primera vez, solo guardar el estado inicial
@@ -70,26 +82,29 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
                 // Verificar cambios de estado
                 inscripcionesActuales.forEach((inscripcionActual: any) => {
                     const inscripcionPrevia = inscripcionesPrevias.find(
-                        (prev: any) => prev.eventoId === inscripcionActual.eventoId
+                        (prev: any) =>
+                            prev.eventoId === inscripcionActual.eventoId
                     )
 
                     // Si cambió de PENDIENTE a CONFIRMADA
-                    if (inscripcionPrevia && 
-                        inscripcionPrevia.estado === 'PENDIENTE' && 
-                        inscripcionActual.estado === 'CONFIRMADA') {
-                        
+                    if (
+                        inscripcionPrevia &&
+                        inscripcionPrevia.estado === 'PENDIENTE' &&
+                        inscripcionActual.estado === 'CONFIRMADA'
+                    ) {
                         // Obtener datos del evento para el mensaje
                         api.get(`/api/v1/evento/${inscripcionActual.eventoId}`)
-                            .then(eventoRes => {
+                            .then((eventoRes) => {
                                 agregarNotificacion({
                                     mensaje: `🎉 ¡Excelente! Tu inscripción al evento "${eventoRes.data.titulo}" ha sido CONFIRMADA. Ya no estás en lista de espera.`,
-                                    tipo: 'success'
+                                    tipo: 'success',
                                 })
                             })
                             .catch(() => {
                                 agregarNotificacion({
-                                    mensaje: '🎉 ¡Una de tus inscripciones ha sido confirmada! Ya no estás en lista de espera.',
-                                    tipo: 'success'
+                                    mensaje:
+                                        '🎉 ¡Una de tus inscripciones ha sido confirmada! Ya no estás en lista de espera.',
+                                    tipo: 'success',
                                 })
                             })
                     }
@@ -97,20 +112,26 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
                     // Si se inscribió a un nuevo evento
                     if (!inscripcionPrevia) {
                         api.get(`/api/v1/evento/${inscripcionActual.eventoId}`)
-                            .then(eventoRes => {
-                                const mensaje = inscripcionActual.estado === 'CONFIRMADA' 
-                                    ? `✅ Te has inscrito correctamente al evento "${eventoRes.data.titulo}".`
-                                    : `⏳ Te has inscrito al evento "${eventoRes.data.titulo}". Estás en lista de espera.`
-                                
+                            .then((eventoRes) => {
+                                const mensaje =
+                                    inscripcionActual.estado === 'CONFIRMADA'
+                                        ? `✅ Te has inscrito correctamente al evento "${eventoRes.data.titulo}".`
+                                        : `⏳ Te has inscrito al evento "${eventoRes.data.titulo}". Estás en lista de espera.`
+
                                 agregarNotificacion({
                                     mensaje,
-                                    tipo: inscripcionActual.estado === 'CONFIRMADA' ? 'success' : 'info'
+                                    tipo:
+                                        inscripcionActual.estado ===
+                                        'CONFIRMADA'
+                                            ? 'success'
+                                            : 'info',
                                 })
                             })
                             .catch(() => {
                                 agregarNotificacion({
-                                    mensaje: '✅ Te has inscrito a un nuevo evento.',
-                                    tipo: 'success'
+                                    mensaje:
+                                        '✅ Te has inscrito a un nuevo evento.',
+                                    tipo: 'success',
                                 })
                             })
                     }
@@ -132,18 +153,16 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }, [usuario])
 
     const marcarComoLeida = (id: string) => {
-        setNotificaciones(prev =>
-            prev.map(n => n.id === id ? { ...n, leida: true } : n)
+        setNotificaciones((prev) =>
+            prev.map((n) => (n.id === id ? { ...n, leida: true } : n))
         )
     }
 
     const marcarTodasComoLeidas = () => {
-        setNotificaciones(prev =>
-            prev.map(n => ({ ...n, leida: true }))
-        )
+        setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
     }
 
-    const notificacionesNoLeidas = notificaciones.filter(n => !n.leida).length
+    const notificacionesNoLeidas = notificaciones.filter((n) => !n.leida).length
 
     return (
         <NotificationContext.Provider
@@ -152,7 +171,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
                 notificacionesNoLeidas,
                 marcarComoLeida,
                 marcarTodasComoLeidas,
-                agregarNotificacion
+                agregarNotificacion,
             }}
         >
             {children}
@@ -163,7 +182,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 export function useNotifications() {
     const context = useContext(NotificationContext)
     if (context === undefined) {
-        throw new Error('useNotifications must be used within a NotificationProvider')
+        throw new Error(
+            'useNotifications must be used within a NotificationProvider'
+        )
     }
     return context
 }

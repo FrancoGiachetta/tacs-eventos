@@ -162,7 +162,8 @@ export default function FormularioEvento({
                         />
                         {!visualizar && (
                             <p className="text-xs text-gray-500 mt-1">
-                                Los eventos deben programarse para fechas futuras
+                                Los eventos deben programarse para fechas
+                                futuras
                             </p>
                         )}
                         {
@@ -195,10 +196,42 @@ export default function FormularioEvento({
                             />
                             {!visualizar && (
                                 <div className="flex gap-2 text-xs">
-                                    <button type="button" onClick={() => setValue('duracionMinutos', 60)} className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200">1 hora</button>
-                                    <button type="button" onClick={() => setValue('duracionMinutos', 120)} className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200">2 horas</button>
-                                    <button type="button" onClick={() => setValue('duracionMinutos', 180)} className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200">3 horas</button>
-                                    <button type="button" onClick={() => setValue('duracionMinutos', 480)} className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200">8 horas</button>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setValue('duracionMinutos', 60)
+                                        }
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        1 hora
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setValue('duracionMinutos', 120)
+                                        }
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        2 horas
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setValue('duracionMinutos', 180)
+                                        }
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        3 horas
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setValue('duracionMinutos', 480)
+                                        }
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        8 horas
+                                    </button>
                                 </div>
                             )}
                         </div>
@@ -277,11 +310,15 @@ export default function FormularioEvento({
                         </label>
                         <div className="space-y-2">
                             <div className="relative">
-                                <span className="absolute left-3 top-2 text-gray-500">$</span>
+                                <span className="absolute left-3 top-2 text-gray-500">
+                                    $
+                                </span>
                                 <input
                                     type="number"
                                     id="precio"
-                                    {...register('precio', { valueAsNumber: true })}
+                                    {...register('precio', {
+                                        valueAsNumber: true,
+                                    })}
                                     className="w-full rounded-md border border-slate-300 pl-8 pr-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                                     placeholder="0.00"
                                     step="0.01"
@@ -291,10 +328,34 @@ export default function FormularioEvento({
                             </div>
                             {!visualizar && (
                                 <div className="flex gap-2 text-xs">
-                                    <button type="button" onClick={() => setValue('precio', 0)} className="px-2 py-1 bg-green-100 text-green-800 rounded hover:bg-green-200">Gratis</button>
-                                    <button type="button" onClick={() => setValue('precio', 1000)} className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200">$1,000</button>
-                                    <button type="button" onClick={() => setValue('precio', 2500)} className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200">$2,500</button>
-                                    <button type="button" onClick={() => setValue('precio', 5000)} className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200">$5,000</button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setValue('precio', 0)}
+                                        className="px-2 py-1 bg-green-100 text-green-800 rounded hover:bg-green-200"
+                                    >
+                                        Gratis
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setValue('precio', 1000)}
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        $1,000
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setValue('precio', 2500)}
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        $2,500
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setValue('precio', 5000)}
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        $5,000
+                                    </button>
                                 </div>
                             )}
                         </div>

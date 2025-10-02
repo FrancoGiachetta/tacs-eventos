@@ -45,22 +45,24 @@ export default function DetalleEvento() {
                     const estadoInscripcion = inscripcionResponse.data?.estado
 
                     if (estadoInscripcion === 'CONFIRMADA') {
-                        toast.success('¡Inscripción confirmada! Tienes tu lugar asegurado')
+                        toast.success(
+                            '¡Inscripción confirmada! Tienes tu lugar asegurado'
+                        )
                         agregarNotificacion({
                             mensaje: `✅ Te has inscrito correctamente al evento "${eventoInfo?.titulo}". Tu lugar está confirmado.`,
-                            tipo: 'success'
+                            tipo: 'success',
                         })
                     } else if (estadoInscripcion === 'PENDIENTE') {
                         toast.info('Inscripción en lista de espera')
                         agregarNotificacion({
                             mensaje: `⏳ Te has inscrito al evento "${eventoInfo?.titulo}". Estás en lista de espera, te notificaremos si se libera un lugar.`,
-                            tipo: 'info'
+                            tipo: 'info',
                         })
                     } else {
                         toast.success('Inscripción realizada correctamente')
                         agregarNotificacion({
                             mensaje: `✅ Te has inscrito al evento "${eventoInfo?.titulo}".`,
-                            tipo: 'success'
+                            tipo: 'success',
                         })
                     }
                 } catch {
@@ -68,10 +70,10 @@ export default function DetalleEvento() {
                     toast.success('Inscripción realizada correctamente')
                     agregarNotificacion({
                         mensaje: `✅ Te has inscrito al evento "${eventoInfo?.titulo}".`,
-                        tipo: 'success'
+                        tipo: 'success',
                     })
                 }
-                
+
                 // Redirigir a mis inscripciones después de inscripción exitosa
                 setTimeout(() => {
                     navigate('/mis-inscripciones')

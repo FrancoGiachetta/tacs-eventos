@@ -2,14 +2,23 @@ import { useState, useRef, useEffect } from 'react'
 import { useNotifications } from '../contexts/NotificationContext'
 
 export default function NotificationDropdown() {
-    const { notificaciones, notificacionesNoLeidas, marcarComoLeida, marcarTodasComoLeidas, agregarNotificacion } = useNotifications()
+    const {
+        notificaciones,
+        notificacionesNoLeidas,
+        marcarComoLeida,
+        marcarTodasComoLeidas,
+        agregarNotificacion,
+    } = useNotifications()
     const [isOpen, setIsOpen] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
 
     // Cerrar dropdown al hacer click fuera
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+            ) {
                 setIsOpen(false)
             }
         }
@@ -23,14 +32,16 @@ export default function NotificationDropdown() {
     const formatearFecha = (fecha: string) => {
         const ahora = new Date()
         const fechaNotif = new Date(fecha)
-        const diffMinutos = Math.floor((ahora.getTime() - fechaNotif.getTime()) / (1000 * 60))
-        
+        const diffMinutos = Math.floor(
+            (ahora.getTime() - fechaNotif.getTime()) / (1000 * 60)
+        )
+
         if (diffMinutos < 1) return 'Hace un momento'
         if (diffMinutos < 60) return `Hace ${diffMinutos} min`
-        
+
         const diffHoras = Math.floor(diffMinutos / 60)
         if (diffHoras < 24) return `Hace ${diffHoras}h`
-        
+
         const diffDias = Math.floor(diffHoras / 24)
         return `Hace ${diffDias} días`
     }
@@ -61,7 +72,9 @@ export default function NotificationDropdown() {
                 <i className="fas fa-bell text-xl"></i>
                 {notificacionesNoLeidas > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                        {notificacionesNoLeidas > 9 ? '9+' : notificacionesNoLeidas}
+                        {notificacionesNoLeidas > 9
+                            ? '9+'
+                            : notificacionesNoLeidas}
                     </span>
                 )}
             </button>
@@ -70,7 +83,9 @@ export default function NotificationDropdown() {
                 <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
                     <div className="p-4 border-b border-gray-200">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold">Notificaciones</h3>
+                            <h3 className="text-lg font-semibold">
+                                Notificaciones
+                            </h3>
                             {notificacionesNoLeidas > 0 && (
                                 <button
                                     onClick={marcarTodasComoLeidas}
@@ -82,10 +97,13 @@ export default function NotificationDropdown() {
                         </div>
                         {/* Botón de prueba temporal */}
                         <button
-                            onClick={() => agregarNotificacion({
-                                mensaje: '🧪 Prueba: Las notificaciones están funcionando correctamente!',
-                                tipo: 'success'
-                            })}
+                            onClick={() =>
+                                agregarNotificacion({
+                                    mensaje:
+                                        '🧪 Prueba: Las notificaciones están funcionando correctamente!',
+                                    tipo: 'success',
+                                })
+                            }
                             className="mt-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded"
                         >
                             Probar notificación
@@ -101,7 +119,9 @@ export default function NotificationDropdown() {
                             notificaciones.slice(0, 10).map((notif) => (
                                 <div
                                     key={notif.id}
-                                    onClick={() => handleNotificacionClick(notif.id)}
+                                    onClick={() =>
+                                        handleNotificacionClick(notif.id)
+                                    }
                                     className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
                                         !notif.leida ? 'bg-blue-50' : ''
                                     }`}
@@ -111,11 +131,15 @@ export default function NotificationDropdown() {
                                             {getIconoTipo(notif.tipo)}
                                         </span>
                                         <div className="flex-1 min-w-0">
-                                            <p className={`text-sm ${!notif.leida ? 'font-medium' : 'font-normal'} text-gray-900`}>
+                                            <p
+                                                className={`text-sm ${!notif.leida ? 'font-medium' : 'font-normal'} text-gray-900`}
+                                            >
                                                 {notif.mensaje}
                                             </p>
                                             <p className="text-xs text-gray-500 mt-1">
-                                                {formatearFecha(notif.fechaCreacion)}
+                                                {formatearFecha(
+                                                    notif.fechaCreacion
+                                                )}
                                             </p>
                                         </div>
                                         {!notif.leida && (
