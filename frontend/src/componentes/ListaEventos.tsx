@@ -34,7 +34,7 @@ export default function ListaEventos() {
                 params.append('fechaInicioMin', filtros.fechaInicioMin)
             if (filtros.fechaInicioMax)
                 params.append('fechaInicioMax', filtros.fechaInicioMax)
-            if (filtros.categoria && filtros.categoria !== '')
+            if (filtros.categoria)
                 params.append('categoria', filtros.categoria)
             params.append('page', pagina.toString())
 
@@ -68,6 +68,7 @@ export default function ListaEventos() {
             <EventFilters
                 onFilterChange={handleFilterChange}
                 onReset={handleReset}
+                filtrosActuales={filtros}
             />
 
             <EventList
