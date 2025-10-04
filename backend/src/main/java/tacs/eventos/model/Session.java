@@ -6,11 +6,15 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
+import jakarta.validation.constraints.NotNull;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class Session {
+    @NotNull
     private String token; // UUID aleatorio en texto
+    @NotNull
     private String userId;
     private Instant expiresAt;
     private boolean active = true;

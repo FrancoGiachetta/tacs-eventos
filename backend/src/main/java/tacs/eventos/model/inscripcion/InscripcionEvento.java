@@ -13,20 +13,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@Getter
 public class InscripcionEvento {
-    @Getter
     private String id = UUID.randomUUID().toString();
-    @Getter
     private final Usuario participante;
-    @Getter
     private final Evento evento;
     // TODO: agregar cuando este definido
     // private DatosDePago datosDePago;
-    @Getter
     private final Optional<LocalDateTime> fechaHoraIngresoAWaitlist;
-    @Getter
     private LocalDateTime fechahoraConfirmacion = LocalDateTime.now();
-    @Getter
     private Optional<LocalDateTime> fechaHoraCancelacion = Optional.empty();
     // TODO: agregar cuando este definido
     // private Optional<String> errorDePago;
