@@ -21,6 +21,7 @@ public class SessionService {
     private final int minutes;
 
     public SessionService(UsuarioRepository usuarios, SessionRepository sesiones, PasswordEncoder encoder,
+            // todo parametrizar el tiempo de expiracion
             @Value("${app.session.minutes:30}") int minutes) {
         this.usuarios = usuarios;
         this.sesiones = sesiones;
