@@ -30,9 +30,9 @@ class InscripcionesInMemoryRepoTest {
         this.u2 = new Usuario("pepe@gmail.com", "asd", null);
         this.u3 = new Usuario("pepe@gmail.com", "asd", null);
         this.u4 = new Usuario("pepe@gmail.com", "asd", null);
-        this.i1 = InscripcionFactory.directa(u1, this.e);
-        this.i2 = InscripcionFactory.directa(u2, this.e);
-        this.i3 = InscripcionFactory.directa(u3, this.e);
+        this.i1 = InscripcionFactory.confirmada(u1, this.e);
+        this.i2 = InscripcionFactory.confirmada(u2, this.e);
+        this.i3 = InscripcionFactory.confirmada(u3, this.e);
         this.repo.guardarInscripcion(this.i1);
         this.repo.guardarInscripcion(this.i2);
         this.repo.guardarInscripcion(this.i3);
@@ -55,7 +55,7 @@ class InscripcionesInMemoryRepoTest {
 
     @Test
     void getInscripcionesConfirmadasPorParticipante() {
-        var inscripciones = this.repo.getInscripcionesConfirmadasPorParticipante(u1);
+        var inscripciones = this.repo.getInscripcionesNoCanceladasPorParticipante(u1);
         assertEquals(1, inscripciones.size());
         assertTrue(inscripciones.contains(this.i1));
     }
@@ -70,7 +70,7 @@ class InscripcionesInMemoryRepoTest {
 
     @Test
     void guardarInscripcion() {
-        var i4 = InscripcionFactory.directa(u4, this.e);
+        var i4 = InscripcionFactory.confirmada(u4, this.e);
         this.repo.guardarInscripcion(i4);
         var i = this.repo.getInscripcionConfirmada(u4, this.e);
         assertTrue(i.isPresent());
