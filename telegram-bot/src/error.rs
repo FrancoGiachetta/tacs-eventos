@@ -1,7 +1,8 @@
+use teloxide::dispatching::dialogue::InMemStorageError;
 use thiserror::Error;
 use tracing::subscriber::SetGlobalDefaultError;
 
-use crate::{dialogue::DialogueHandlerError, request_client::RequestClientError};
+use crate::request_client::RequestClientError;
 
 #[derive(Debug, Error)]
 pub enum BotError {
@@ -16,5 +17,5 @@ pub enum BotError {
     #[error(transparent)]
     RequestError(#[from] RequestClientError),
     #[error(transparent)]
-    DialogueError(#[from] DialogueHandlerError),
+    DialogueError(#[from] InMemStorageError),
 }

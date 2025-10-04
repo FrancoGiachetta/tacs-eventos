@@ -10,7 +10,7 @@ mod request_client;
 mod schemas;
 
 #[tokio::main]
-async fn main() -> BotResult {
+async fn main() -> BotResult<()> {
     // Load .env vars
     dotenv::dotenv()?;
 

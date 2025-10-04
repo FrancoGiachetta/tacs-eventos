@@ -1,25 +1,21 @@
 use lazy_static::lazy_static;
 use regex::Regex;
-use teloxide::prelude::Requester;
 
 use crate::{
     bot::BotResult,
-    controller::MessageController,
+    controller::Controller,
     dialogue::{MyDialogue, State},
     schemas::user::UserOut,
 };
 
-pub async fn handle_register_email(msg_ctl: MessageController, dialogue: MyDialogue) -> BotResult {
+pub async fn handle_register_email(ctl: Controller, dialogue: MyDialogue) -> BotResult<()> {
     lazy_static! {
         static ref EMAIL_REGEX: Regex = Regex::new(r"/^[^\s@]+@[^\s@]+\.[^\s@]+$/").unwrap();
     }
 
-    match msg_ctl.msg.text() {
+    match ctl.message().text() {
         Some(email) if EMAIL_REGEX.is_match(email) => {
-            msg_ctl
-                .bot
-                .send_message(msg_ctl.chat_id, "Ahora necesito una contrasena")
-                .await?;
+            ctl.send_message("Ahora necesito una contrasena").await?;
 
             dialogue
                 .update(State::RegisterPassword {
@@ -28,10 +24,7 @@ pub async fn handle_register_email(msg_ctl: MessageController, dialogue: MyDialo
                 .await?;
         }
         _ => {
-            msg_ctl
-                .bot
-                .send_message(msg_ctl.chat_id, "Ese email no es valido!")
-                .await?;
+            ctl.send_message("Ese email no es valido!").await?;
         }
     }
 
@@ -39,23 +32,18 @@ pub async fn handle_register_email(msg_ctl: MessageController, dialogue: MyDialo
 }
 
 pub async fn handle_register_password(
-    msg_ctl: MessageController,
+    ctl: Controller,
     dialogue: MyDialogue,
     email: String,
-) -> BotResult {
+) -> BotResult<()> {
     lazy_static! {
         static ref PASSWORD_REGEX: Regex =
             Regex::new(r"/^(?=.*[A-Za-z])(?=.*\d).{8,72}$/").unwrap();
     }
 
-    match msg_ctl.msg.text() {
+    match ctl.message().text() {
         Some(password) if PASSWORD_REGEX.is_match(password) => {
-            msg_ctl
-                .bot
-                .send_message(
-                    msg_ctl.chat_id,
-                    "Ahora necesito que confirmes las contrasena",
-                )
+            ctl.send_message("Ahora necesito que confirmes las contrasena")
                 .await?;
 
             dialogue
@@ -66,10 +54,7 @@ pub async fn handle_register_password(
                 .await?;
         }
         _ => {
-            msg_ctl
-                .bot
-                .send_message(msg_ctl.chat_id, "Esa contrasena es invalida!")
-                .await?;
+            ctl.send_message("Esa contrasena es invalida!").await?;
         }
     }
 
@@ -77,22 +62,17 @@ pub async fn handle_register_password(
 }
 
 pub async fn handle_confirm_password(
-    msg_ctl: MessageController,
+    ctl: Controller,
     dialogue: MyDialogue,
     (email, password): (String, String),
-) -> BotResult {
-    match msg_ctl.msg.text() {
+) -> BotResult<()> {
+    match ctl.message().text() {
         Some(confirm_pass) if password == confirm_pass => {
-            msg_ctl
-                .bot
-                .send_message(
-                    msg_ctl.chat_id,
-                    "Ahora necesito que confirmes las contrasena",
-                )
+            ctl.send_message("Ahora necesito que confirmes las contrasena")
                 .await?;
 
-            let token = msg_ctl
-                .req_client
+            let token = ctl
+                .request_client()
                 .send_user_registration_request(UserOut {
                     email,
                     password,
@@ -100,13 +80,11 @@ pub async fn handle_confirm_password(
                 })
                 .await?;
 
-            // TODO: Store token somewhere to be used.
+            ctl.send_message(&format!("Your token! {}", token.token))
+                .await?;
         }
         _ => {
-            msg_ctl
-                .bot
-                .send_message(msg_ctl.chat_id, "Esa contrasena es invalida!")
-                .await?;
+            ctl.send_message("Esa contrasena es invalida!").await?;
         }
     }
 

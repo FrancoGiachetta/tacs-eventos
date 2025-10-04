@@ -1,18 +1,19 @@
 use teloxide::{
-    dispatching::{UpdateFilterExt, UpdateHandler, dialogue::ErasedStorage},
+    dispatching::{
+        UpdateHandler,
+        dialogue::{self, InMemStorage},
+    },
     dptree,
     prelude::Dialogue,
     types::Update,
 };
 
-use crate::{controller::MessageController, error::BotError};
+use crate::error::BotError;
 
 mod register;
 
-pub type MyDialogue = Dialogue<State, ErasedStorage<State>>;
-pub type DialogueStorage = ErasedStorage<State>;
-
-pub type DialogueHandlerError = Box<dyn std::error::Error + Send + Sync>;
+pub type MyDialogue = Dialogue<State, InMemStorage<State>>;
+pub type DialogueStorage = InMemStorage<State>;
 
 #[derive(Clone, Default)]
 pub enum State {
@@ -32,8 +33,7 @@ pub enum State {
 ///
 /// Each branch matches a state and executes its respective endpoint.
 pub fn create_dialogue_handler() -> UpdateHandler<BotError> {
-    Update::filter_message()
-        .filter_map(|msg, bot, req_client| Some(MessageController::new(msg, bot, req_client)))
+    dialogue::enter::<Update, DialogueStorage, State, _>()
         .branch(dptree::case![State::Start])
         .branch(dptree::case![State::RegisterEmail].endpoint(register::handle_register_email))
         .branch(

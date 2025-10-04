@@ -1,12 +1,8 @@
-use crate::{
-    bot::BotResult, controller::MessageController, error::BotError, schemas::event::EventFilter,
-};
+use crate::{bot::BotResult, controller::Controller, error::BotError, schemas::event::EventFilter};
 use event::parse_event_filters;
 use teloxide::{
-    dispatching::{HandlerExt, UpdateFilterExt, UpdateHandler},
+    dispatching::{HandlerExt, UpdateHandler},
     dptree,
-    prelude::Requester,
-    types::Update,
     utils::command::BotCommands,
 };
 
@@ -34,24 +30,18 @@ pub enum Command {
 ///
 /// Each branch matches a command and executes its respective endpoint.
 pub fn create_command_handler() -> UpdateHandler<BotError> {
-    Update::filter_message()
-        .filter_map(|msg, bot, req_client| Some(MessageController::new(msg, bot, req_client)))
-        .branch(
-            dptree::entry()
-                .filter_command::<Command>()
-                .branch(
-                    dptree::case![Command::ListEvents(filters)].endpoint(event::handle_list_events),
-                )
-                .branch(dptree::case![Command::Register].endpoint(user::handle_register))
-                .branch(dptree::case![Command::Login])
-                .branch(dptree::case![Command::Help].endpoint(handle_help_command)),
-        )
+    dptree::entry()
+        .filter_command::<Command>()
+        .branch(dptree::case![Command::ListEvents(filters)].endpoint(event::handle_list_events))
+        .branch(dptree::case![Command::Register].endpoint(user::handle_register))
+        .branch(dptree::case![Command::Login])
+        .branch(dptree::case![Command::Help].endpoint(handle_help_command))
 }
 
-async fn handle_help_command(msg_ctl: MessageController) -> BotResult {
+async fn handle_help_command(msg_ctl: Controller) -> BotResult<()> {
     msg_ctl
-        .bot
-        .send_message(msg_ctl.chat_id, Command::descriptions().to_string())
+        .send_message(&Command::descriptions().to_string())
         .await?;
+
     Ok(())
 }

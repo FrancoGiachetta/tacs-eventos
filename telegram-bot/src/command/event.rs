@@ -4,27 +4,23 @@ use chrono::NaiveDate;
 use lazy_static::lazy_static;
 use regex::Regex;
 use reqwest::StatusCode;
-use teloxide::{prelude::Requester, utils::command::ParseError};
+use teloxide::utils::command::ParseError;
 use tracing::{error, info};
 
 use crate::{
-    bot::BotResult, controller::MessageController, dialogue::MyDialogue,
-    request_client::RequestClientError, schemas::event::EventFilter,
+    bot::BotResult, controller::Controller, request_client::RequestClientError,
+    schemas::event::EventFilter,
 };
 
 /// List open events.
 ///
 /// Sends a GET request looking for all the still open events. The command also
 /// allows to pass arguments to filter events.
-pub async fn handle_list_events(
-    msg_ctl: MessageController,
-    _dialogue: MyDialogue,
-    filters: EventFilter,
-) -> BotResult {
+pub async fn handle_list_events(ctl: Controller, filters: EventFilter) -> BotResult<()> {
     info!("Listing list_events!");
 
-    match msg_ctl
-        .req_client
+    match ctl
+        .request_client()
         .send_get_events_list_request(filters)
         .await
     {
@@ -35,10 +31,7 @@ pub async fn handle_list_events(
                 .collect::<Vec<String>>()
                 .join("\n");
 
-            msg_ctl
-                .bot
-                .send_message(msg_ctl.chat_id, events_msg)
-                .await?;
+            ctl.send_message(&events_msg).await?;
         }
         Err(err) => {
             error!("Got an error while performing the request: {}", err);
@@ -50,12 +43,12 @@ pub async fn handle_list_events(
                         .status()
                         .is_some_and(|e| matches!(e, StatusCode::FORBIDDEN)) =>
                 {
-                    "❌ Ese comando requiere que estes logeado!"
+                    "Ese comando requiere que estes logeado!"
                 }
-                _ => "❌ Hubo un error al ejecutar el comando!",
+                _ => "Hubo un error al ejecutar el comando!",
             };
 
-            msg_ctl.bot.send_message(msg_ctl.chat_id, error_msg).await?;
+            ctl.send_error_message(error_msg).await?;
         }
     }
 

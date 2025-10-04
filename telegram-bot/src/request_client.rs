@@ -2,7 +2,7 @@ use std::{env, time::Duration};
 
 use lazy_static::lazy_static;
 use reqwest::{Client, Response};
-use serde_json::{Value, json};
+use serde_json::Value;
 use thiserror::Error;
 use tracing::info;
 
@@ -107,7 +107,7 @@ impl RequestClient {
         Ok(serde_json::from_value(response)?)
     }
 
-    async fn send_request_with_retry<'req>(
+    pub async fn send_request_with_retry<'req>(
         &self,
         url: String,
         method: RequestMethod<'req>,
