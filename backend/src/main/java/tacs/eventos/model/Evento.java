@@ -9,6 +9,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+
 @NoArgsConstructor
 @Getter
 @Document(collection = "eventos")
@@ -18,19 +21,23 @@ public class Evento {
     private String id;
     @Setter
     @Indexed
+    @NotBlank
     private String titulo;
     @Setter
     private String descripcion;
     @Setter
     private LocalDateTime fechaHoraInicio;
     @Setter
+    @Positive
     private int duracionMinutos;
     @Setter
     private String ubicacion;
     @Setter
+    @Positive
     private int cupoMaximo;
     @Setter
     @Indexed
+    @Positive
     private double precio; // TODO: cambiar el tipo de dato. Debería ser un número de precisión fija. Fijarme si no
     // puedo recibir directamente BigDecimal o algo así en el DTO. Si no, que el front mande un
     // String que cumpla la regex correcta, y el back lo transforme manualmente.
@@ -58,7 +65,7 @@ public class Evento {
     }
 
     public Evento(String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
-                  String ubicacion, int cupoMaximo, double precio, String categoria) {
+            String ubicacion, int cupoMaximo, double precio, String categoria) {
 
         this.id = UUID.randomUUID().toString();
         this.titulo = titulo;
@@ -71,6 +78,21 @@ public class Evento {
         this.categoria = categoria;
     }
 
+    /**
+     * Verifica si el evento permite nuevas inscripciones.
+     *
+     * @param inscritos
+     *            Número actual de inscritos en el evento.
+     *
+     * @return true si el evento está abierto y no ha alcanzado el cupo máximo, false en caso contrario.
+     */
+    public boolean permiteIncripcion(int inscritos) {
+        return abierto && (inscritos < cupoMaximo);
+    }
+
+    /**
+     * Marca el evento como cerrado, impidiendo nuevas inscripciones.
+     */
     public void cerrarEvento() {
         this.abierto = false;
     }

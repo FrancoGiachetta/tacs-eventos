@@ -1,18 +1,28 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { EventoFiltros } from '../types/evento'
 import { CATEGORIAS_EVENTO, type CategoriaEvento } from '../types/categorias'
 
 interface EventFiltersProps {
     onFilterChange: (filtros: EventoFiltros) => void
     onReset: () => void
+    filtrosActuales?: EventoFiltros
 }
 
 export default function EventFilters({
     onFilterChange,
     onReset,
+    filtrosActuales = {},
 }: EventFiltersProps) {
-    const [filtros, setFiltros] = useState<EventoFiltros>({})
-    const [esGratis, setEsGratis] = useState(false)
+    const [filtros, setFiltros] = useState<EventoFiltros>(filtrosActuales)
+    const [esGratis, setEsGratis] = useState(
+        filtrosActuales.precioPesosMax === 0
+    )
+
+    // Sincronizar filtros cuando cambien los valores actuales
+    useEffect(() => {
+        setFiltros(filtrosActuales)
+        setEsGratis(filtrosActuales.precioPesosMax === 0)
+    }, [filtrosActuales])
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
