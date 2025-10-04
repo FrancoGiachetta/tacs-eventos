@@ -7,6 +7,7 @@ import {
     getRolPrincipal,
     RolUsuario,
 } from '../types/usuario'
+import NotificationDropdown from './NotificationDropdown'
 
 export default function BarraSuperior() {
     const [open, setOpen] = useState(false)
@@ -86,29 +87,34 @@ export default function BarraSuperior() {
                             </Link>
                         )}
                     </nav>
-                    <div className="relative">
-                        <button
-                            className="ml-2 rounded-full bg-white/15 px-3 py-1 text-sm hover:bg-white/25"
-                            onClick={() => setOpen((v) => !v)}
-                        >
-                            {usuario.email}
-                        </button>
 
-                        {open && (
-                            <div className="absolute right-0 mt-2 w-48 rounded-md bg-white text-slate-900 shadow-lg">
-                                <div className="flex flex-col p-2 gap-2">
-                                    <div className="px-3 py-1 text-sm text-gray-600 border-b">
-                                        {usuario.email}
+                    <div className="flex items-center gap-4">
+                        <NotificationDropdown />
+
+                        <div className="relative">
+                            <button
+                                className="ml-2 rounded-full bg-white/15 px-3 py-1 text-sm hover:bg-white/25"
+                                onClick={() => setOpen((v) => !v)}
+                            >
+                                {usuario.email}
+                            </button>
+
+                            {open && (
+                                <div className="absolute right-0 mt-2 w-48 rounded-md bg-white text-slate-900 shadow-lg">
+                                    <div className="flex flex-col p-2 gap-2">
+                                        <div className="px-3 py-1 text-sm text-gray-600 border-b">
+                                            {usuario.email}
+                                        </div>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="rounded border px-3 py-1 text-left hover:bg-gray-100"
+                                        >
+                                            Cerrar sesión
+                                        </button>
                                     </div>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="rounded border px-3 py-1 text-left hover:bg-gray-100"
-                                    >
-                                        Cerrar sesión
-                                    </button>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

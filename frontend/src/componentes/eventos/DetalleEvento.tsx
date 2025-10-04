@@ -6,11 +6,13 @@ import FormularioEvento from './FormularioEvento'
 import { toast } from '../../lib/simpleToast'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { useNotifications } from '../../contexts/NotificationContext'
 import { esAdmin, esOrganizador } from '../../types/usuario'
 
 export default function DetalleEvento() {
     let eventoId = useParams().eventoId
     const { usuario } = useAuth()
+    const { agregarNotificacion } = useNotifications()
     const navigate = useNavigate()
 
     let [eventoInfo, setEventoInfo] = useState<Evento | null>(null)
@@ -34,21 +36,50 @@ export default function DetalleEvento() {
             )
 
             // Status 201 = nueva inscripción creada
-            // Status 303 = ya estaba inscripto (redirigido a inscripción existente)
             if (response.status === 201) {
-                toast.success('Inscripción realizada correctamente')
+                // Obtener el estado de la inscripción después de crearla
+                try {
+                    const inscripcionResponse = await api.get(
+                        `/api/v1/evento/${eventoId}/inscripcion/${usuario.id}`
+                    )
+                    const estadoInscripcion = inscripcionResponse.data?.estado
+
+                    if (estadoInscripcion === 'CONFIRMADA') {
+                        toast.success(
+                            '¡Inscripción confirmada! Tienes tu lugar asegurado'
+                        )
+                        agregarNotificacion({
+                            mensaje: `✅ Te has inscrito correctamente al evento "${eventoInfo?.titulo}". Tu lugar está confirmado.`,
+                            tipo: 'success',
+                        })
+                    } else if (estadoInscripcion === 'PENDIENTE') {
+                        toast.info('Inscripción en lista de espera')
+                        agregarNotificacion({
+                            mensaje: `⏳ Te has inscrito al evento "${eventoInfo?.titulo}". Estás en lista de espera, te notificaremos si se libera un lugar.`,
+                            tipo: 'info',
+                        })
+                    } else {
+                        toast.success('Inscripción realizada correctamente')
+                        agregarNotificacion({
+                            mensaje: `✅ Te has inscrito al evento "${eventoInfo?.titulo}".`,
+                            tipo: 'success',
+                        })
+                    }
+                } catch {
+                    // Si falla obtener el estado, mostrar mensaje genérico
+                    toast.success('Inscripción realizada correctamente')
+                    agregarNotificacion({
+                        mensaje: `✅ Te has inscrito al evento "${eventoInfo?.titulo}".`,
+                        tipo: 'success',
+                    })
+                }
+
                 // Redirigir a mis inscripciones después de inscripción exitosa
                 setTimeout(() => {
                     navigate('/mis-inscripciones')
-                }, 1500) // Esperar 1.5s para que el usuario vea el mensaje
+                }, 2000) // Esperar 2s para que el usuario vea el mensaje
             } else if (response.status === 303) {
                 toast.info('Ya estás inscripto a este evento')
-            } else {
-                toast.success('Inscripción confirmada')
-                // Redirigir también en caso de otras respuestas exitosas
-                setTimeout(() => {
-                    navigate('/mis-inscripciones')
-                }, 1500)
             }
         } catch (e: any) {
             // Axios trata 303 como error por defecto, así que manejamos también aquí
