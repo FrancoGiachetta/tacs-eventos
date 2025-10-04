@@ -1,5 +1,7 @@
 package tacs.eventos.controller;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -9,14 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import tacs.eventos.controller.validadores.Validador;
 import tacs.eventos.controller.validadores.ValidadorAutorizacionUsuario;
 import tacs.eventos.dto.*;
 import tacs.eventos.model.Evento;
-import tacs.eventos.model.InscripcionEnWaitlist;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
@@ -31,11 +29,9 @@ import tacs.eventos.service.UsuarioService;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
+import static tacs.eventos.dto.EstadoInscripcionMapper.mapEstado;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -242,12 +238,12 @@ public class EventoController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        if (this.inscripcionesService.buscarInscripcionConfirmada(usuarioInscripto, evento).isPresent())
-            return ResponseEntity.ok(InscripcionResponse.confirmada(evento.getId()));
-        else if (this.inscripcionesService.inscripcionEstaEnWaitlist(evento, usuarioInscripto))
-            return ResponseEntity.ok(InscripcionResponse.enWaitlist(evento.getId()));
-        else
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El usuario no está inscripto al evento");
+        Optional<InscripcionEvento> inscripcion = inscripcionesService.inscripcionParaUsuarioYEvento(usuarioInscripto,
+                evento);
+        return inscripcion.filter(i -> i.getEstado() != EstadoInscripcion.CANCELADA)
+                .map(i -> new InscripcionResponse(i.getEvento().getId(), mapEstado(i.getEstado())))
+                .map(ResponseEntity::ok).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "El usuario no está inscripto al evento"));
     }
 
     /**
@@ -354,11 +350,15 @@ public class EventoController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador");
         }
 
-        return ResponseEntity.ok(this.inscripcionesService.buscarWaitlistDeEvento(evento).getItems().stream()
-                .map((InscripcionEnWaitlist i) -> {
-                    var usuarioResponse = new UsuarioResponse(i.getCandidato().getId(), i.getCandidato().getEmail(),
-                            i.getCandidato().getRoles());
-                    return new InscripcionEnWaitlistResponse(usuarioResponse, i.getFechaIngreso());
+        return ResponseEntity
+                .ok(this.inscripcionesService.inscripcionesPendientes(evento).stream().map((InscripcionEvento i) -> {
+                    var usuarioResponse = new UsuarioResponse(i.getParticipante().getId(),
+                            i.getParticipante().getEmail(), i.getParticipante().getRoles());
+                    return new InscripcionEnWaitlistResponse(usuarioResponse, i.getFechaHoraIngresoAWaitlist().orElse(
+                            null)); /*
+                                     * La fechaHora de ingreso a watilist no debería ser nunca null en este caso, porque
+                                     * estamos buscando las inscripciones pendientes, o sea, las que están en watilist
+                                     */
                 }).toList());
     }
 

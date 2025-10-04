@@ -47,7 +47,7 @@ public class EstadisticaService {
             int totalInscripcionesEnWaitlist;
             TotalInscripcionesEvento = this.inscripcionesRepository.getInscripcionesPorEvento(evento).size();
             eventoWaitlist = this.waitlistRepository.waitlist(evento);
-            totalInscripcionesEnWaitlist = eventoWaitlist.getItems().size();
+            totalInscripcionesEnWaitlist = eventoWaitlist.cantidadEnCola(); // TODO: reemplazar por llamada a repo
             calculoTasa = (TotalInscripcionesEvento / totalInscripcionesEnWaitlist) * 100;
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "El evento ya fue cerrado");

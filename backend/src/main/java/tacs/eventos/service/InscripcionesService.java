@@ -2,12 +2,9 @@ package tacs.eventos.service;
 
 import lombok.AllArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
-import tacs.eventos.model.Waitlist;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
 import tacs.eventos.repository.WaitlistRepository;
@@ -45,12 +42,13 @@ public class InscripcionesService {
     public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario)
             throws InterruptedException, ExecutionException {
         Optional<InscripcionEvento> inscripcion = inscripcionAsyncService
-                .intentarInscribir(InscripcionFactory.directa(usuario, evento)).get();
+                .intentarInscribir(InscripcionFactory.confirmada(usuario, evento)).get();
 
         // Primero intenta inscribirlo directamente. Si no, lo manda a la waitlist.
         return inscripcion.or(() -> {
-            Waitlist waitlist = waitlistRepository.waitlist(evento);
-            waitlist.agregar(usuario);
+            InscripcionEvento inscripcionEvento = InscripcionFactory.pendiente(usuario, evento);
+            inscripcionesRepository.guardarInscripcion(inscripcionEvento);
+            waitlistRepository.waitlist(evento).agregar(inscripcionEvento.getId());
             return Optional.empty();
         });
     }
@@ -64,14 +62,12 @@ public class InscripcionesService {
      * @param usuario
      */
     public void cancelarInscripcion(Evento evento, Usuario usuario) {
-        // Si el usuario estaba inscripto, cancela su inscripción. Si no, intenta
-        // sacarlo de la waitlist.
-        var inscripcionConfirmada = inscripcionesRepository.getInscripcionConfirmada(usuario, evento);
-        inscripcionConfirmada.ifPresentOrElse(InscripcionEvento::cancelar,
-                () -> waitlistRepository.waitlist(evento).anularInscripcion(usuario));
-        if (inscripcionConfirmada.isPresent()) { // Si se eliminó una inscripción confirmada (se liberó un lugar)
-            // Promueve al próximo de la waitlist (si hay alguien). Hace esto en forma
-            // asincrónica, porque es una acción
+        // Si el usuario estaba inscripto, cancela su inscripción. Si no, intenta sacarlo de la waitlist.
+        var inscripcion = inscripcionesRepository.getInscripcionParaUsuarioYEvento(usuario, evento);
+        var estabaConfirmada = inscripcion.map(InscripcionEvento::estaConfirmada).orElse(false);
+        inscripcion.ifPresent(InscripcionEvento::cancelar);
+        if (estabaConfirmada) { // Si se eliminó una inscripción confirmada (se liberó un lugar)
+            // Promueve al próximo de la waitlist (si hay alguien). Hace esto en forma asincrónica, porque es una acción
             // que
             // puede tardar (ya que la inscripción está sincronizada por evento), y al
             // usuario que canceló su
@@ -89,38 +85,29 @@ public class InscripcionesService {
      * @return si el usuario está en la waitlist o tiene una inscripción confirmada para ese evento
      */
     public boolean inscripcionConfirmadaOEnWaitlist(Evento evento, Usuario usuario) {
-        return inscripcionEstaConfirmada(evento, usuario) || inscripcionEstaEnWaitlist(evento, usuario);
+        return inscripcionesRepository.getInscripcionParaUsuarioYEvento(usuario, evento)
+                .map(i -> i.estaConfirmada() || i.estaPendiente()).orElse(false);
     }
 
     /**
      * @param evento
-     * @param usuario
      *
-     * @return true si un usuario tiene una inscripción confirmada para el evento
+     * @return todas las inscripciones (confirmadas, canceladas, o pendientes) de ese evento
      */
-    public boolean inscripcionEstaConfirmada(Evento evento, Usuario usuario) {
-        return buscarInscripcionConfirmada(usuario, evento).isPresent();
-    }
-
-    /**
-     * @param evento
-     * @param usuario
-     *
-     * @return true si el usuario está en la waitlist del evento, false si no
-     */
-    public boolean inscripcionEstaEnWaitlist(Evento evento, Usuario usuario) {
-        return waitlistRepository.waitlist(evento).contiene(usuario);
-    }
-
-    public Optional<InscripcionEvento> buscarInscripcionConfirmada(Usuario usuario, Evento evento) {
-        return inscripcionesRepository.getInscripcionConfirmada(usuario, evento);
-    }
-
     public List<InscripcionEvento> buscarInscripcionesDeEvento(Evento evento) {
         return inscripcionesRepository.getInscripcionesPorEvento(evento);
     }
 
-    public Waitlist buscarWaitlistDeEvento(Evento evento) {
-        return waitlistRepository.waitlist(evento);
+    /**
+     * @param evento
+     *
+     * @return las inscripciones pendientes de ese evento
+     */
+    public List<InscripcionEvento> inscripcionesPendientes(Evento evento) {
+        return inscripcionesRepository.getInscripcionesPendientes(evento);
+    }
+
+    public Optional<InscripcionEvento> inscripcionParaUsuarioYEvento(Usuario usuarioInscripto, Evento evento) {
+        return inscripcionesRepository.getInscripcionParaUsuarioYEvento(usuarioInscripto, evento);
     }
 }

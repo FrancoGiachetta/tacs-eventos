@@ -1,7 +1,5 @@
 package tacs.eventos.service;
 
-import lombok.AllArgsConstructor;
-
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -12,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
-import tacs.eventos.model.inscripcion.InscripcionFactory;
 import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 
@@ -36,8 +33,8 @@ public class InscripcionAsyncService {
      */
     @Async
     public void inscribirProximo(Evento evento) {
-        waitlistRepository.waitlist(evento).proximo()
-                .map(inscripcionEnWaitlist -> InscripcionFactory.desdeWaitlist(evento, inscripcionEnWaitlist))
+        waitlistRepository.waitlist(evento).proximo().flatMap(inscripcionesRepository::getInscripcionPorId)
+                .filter(InscripcionEvento::estaPendiente) // Solo inscribo si sigue pendiente
                 .ifPresent(this::intentarInscribir);
     }
 
