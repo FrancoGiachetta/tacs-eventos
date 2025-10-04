@@ -4,6 +4,17 @@ Proyecto de la materia **TACS** - Gestión de Eventos con **Spring Boot** y **Re
 
 Sistema completo de gestión de eventos con roles de usuario (Admin, Organizador, Usuario), inscripciones, waitlist y panel de administración.
 
+## [Temporal] Prerequisito: levantar los servicios de bases de datos
+### 1. Levantar Redis
+Ejecutar el siguiente comando de docker:
+```bash
+docker run -p 6379:6379 --name redis-app-eventos -d redis redis-server --appendonly yes
+```
+### 2. Levantar MongoDB
+```bash
+docker run -d -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=nraboy -e MONGO_INITDB_ROOT_PASSWORD=password1234 --name mongodb mongodb/mongodb-community-server:latest
+```
+
 ## 🐳 Ejecución con Docker (Recomendado)
 
 ### Prerequisitos
