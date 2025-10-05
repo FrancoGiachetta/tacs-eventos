@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNotifications } from '../contexts/NotificationContext'
 
 export default function ToastNotifications() {
-    const { notificaciones } = useNotifications()
+    const { notificaciones, marcarComoLeida } = useNotifications()
     const [toastsVisibles, setToastsVisibles] = useState<string[]>([])
 
     useEffect(() => {
@@ -28,6 +28,8 @@ export default function ToastNotifications() {
 
     const removerToast = (id: string) => {
         setToastsVisibles((prev) => prev.filter((toastId) => toastId !== id))
+        // También marcar la notificación como leída para evitar que reaparezca
+        marcarComoLeida(id)
     }
 
     const getIconoTipo = (tipo: string) => {

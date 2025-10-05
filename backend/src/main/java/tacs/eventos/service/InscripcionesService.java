@@ -107,6 +107,53 @@ public class InscripcionesService {
         return inscripcionesRepository.getInscripcionesPendientes(evento);
     }
 
+    /**
+     * Intenta inscribir al usuario directamente al evento (sin pasar por la waitlist).
+     *
+     * @param inscripcion
+     *            la inscripción que se quiere intentar realizar
+     *
+     * @return la inscripción realizada, o un Optional vacío si no pudo realizar la inscripción porque no había lugar
+     */
+    private Optional<InscripcionEvento> intentarInscribir(InscripcionEvento inscripcion) {
+        // Sincronizo la inscripción por evento. Esto es para evitar que entre el momento en el que se chequeó si había
+        // lugar, y se persistió la inscripción en la base, el evento justo alcance la capacidad máxima. Si eso ocurre,
+        // la cantidad de inscriptos en un evento puede superar el cupo máximo, y eso nunca puede pasar.
+        // TODO: esta forma de lockear en realidad no está del todo OK porque lockea por objeto físico. Nada nos asegura
+        // que no se instance el evento con el mismo id en otro hilo, y no se actualice al mismo tiempo. De todas
+        // formas, capaz deberíamos usar otra estrategia de lockeo más liviana como usar un número de versión (como hace
+        // hibernate) o el hash del estado interno del evento (como lo que vimos en la clase de API REST que se hace con
+        // el ETag.
+        synchronized (inscripcion.getEvento()) {
+            int inscriptos = this.inscripcionesRepository.cantidadInscriptos(inscripcion.getEvento());
+            if (!inscripcion.getEvento().permiteIncripcion(inscriptos))
+                return Optional.empty();
+            inscripcionesRepository.guardarInscripcion(inscripcion);
+            return Optional.of(inscripcion);
+        }
+    }
+
+    /**
+     * Promueve al próximo de la waitlist a inscripción, si es que hay alguien en la waitlist. Este métod0 es
+     * asincrónico.
+     *
+     * @param evento
+     */
+    @Async
+    protected void inscribirProximo(Evento evento) {
+        waitlistRepository.waitlist(evento).proximo().flatMap(inscripcionesRepository::getInscripcionPorId)
+                .filter(InscripcionEvento::estaPendiente) // Solo inscribo si sigue pendiente
+                .ifPresent(inscripcion -> {
+                    // Verifico si hay lugar disponible antes de promocionar
+                    synchronized (evento) {
+                        int inscriptos = this.inscripcionesRepository.cantidadInscriptos(evento);
+                        if (evento.permiteIncripcion(inscriptos)) {
+                            inscripcion.confirmar(); // Cambio el estado de PENDIENTE a CONFIRMADA (sin duplicar)
+                        }
+                    }
+                });
+    }
+
     public Optional<InscripcionEvento> inscripcionParaUsuarioYEvento(Usuario usuarioInscripto, Evento evento) {
         return inscripcionesRepository.getInscripcionParaUsuarioYEvento(usuarioInscripto, evento);
     }
