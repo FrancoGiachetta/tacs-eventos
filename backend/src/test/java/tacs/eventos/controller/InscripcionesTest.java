@@ -4,14 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import tacs.eventos.config.TestMongoConfiguration;
 import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
@@ -24,6 +29,8 @@ import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
 import tacs.eventos.service.WaitlistService;
 import tacs.eventos.service.inscripciones.CupoEventoService;
+import tacs.eventos.config.TestRedisConfiguration;
+
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
@@ -40,6 +47,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Import({TestRedisConfiguration.class, TestMongoConfiguration.class})
+@ActiveProfiles("test")
+@Testcontainers
 public class InscripcionesTest {
 
     @Autowired
