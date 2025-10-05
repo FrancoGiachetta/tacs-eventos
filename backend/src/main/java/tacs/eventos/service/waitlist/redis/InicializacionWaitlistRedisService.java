@@ -26,6 +26,9 @@ public class InicializacionWaitlistRedisService {
     void inicializarWaitlist(Evento evento, Waitlist waitlistAInicializar) {
         /* Avisa que está inicializando esta cola, para que ninguna otra instancia de este servicio intente hacerlo */
         flagsInicializacion.setEstadoInicializacion(flagInicializacionCola(evento), INICIALIZANDO);
+        /* TODO: esta operación de inicialización es muy pesada. Capaz estaría bueno activar en Redis la característica
+            de snapshots, aof, o algún otro tipo de backup a disco, y después, en esta inicialización, hacer un peek
+            a la última inscripción en la cola Redis, y solamente insertar las posteriores a esa */
         /* Busca a todos los pendientes y los inserta en la waitlist en el orden correspondiente */
         List<InscripcionEvento> inscripcionesPendientes = inscripcionesRepository
                 .findByEventoAndEstadoOrderByFechaHoraIngresoAWaitlist(evento, EstadoInscripcion.PENDIENTE);
