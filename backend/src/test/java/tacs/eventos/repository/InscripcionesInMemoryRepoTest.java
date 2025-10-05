@@ -40,10 +40,10 @@ class InscripcionesInMemoryRepoTest {
 
     @Test
     void todos() {
-//        var inscripciones = this.repo.todos();
-//        assertTrue(inscripciones.contains(this.i1));
-//        assertTrue(inscripciones.contains(this.i2));
-//        assertTrue(inscripciones.contains(this.i3));
+        // var inscripciones = this.repo.todos();
+        // assertTrue(inscripciones.contains(this.i1));
+        // assertTrue(inscripciones.contains(this.i2));
+        // assertTrue(inscripciones.contains(this.i3));
     }
 
     @Test

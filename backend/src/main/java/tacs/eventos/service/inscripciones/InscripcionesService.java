@@ -30,10 +30,14 @@ public class InscripcionesService {
      *
      * @param evento
      * @param usuario
+     *
      * @return la inscripción generada si pudo inscribirlo, o un Optional vacío si lo mandó a la waitlist.
-     * @throws EventoCerradoException si el evento está cerrado y ya no recibe inscripciones
+     *
+     * @throws EventoCerradoException
+     *             si el evento está cerrado y ya no recibe inscripciones
      */
-    public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario) throws EventoCerradoException {
+    public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario)
+            throws EventoCerradoException {
         if (!evento.isAbierto())
             throw new EventoCerradoException(evento);
         // Primero intenta inscribirlo directamente. Si no, lo manda a la waitlist.
@@ -63,10 +67,12 @@ public class InscripcionesService {
         inscripcion.cancelar();
         inscripcionesRepository.save(inscripcion);
         if (estabaConfirmada) { // Si se eliminó una inscripción confirmada (se liberó un lugar)
-            /* Promueve al próximo de la waitlist (si hay alguien). Hace esto en forma asincrónica, porque es una acción
-             que puede tardar (ya que la inscripción está sincronizada por evento), y al usuario que canceló su
-             inscripción le tenemos que devolver en el momento el response confirmandole que su incscipción fue
-             cancelada. */
+            /*
+             * Promueve al próximo de la waitlist (si hay alguien). Hace esto en forma asincrónica, porque es una acción
+             * que puede tardar (ya que la inscripción está sincronizada por evento), y al usuario que canceló su
+             * inscripción le tenemos que devolver en el momento el response confirmandole que su incscipción fue
+             * cancelada.
+             */
             cupoEventoService.devolverCupo(evento);
             inscribirProximo(evento);
         }
@@ -75,6 +81,7 @@ public class InscripcionesService {
     /**
      * @param evento
      * @param usuario
+     *
      * @return si el usuario está en la waitlist o tiene una inscripción confirmada para ese evento
      */
     public Optional<InscripcionEvento> inscripcionNoCancelada(Evento evento, Usuario usuario) {
@@ -83,6 +90,7 @@ public class InscripcionesService {
 
     /**
      * @param evento
+     *
      * @return todas las inscripciones (confirmadas, canceladas, o pendientes) de ese evento
      */
     public List<InscripcionEvento> inscripcionesConfirmadas(Evento evento) {
@@ -91,6 +99,7 @@ public class InscripcionesService {
 
     /**
      * @param evento
+     *
      * @return las inscripciones pendientes de ese evento
      */
     public List<InscripcionEvento> inscripcionesPendientes(Evento evento) {
@@ -100,9 +109,11 @@ public class InscripcionesService {
     /**
      * Intenta inscribir al usuario directamente al evento (sin pasar por la waitlist).
      *
-     * @param inscripcion la inscripción que se quiere intentar realizar
+     * @param inscripcion
+     *            la inscripción que se quiere intentar realizar
+     *
      * @return la inscripción realizada, o un Optional vacío si no pudo realizar la inscripción porque no había lugar o
-     * porque el evento fue cerrado.
+     *         porque el evento fue cerrado.
      */
     private Optional<InscripcionEvento> intentarInscribir(InscripcionEvento inscripcion) {
         boolean hayCupo = cupoEventoService.obtenerCupo(inscripcion.getEvento());
@@ -124,8 +135,10 @@ public class InscripcionesService {
      *
      * @param evento
      */
-    /* TODO: hacer esto N veces, por si por algún error en el sistema habían quedado lugares libres en el
-        evento sin llenar */
+    /*
+     * TODO: hacer esto N veces, por si por algún error en el sistema habían quedado lugares libres en el evento sin
+     * llenar
+     */
     @Async
     protected void inscribirProximo(Evento evento) {
         waitlistService.waitlist(evento).proxima().ifPresent(this::intentarInscribir);

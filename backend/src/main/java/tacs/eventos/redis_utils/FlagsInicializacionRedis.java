@@ -17,8 +17,7 @@ public class FlagsInicializacionRedis {
 
     public EstadoInicializacionRedis getEstadoInicializacion(String flagInicializacion) {
         RBucket<String> flagInicializacionCola = redisson.getBucket(flagInicializacion, new JsonJacksonCodec());
-        return Optional.ofNullable(flagInicializacionCola.get())
-                .map(EstadoInicializacionRedis::valueOf)
+        return Optional.ofNullable(flagInicializacionCola.get()).map(EstadoInicializacionRedis::valueOf)
                 .orElse(NO_INICIALIZADO);
     }
 

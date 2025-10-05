@@ -45,18 +45,18 @@ public class InscripcionEvento {
     private EstadoInscripcion estado;
 
     /**
-     * NO USAR, PUBLICA PARA TESTING, usar los métod0s de la clase InscripcionFactory.
-     * Crea una nueva inscripción.
+     * NO USAR, PUBLICA PARA TESTING, usar los métod0s de la clase InscripcionFactory. Crea una nueva inscripción.
      *
      * @param participante
      * @param evento
      * @param fechaHoraIngresoAWaitlist
      * @param fechaHoraConfirmacion
      * @param estado
+     *
      * @return
      */
     public static InscripcionEvento crearNueva(Usuario participante, Evento evento,
-                                               LocalDateTime fechaHoraIngresoAWaitlist, LocalDateTime fechaHoraConfirmacion, EstadoInscripcion estado) {
+            LocalDateTime fechaHoraIngresoAWaitlist, LocalDateTime fechaHoraConfirmacion, EstadoInscripcion estado) {
         return new InscripcionEvento(UUID.randomUUID().toString(), participante, evento, fechaHoraIngresoAWaitlist,
                 fechaHoraConfirmacion, null, estado);
     }

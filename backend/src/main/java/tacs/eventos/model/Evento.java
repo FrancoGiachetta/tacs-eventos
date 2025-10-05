@@ -50,7 +50,7 @@ public class Evento {
     private Usuario organizador;
 
     public Evento(String id, String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
-                  String ubicacion, int cupoMaximo, double precio, String categoria, boolean abierto, Usuario organizador) {
+            String ubicacion, int cupoMaximo, double precio, String categoria, boolean abierto, Usuario organizador) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;

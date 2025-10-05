@@ -24,53 +24,63 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
      *
      * @param participante
      * @param estado
+     *
      * @return
      */
     List<InscripcionEvento> findByParticipanteAndEstadoNot(Usuario participante, EstadoInscripcion estado);
 
     Optional<InscripcionEvento> findFirstByParticipanteAndEventoAndEstadoNot(Usuario participante, Evento evento,
-                                                                             EstadoInscripcion estado);
+            EstadoInscripcion estado);
 
     /**
      * @param evento
+     *
      * @return todas las inscripciones (confirmadas, canceladas, o pendientes) de ese evento
      */
     List<InscripcionEvento> findByEventoAndEstado(Evento evento, EstadoInscripcion estado);
 
     /**
-     * Obtiene todas las inscripciones pendientes para ese evento que hayan sido agregadas a la waitlist
-     * después de la fecha pasada por parámetro, ordenadas por fecha de adición.
+     * Obtiene todas las inscripciones pendientes para ese evento que hayan sido agregadas a la waitlist después de la
+     * fecha pasada por parámetro, ordenadas por fecha de adición.
      *
      * @param evento
      * @param fechaHoraIngresoAWaitlist
+     *
      * @return
      */
-    default List<InscripcionEvento> pendientesPosterioresALaFechaOrdenados(Evento evento, LocalDateTime fechaHoraIngresoAWaitlist) {
-        return findByEventoAndEstadoAndFechaHoraIngresoAWaitlistGreaterThanEqualOrderByFechaHoraIngresoAWaitlist(evento, EstadoInscripcion.PENDIENTE, fechaHoraIngresoAWaitlist);
+    default List<InscripcionEvento> pendientesPosterioresALaFechaOrdenados(Evento evento,
+            LocalDateTime fechaHoraIngresoAWaitlist) {
+        return findByEventoAndEstadoAndFechaHoraIngresoAWaitlistGreaterThanEqualOrderByFechaHoraIngresoAWaitlist(evento,
+                EstadoInscripcion.PENDIENTE, fechaHoraIngresoAWaitlist);
     }
 
     /**
-     * Obtiene todas las inscripciones para ese evento, en ese estado, que hayan sido agregadas a la waitlist en una fecha
-     * posterior a la pasada por parámetro, ordenadas por fechaHoraIngresoAWaitlist.
+     * Obtiene todas las inscripciones para ese evento, en ese estado, que hayan sido agregadas a la waitlist en una
+     * fecha posterior a la pasada por parámetro, ordenadas por fechaHoraIngresoAWaitlist.
      *
      * @param evento
      * @param estado
      * @param fechaHoraIngresoAWaitlist
+     *
      * @return
      */
-    List<InscripcionEvento> findByEventoAndEstadoAndFechaHoraIngresoAWaitlistGreaterThanEqualOrderByFechaHoraIngresoAWaitlist(Evento evento, EstadoInscripcion estado, LocalDateTime fechaHoraIngresoAWaitlist);
+    List<InscripcionEvento> findByEventoAndEstadoAndFechaHoraIngresoAWaitlistGreaterThanEqualOrderByFechaHoraIngresoAWaitlist(
+            Evento evento, EstadoInscripcion estado, LocalDateTime fechaHoraIngresoAWaitlist);
 
     /**
      * Obtiene todas las inscripciones para ese evento, en ese estado, ordenadas por fechaHoraIngresoAWaitlist.
      *
      * @param evento
      * @param estado
+     *
      * @return
      */
-    List<InscripcionEvento> findByEventoAndEstadoOrderByFechaHoraIngresoAWaitlist(Evento evento, EstadoInscripcion estado);
+    List<InscripcionEvento> findByEventoAndEstadoOrderByFechaHoraIngresoAWaitlist(Evento evento,
+            EstadoInscripcion estado);
 
     /**
      * @param evento
+     *
      * @return cantidad de inscripciones confirmadas para ese evento
      */
     int countByEvento(Evento evento);
@@ -80,6 +90,7 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
      *
      * @param usuarioInscripto
      * @param evento
+     *
      * @return la inscripción, o un Optional vacío si no existe una que no cumpla con las condiciones
      */
     default Optional<InscripcionEvento> noCanceladaParaParticipanteYEvento(Usuario usuarioInscripto, Evento evento) {
@@ -88,6 +99,7 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
 
     /**
      * @param participante
+     *
      * @return las inscripciones no canceladas de ese participante
      */
     default List<InscripcionEvento> noCanceladasDeParticipante(Usuario participante) {
@@ -97,6 +109,7 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
     /**
      * @param evento
      * @param estadoInscripcion
+     *
      * @return cantidad de inscripciones en ese estado para ese evento
      */
     int countByEventoAndEstado(Evento evento, EstadoInscripcion estadoInscripcion);
@@ -108,9 +121,6 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
     /**
      * @return todos los eventos que tengan inscripciones creadas (en cualquier estado)
      */
-    @Aggregation(pipeline = {
-            "{ '$group': { '_id': '$evento' } }",
-            "{ '$replaceRoot': { 'newRoot': '$_id' } }"
-    })
+    @Aggregation(pipeline = { "{ '$group': { '_id': '$evento' } }", "{ '$replaceRoot': { 'newRoot': '$_id' } }" })
     Stream<Evento> eventosConInscripciones();
 }

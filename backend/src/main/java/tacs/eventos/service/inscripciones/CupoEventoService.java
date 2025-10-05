@@ -18,13 +18,16 @@ public class CupoEventoService {
     private final InscripcionesRepository inscripcionesRepository;
     private final FlagsInicializacionRedis inicializacionRedis;
 
-    /* TODO: manejar caso de que el organizador del evento modifique el cupo máximo del evento. Tendríamos que volver
-    a inicializar el semáforo, o invalidarlo seteándole el estado NO_INICIALIZADO */
+    /*
+     * TODO: manejar caso de que el organizador del evento modifique el cupo máximo del evento. Tendríamos que volver a
+     * inicializar el semáforo, o invalidarlo seteándole el estado NO_INICIALIZADO
+     */
 
     /**
      * Intenta obtener un cupo para el evento. Si no hay cupo, retorna false. Si hay cupo, reserva uno y retorna true.
      *
      * @param evento
+     *
      * @return si se logró obtener un cupo
      */
     public boolean obtenerCupo(Evento evento) {
@@ -53,8 +56,10 @@ public class CupoEventoService {
             try {
                 sincronizacionInicializacionSemaforo(evento).await();
             } catch (InterruptedException e) {
-                /* TODO: ver cómo hacemos el logueo (recordar que tenemos muchas instancias, y encima usamos docker,
-                 *   así que es inviable escribir en un archivo) */
+                /*
+                 * TODO: ver cómo hacemos el logueo (recordar que tenemos muchas instancias, y encima usamos docker, así
+                 * que es inviable escribir en un archivo)
+                 */
                 e.printStackTrace();
                 inicializarSemaforo(evento); // Si hubo un error, lo hago yo
             }

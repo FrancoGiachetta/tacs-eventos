@@ -14,7 +14,7 @@ import tacs.eventos.repository.usuario.UsuarioRepository;
 import java.util.Set;
 
 @SpringBootApplication(exclude = {
-        org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration.class})
+        org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration.class })
 @EnableAsync
 public class EventosApplication {
 

@@ -17,7 +17,8 @@ public class WaitlistRedis implements Waitlist {
     protected final Queue<String> items;
     protected final InscripcionesRepository inscripcionesRepository;
 
-    public WaitlistRedis(Evento evento, RedissonClient redisson, String prefijoIdDeCola, InscripcionesRepository inscripcionesRepository) {
+    public WaitlistRedis(Evento evento, RedissonClient redisson, String prefijoIdDeCola,
+            InscripcionesRepository inscripcionesRepository) {
         this.redisson = redisson;
         this.evento = evento;
         this.inscripcionesRepository = inscripcionesRepository;

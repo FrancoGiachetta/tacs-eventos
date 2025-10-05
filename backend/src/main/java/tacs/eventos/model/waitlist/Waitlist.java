@@ -11,7 +11,8 @@ public interface Waitlist {
     /**
      * Agrega a la waitlist una inscripción.
      *
-     * @param idInscripcion id de una inscripción pendiente que ya fue registrada en el sistema
+     * @param idInscripcion
+     *            id de una inscripción pendiente que ya fue registrada en el sistema
      */
     void agregar(String idInscripcion);
 

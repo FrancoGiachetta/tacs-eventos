@@ -26,8 +26,7 @@ public class RedisWaitlistService implements WaitlistService {
         if (inicializacion.estadoInicializacionWaitlist(evento) == NO_INICIALIZADO)
             inicializacion.inicializarWaitlist(evento, watilistPermanente(evento));
 
-        return inicializacion.estadoInicializacionWaitlist(evento) == LISTO
-                ? watilistPermanente(evento)
+        return inicializacion.estadoInicializacionWaitlist(evento) == LISTO ? watilistPermanente(evento)
                 : waitlistTemporal(evento);
     }
 

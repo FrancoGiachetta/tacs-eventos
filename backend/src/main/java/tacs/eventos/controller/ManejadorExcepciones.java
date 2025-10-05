@@ -28,8 +28,8 @@ public class ManejadorExcepciones {
     @ExceptionHandler(EventoCerradoException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleEventoCerrado(EventoCerradoException e) {
-        return new ErrorResponse(List.of(
-                new Error(null, "El evento " + e.evento.getTitulo() + " no permite inscripciones")));
+        return new ErrorResponse(
+                List.of(new Error(null, "El evento " + e.evento.getTitulo() + " no permite inscripciones")));
     }
 
 }
