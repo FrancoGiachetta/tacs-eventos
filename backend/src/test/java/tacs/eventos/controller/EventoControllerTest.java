@@ -97,7 +97,6 @@ class EventoControllerTest {
         Mockito.when(modelMapper.map(e1, EventoResponse.class)).thenReturn(r1);
         Mockito.when(modelMapper.map(e2, EventoResponse.class)).thenReturn(r2);
 
-
         Authentication auth = new UsernamePasswordAuthenticationToken(usuario, null);
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
@@ -115,45 +114,31 @@ class EventoControllerTest {
 
         Mockito.when(modelMapper.map(any(CreacionEventoRequest.class), any())).thenReturn(e1);
 
-        assertDoesNotThrow(() ->
-            mockMvc.perform(post("/api/v1/evento")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request))
-                    .principal(() -> usuario.getId())
-                    .header("Authorization", "Bearer token")) // simula usuario autenticado
+        assertDoesNotThrow(() -> mockMvc
+                .perform(post("/api/v1/evento").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)).principal(() -> usuario.getId())
+                        .header("Authorization", "Bearer token")) // simula usuario autenticado
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString("/api/v1/evento")))
-        );
+                .andExpect(header().string("Location", containsString("/api/v1/evento"))));
     }
 
     @Test
     void obtenerEvento_existente_devuelve200() throws Exception {
-        assertDoesNotThrow(() ->
-            mockMvc.perform(get("/api/v1/evento/e1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is("e1")))
-                .andExpect(jsonPath("$.titulo", is("Concierto")))
-        );
+        assertDoesNotThrow(() -> mockMvc.perform(get("/api/v1/evento/e1")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is("e1"))).andExpect(jsonPath("$.titulo", is("Concierto"))));
     }
 
     @Test
     void obtenerEvento_inexistente_devuelve404() throws Exception {
         Mockito.when(eventoService.buscarEventoPorId("noExiste")).thenReturn(Optional.empty());
 
-        assertDoesNotThrow(() ->
-            mockMvc.perform(get("/api/v1/evento/noExiste"))
-                .andExpect(status().isNotFound())
-        );
+        assertDoesNotThrow(() -> mockMvc.perform(get("/api/v1/evento/noExiste")).andExpect(status().isNotFound()));
     }
 
     @Test
     void listarEventos_sinFiltros_devuelveLista() throws Exception {
-        assertDoesNotThrow(() ->
-            mockMvc.perform(get("/api/v1/evento"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is("e1")))
-                .andExpect(jsonPath("$[1].id", is("e2")))
-        );
+        assertDoesNotThrow(() -> mockMvc.perform(get("/api/v1/evento")).andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2))).andExpect(jsonPath("$[0].id", is("e1")))
+                .andExpect(jsonPath("$[1].id", is("e2"))));
     }
 }

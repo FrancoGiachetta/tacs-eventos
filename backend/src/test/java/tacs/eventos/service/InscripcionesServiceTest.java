@@ -40,7 +40,7 @@ class InscripcionesServiceTest {
     private Usuario u1 = new Usuario("test@mail.com", "hash", Set.of(RolUsuario.USUARIO));
     private Usuario u2 = new Usuario("test2@mail.com", "hash", Set.of(RolUsuario.USUARIO));
 
-    private Evento e1= new Evento("Concierto", "", LocalDateTime.now(), 100, "", 10, 100, "Musica");
+    private Evento e1 = new Evento("Concierto", "", LocalDateTime.now(), 100, "", 10, 100, "Musica");
     private Evento e2 = new Evento("Partido", "", LocalDateTime.now(), 100, "", 10, 100, "Deportes");
 
     private InscripcionEvento i1 = InscripcionFactory.confirmada(u1, e1);
@@ -87,11 +87,8 @@ class InscripcionesServiceTest {
     void cancelarInscripcion() {
         inscripcionesService.cancelarInscripcion(e2, u2);
         assertEquals(EstadoInscripcion.CANCELADA, i2.getEstado());
-        assertDoesNotThrow(() ->
-            Mockito.verify(waitlistRepository, Mockito.atLeastOnce()).waitlist(e2)
-        );
-        assertDoesNotThrow(() ->
-            Mockito.verify(inscripcionesRepository, Mockito.atLeastOnce()).getInscripcionPorId("proximo2")
-        );
+        assertDoesNotThrow(() -> Mockito.verify(waitlistRepository, Mockito.atLeastOnce()).waitlist(e2));
+        assertDoesNotThrow(
+                () -> Mockito.verify(inscripcionesRepository, Mockito.atLeastOnce()).getInscripcionPorId("proximo2"));
     }
 }

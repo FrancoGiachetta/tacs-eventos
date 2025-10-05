@@ -42,16 +42,16 @@ public class EstadisticaService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
         int calculoTasa = 0;
 
-            if (evento.getEstado() == EstadoEvento.ABIERTO) {
-                int TotalInscripcionesEvento;
-                Waitlist eventoWaitlist;
-                int totalInscripcionesEnWaitlist;
-                TotalInscripcionesEvento = this.inscripcionesRepository.getInscripcionesPorEvento(evento).size();
-                eventoWaitlist = this.waitlistRepository.waitlist(evento);
-                totalInscripcionesEnWaitlist = eventoWaitlist.cantidadEnCola(); // TODO: reemplazar por llamada a repo
-                calculoTasa = (TotalInscripcionesEvento / totalInscripcionesEnWaitlist) * 100;
-        } else  {
-                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "El evento ya fue cerrado");
+        if (evento.getEstado() == EstadoEvento.ABIERTO) {
+            int TotalInscripcionesEvento;
+            Waitlist eventoWaitlist;
+            int totalInscripcionesEnWaitlist;
+            TotalInscripcionesEvento = this.inscripcionesRepository.getInscripcionesPorEvento(evento).size();
+            eventoWaitlist = this.waitlistRepository.waitlist(evento);
+            totalInscripcionesEnWaitlist = eventoWaitlist.cantidadEnCola(); // TODO: reemplazar por llamada a repo
+            calculoTasa = (TotalInscripcionesEvento / totalInscripcionesEnWaitlist) * 100;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "El evento ya fue cerrado");
         }
 
         return calculoTasa;
