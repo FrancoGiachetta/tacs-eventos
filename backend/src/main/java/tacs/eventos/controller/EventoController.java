@@ -72,9 +72,10 @@ public class EventoController {
      * Devuelve el evento con el id en el url
      *
      * @param eventoId
-     *            id del evento que se quiere obtener
+     *                 id del evento que se quiere obtener
      *
-     * @return ResponseEntity devuelve el código 200 OK y un body con los datos del evento pedido. Si el evento se
+     * @return ResponseEntity devuelve el código 200 OK y un body con los datos del
+     *         evento pedido. Si el evento se
      *         existe, devuelve NOT_FOUND 404.
      */
     @GetMapping("/{eventoId}")
@@ -89,19 +90,21 @@ public class EventoController {
      * Devuelve todos los eventos vigentes. Aplica filtros si los hubiera.
      *
      * @param precioMinimoParam
-     *            precio mínimo del evento.
+     *                           precio mínimo del evento.
      * @param precioMaximoParam
-     *            precio máximo del evento.
+     *                           precio máximo del evento.
      * @param fechaMinParam
-     *            fecha mínima de creación del evento.
+     *                           fecha mínima de creación del evento.
      * @param fechaMaxParam
-     *            fecha máxima de creación del evento
+     *                           fecha máxima de creación del evento
      * @param categoriaParam
-     *            categoría buscada del evento.
+     *                           categoría buscada del evento.
      * @param palabrasClaveParam
-     *            palabras que definen características del evento buscado.
+     *                           palabras que definen características del evento
+     *                           buscado.
      *
-     * @return ResponseEntity devuelve el código 200 OK y un body con la lista de eventos que cumplan con los filtros
+     * @return ResponseEntity devuelve el código 200 OK y un body con la lista de
+     *         eventos que cumplan con los filtros
      *         utilizados, si los hay.
      */
     @GetMapping
@@ -146,13 +149,14 @@ public class EventoController {
      * Cambia el estado de un evento entre abierto y cerrado.
      *
      * @param usuario
-     *            usuario logueado
+     *                  usuario logueado
      * @param eventoId
-     *            id del evento cuyo estado se quiere actualizar
+     *                  id del evento cuyo estado se quiere actualizar
      * @param estadoDTO
-     *            DTO representando el estado del evento
+     *                  DTO representando el estado del evento
      *
-     * @return ResponseEntity devuelve el código 204 NO_CONTENT y un body vacio. Si el evento se existe, devuelve
+     * @return ResponseEntity devuelve el código 204 NO_CONTENT y un body vacio. Si
+     *         el evento se existe, devuelve
      *         NOT_FOUND 404.
      */
     @PutMapping("/{eventoId}/estado")
@@ -182,11 +186,12 @@ public class EventoController {
      * Devuelve las inscripciones para un evento.
      *
      * @param usuario
-     *            usuario logueado
+     *                 usuario logueado
      * @param eventoId
-     *            id del evento cuyas inscripciones se quiere consultar
+     *                 id del evento cuyas inscripciones se quiere consultar
      *
-     * @return ResponseEntity devuelve el código 200 OK y un body con la lista de inscriptos solicitada. Si el evento se
+     * @return ResponseEntity devuelve el código 200 OK y un body con la lista de
+     *         inscriptos solicitada. Si el evento se
      *         existe, devuelve NOT_FOUND 404.
      */
     @GetMapping("/{eventoId}/inscripcion")
@@ -208,19 +213,25 @@ public class EventoController {
     }
 
     /**
-     * Devuelve la infromación sobre una inscripcion especifica. El usuario debe ser organizador del evento para poder
+     * Devuelve la infromación sobre una inscripcion especifica. El usuario debe ser
+     * organizador del evento para poder
      * ver esto.
      *
      * @param usuarioLogueado
-     *            usuario logueado al sistema
+     *                        usuario logueado al sistema
      * @param eventoId
-     *            id del evento al que pertenece la inscripción que se está consultando
+     *                        id del evento al que pertenece la inscripción que se
+     *                        está consultando
      * @param usuarioId
-     *            id del usuario al que pertenece la inscripción que se está consultando
+     *                        id del usuario al que pertenece la inscripción que se
+     *                        está consultando
      *
-     * @return ResponseEntity devuelve el código 200 OK y un body con la inscripcion solicitada. Si una se cumple alguna
-     *         de las siguientes condiciones, devuelve NOT_FOUND 404: * El usuario buscado no esta inscripto. * El
-     *         evento se existe. * El usuario que desato la accion no es el organizador.
+     * @return ResponseEntity devuelve el código 200 OK y un body con la inscripcion
+     *         solicitada. Si una se cumple alguna
+     *         de las siguientes condiciones, devuelve NOT_FOUND 404: * El usuario
+     *         buscado no esta inscripto. * El
+     *         evento se existe. * El usuario que desato la accion no es el
+     *         organizador.
      */
     @GetMapping("/{eventoId}/inscripcion/{usuarioId}")
     @ApiResponse(responseCode = "200", description = "Inscripcion encontrada")
@@ -251,19 +262,21 @@ public class EventoController {
     }
 
     /**
-     * Cancela una inscripción. Para poder ver esto, el usuario debe ser el organizador del evento o el mismo usuario
+     * Cancela una inscripción. Para poder ver esto, el usuario debe ser el
+     * organizador del evento o el mismo usuario
      * que se inscribió.
      * <p>
-     * Hace un soft delete, no borra realmente la inscripción si no que la marca como cancelada.
+     * Hace un soft delete, no borra realmente la inscripción si no que la marca
+     * como cancelada.
      * <p>
      * Devuelve el status code 204 NO_CONTENT
      *
      * @param usuarioLogueado
-     *            usuario logueado en el sistema
+     *                        usuario logueado en el sistema
      * @param eventoId
-     *            id del evento cuya inscripción se quiere cancelar
+     *                        id del evento cuya inscripción se quiere cancelar
      * @param usuarioId
-     *            id del usuario que se quiere desinscribir
+     *                        id del usuario que se quiere desinscribir
      */
     @DeleteMapping("/{eventoId}/inscripcion/{usuarioId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -290,17 +303,20 @@ public class EventoController {
     }
 
     /**
-     * Inscribe a un usuario a un evento. Solo el mismo usuario o el organizador del evento pueden crear una
+     * Inscribe a un usuario a un evento. Solo el mismo usuario o el organizador del
+     * evento pueden crear una
      * inscripción.
      *
      * @param usuarioLogueado
-     *            usuario logueado al sistema
+     *                        usuario logueado al sistema
      * @param eventoId
-     *            id del evento sobre el cual se quiere crear una inscripción
+     *                        id del evento sobre el cual se quiere crear una
+     *                        inscripción
      * @param usuarioId
-     *            id del usuario que se quiere inscribir
+     *                        id del usuario que se quiere inscribir
      *
-     * @return ResponseEntity devuelve el código 201 CREATED y un body vacío, o 303 SEE_OTHER si ya existe la
+     * @return ResponseEntity devuelve el código 201 CREATED y un body vacío, o 303
+     *         SEE_OTHER si ya existe la
      *         inscripción
      */
     @PostMapping("/{eventoId}/inscripcion/{usuarioId}")
@@ -323,11 +339,7 @@ public class EventoController {
             return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(location)).build();
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist
-        try {
-            inscripcionesService.inscribirOMandarAWaitlist(evento, usuario);
-        } catch (InterruptedException | ExecutionException e) {
-            throw new ErrorInternoHandler("Error al intertar inscribir al evento", e);
-        }
+        inscripcionesService.inscribirOMandarAWaitlist(evento, usuario);
 
         return ResponseEntity.created(URI.create(location)).build();
     }
@@ -336,9 +348,9 @@ public class EventoController {
      * Permite obtener las inscripciones en waitlist.
      *
      * @param usuario
-     *            usuario logueado al sistema
+     *                 usuario logueado al sistema
      * @param eventoId
-     *            id del evento cuya waitlist se quiere consultar
+     *                 id del evento cuya waitlist se quiere consultar
      *
      * @return Las inscripciones de la waitlist.
      */
@@ -361,8 +373,10 @@ public class EventoController {
                             i.getParticipante().getEmail(), i.getParticipante().getRoles());
                     return new InscripcionEnWaitlistResponse(usuarioResponse, i.getFechaHoraIngresoAWaitlist().orElse(
                             null)); /*
-                                     * La fechaHora de ingreso a watilist no debería ser nunca null en este caso, porque
-                                     * estamos buscando las inscripciones pendientes, o sea, las que están en watilist
+                                     * La fechaHora de ingreso a watilist no debería ser nunca null en este caso,
+                                     * porque
+                                     * estamos buscando las inscripciones pendientes, o sea, las que están en
+                                     * watilist
                                      */
                 }).toList());
     }
