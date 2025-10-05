@@ -1,6 +1,6 @@
 package tacs.eventos.model.waitlist;
 
-import org.redisson.api.RedissonClient;
+import lombok.RequiredArgsConstructor;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
@@ -9,21 +9,14 @@ import java.util.Optional;
 import java.util.Queue;
 
 /**
- * Waitlist que guarda la cola como una Queue de Redis.
+ * Waitlist que guarda la cola como una Queue en una memoria compartida entre
+ * instancias del servicio, como por ejemplo Redis.
  */
-public class WaitlistRedis implements Waitlist {
-    protected final RedissonClient redisson;
+@RequiredArgsConstructor
+public class WaitlistEnMemoriaCompartida implements Waitlist {
     protected final Evento evento;
     protected final Queue<String> items;
     protected final InscripcionesRepository inscripcionesRepository;
-
-    public WaitlistRedis(Evento evento, RedissonClient redisson, String prefijoIdDeCola,
-            InscripcionesRepository inscripcionesRepository) {
-        this.redisson = redisson;
-        this.evento = evento;
-        this.inscripcionesRepository = inscripcionesRepository;
-        this.items = redisson.getQueue(prefijoIdDeCola + evento.getId());
-    }
 
     public void agregar(String idInscripcion) {
         items.add(idInscripcion);

@@ -6,8 +6,8 @@ import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.waitlist.Waitlist;
+import tacs.eventos.model.waitlist.WaitlistEnMemoriaCompartida;
 import tacs.eventos.model.waitlist.WaitlistMongo;
-import tacs.eventos.model.waitlist.WaitlistRedis;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import tacs.eventos.service.WaitlistService;
 
@@ -30,8 +30,8 @@ public class RedisWaitlistService implements WaitlistService {
                 : waitlistTemporal(evento);
     }
 
-    private @NonNull WaitlistRedis watilistPermanente(Evento evento) {
-        return new WaitlistRedis(evento, redisson, "evento:waitlist:", inscripcionesRepository);
+    private @NonNull WaitlistEnMemoriaCompartida watilistPermanente(Evento evento) {
+        return new WaitlistEnMemoriaCompartida(evento, redisson.getQueue("evento:waitlist:" + evento.getId()), inscripcionesRepository);
     }
 
     private @NonNull WaitlistMongo waitlistTemporal(Evento evento) {

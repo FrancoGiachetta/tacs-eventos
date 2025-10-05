@@ -87,6 +87,7 @@ class UsuarioServiceTest {
 
         usuarioRepository.save(usuario);
         when(usuarioRepository.findByEmail(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
         Evento evento1 = new Evento("Evento 1", "Desc 1", null, 60, "Ubicacion", 100, 500, "Categoria");
         Evento evento2 = new Evento("Evento 2", "Desc 2", null, 120, "Ubicacion", 50, 1000, "Categoria");
         Evento evento3 = new Evento("Evento 3", "Desc 3", null, 120, "Ubicacion", 50, 1000, "Categoria");
