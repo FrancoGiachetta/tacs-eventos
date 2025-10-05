@@ -57,6 +57,8 @@ public class InscripcionesTest {
     @MockBean
     private WaitlistService waitlistService;
 
+    // TODO: hacer que los tests le peguen a un Redis falso
+
     @Autowired
     private ObjectMapper objectMapper;
 
