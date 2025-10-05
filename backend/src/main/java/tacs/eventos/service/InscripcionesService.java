@@ -114,7 +114,7 @@ public class InscripcionesService {
         // el ETag.
         synchronized (inscripcion.getEvento()) {
             int inscriptos = this.inscripcionesRepository.cantidadInscriptos(inscripcion.getEvento());
-            if (!inscripcion.getEvento().permiteIncripcion(inscriptos))
+            if (!inscripcion.getEvento().permiteInscripcion(inscriptos))
                 return Optional.empty();
             inscripcionesRepository.guardarInscripcion(inscripcion);
             return Optional.of(inscripcion);

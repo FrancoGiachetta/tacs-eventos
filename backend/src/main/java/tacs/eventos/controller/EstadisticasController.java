@@ -45,7 +45,7 @@ public class EstadisticasController {
         if (!esUsuarioAdmin(authHeader)) {
             return ResponseEntity.status(403).build();
         }
-        return ResponseEntity.ok(estadisticaService.cantidadInscribiciones());
+        return ResponseEntity.ok(estadisticaService.cantidadInscripciones());
     }
 
     @GetMapping("/eventos/{eventoId}/tasa-conversionwl")

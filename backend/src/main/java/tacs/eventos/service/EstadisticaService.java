@@ -28,7 +28,7 @@ public class EstadisticaService {
 
     // TODO: la query deberia ir a la base count sobre inscripciones para tener una mejor performance
 
-    public int cantidadInscribiciones() {
+    public int cantidadInscripciones() {
         return this.inscripcionesRepository.todos().size();
     }
 

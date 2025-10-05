@@ -63,13 +63,13 @@ class EstadisticasControllerTest {
 
     @Test
     void testCantidadInscripciones() {
-        when(estadisticaService.cantidadInscribiciones()).thenReturn(20);
+        when(estadisticaService.cantidadInscripciones()).thenReturn(20);
 
         ResponseEntity<Integer> response = controller.cantidadInscripciones(VALID_AUTH_HEADER);
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(20, response.getBody());
-        assertDoesNotThrow(() -> verify(estadisticaService).cantidadInscribiciones());
+        assertDoesNotThrow(() -> verify(estadisticaService).cantidadInscripciones());
     }
 
     @Test
@@ -104,6 +104,6 @@ class EstadisticasControllerTest {
         ResponseEntity<Integer> response = controller.cantidadInscripciones("Bearer regular-token");
 
         assertEquals(403, response.getStatusCode().value());
-        verify(estadisticaService, never()).cantidadInscribiciones();
+        verify(estadisticaService, never()).cantidadInscripciones();
     }
 }

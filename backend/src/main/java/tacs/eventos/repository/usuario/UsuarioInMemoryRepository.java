@@ -16,8 +16,12 @@ public class UsuarioInMemoryRepository implements UsuarioRepository {
 
     public UsuarioInMemoryRepository(PasswordEncoder pe) {
         // seeder: crea admin si no existe
-        Usuario u = new Usuario("admin@events.local", pe.encode("Admin1234"), Set.of(RolUsuario.ADMIN));
-        this.guardar(u);
+        Usuario admin = new Usuario("admin@events.local", pe.encode("Admin1234"), Set.of(RolUsuario.ADMIN));
+        Usuario organizador = new Usuario("organizador@eventos.com", pe.encode("org123"), Set.of(RolUsuario.ORGANIZADOR));
+        this.guardar(admin);
+        this.guardar(organizador);
+        System.out.println("Admin creado: admin@eventos.com / admin123");
+        System.out.println("Organizador creado: organizador@eventos.com / org123");
     }
 
     @Override

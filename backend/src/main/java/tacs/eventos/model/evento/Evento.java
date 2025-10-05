@@ -66,7 +66,7 @@ public class Evento {
      *
      * @return true si el evento está abierto y no ha alcanzado el cupo máximo, false en caso contrario.
      */
-    public boolean permiteIncripcion(int inscritos) {
+    public boolean permiteInscripcion(int inscritos) {
         return estado == EstadoEvento.ABIERTO && (inscritos < cupoMaximo);
     }
 
