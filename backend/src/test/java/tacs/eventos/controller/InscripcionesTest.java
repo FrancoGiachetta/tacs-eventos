@@ -8,10 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
+
+import tacs.eventos.controller.error.ManejadorDeExcepciones;
 import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
@@ -144,7 +147,8 @@ public class InscripcionesTest {
             when(waitlistRepository.waitlist(e1)).thenReturn(w1);
             // Hace que el evento no tenga cupo
             when(inscripcionesRepository.cantidadInscriptos(e1)).thenReturn(2);
-            // Mockea el pedido POST y verifica que retorne 201 CREATED y apunte a la inscripción
+            // Mockea el pedido POST y verifica que retorne 201 CREATED y apunte a la
+            // inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
             mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
 
@@ -291,8 +295,10 @@ public class InscripcionesTest {
 
             // Chequea que la waitlist haya quedado vacía
             assertEquals(0, w1.cantidadEnCola());
-            // Chequea que el usuario 2 haya quedado inscripto (chequea con una inscripción directa. En realidad sería
-            // una inscripción desde waitlist, no directa, pero como el id de inscripción es (usuario, evento), sirve
+            // Chequea que el usuario 2 haya quedado inscripto (chequea con una inscripción
+            // directa. En realidad sería
+            // una inscripción desde waitlist, no directa, pero como el id de inscripción es
+            // (usuario, evento), sirve
             // igual.
             verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.confirmada(u2, e1));
         }

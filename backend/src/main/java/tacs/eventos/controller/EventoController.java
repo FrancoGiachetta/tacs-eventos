@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import tacs.eventos.controller.error.handlers.AccesoDenegadoHandler;
+import tacs.eventos.controller.error.handlers.ErrorInternoHandler;
 import tacs.eventos.controller.error.handlers.RecursoNoEncontradoHandler;
 import tacs.eventos.controller.validadores.Validador;
 import tacs.eventos.controller.validadores.ValidadorAutorizacionUsuario;
@@ -325,7 +326,7 @@ public class EventoController {
         try {
             inscripcionesService.inscribirOMandarAWaitlist(evento, usuario);
         } catch (InterruptedException | ExecutionException e) {
-            throw e;
+            throw new ErrorInternoHandler("Error al intertar inscribir al evento", e);
         }
 
         return ResponseEntity.created(URI.create(location)).build();

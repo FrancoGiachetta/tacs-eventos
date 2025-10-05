@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tacs.eventos.dto.UsuarioDto;
 import tacs.eventos.controller.error.handlers.AccesoDenegadoHandler;
+import tacs.eventos.controller.error.handlers.ErrorInternoHandler;
 import tacs.eventos.dto.CambiarRolRequest;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
@@ -61,7 +62,7 @@ public class AdminController {
             String token = authHeader.replace("Bearer ", "");
             return sessionService.validate(token).map(usuario -> usuario.tieneRol(RolUsuario.ADMIN)).orElse(false);
         } catch (Exception e) {
-            throw e;
+            throw new ErrorInternoHandler("Error al validar la sesion", e);
         }
     }
 
