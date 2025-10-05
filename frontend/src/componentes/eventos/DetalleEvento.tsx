@@ -101,26 +101,30 @@ export default function DetalleEvento() {
                 />
 
                 {/* Solo mostrar botón de inscribirse para usuarios normales cuando el evento está abierto */}
-                {!esAdmin(usuario) && !esOrganizador(usuario) && eventoInfo.abierto && (
-                    <div className="mt-4 flex justify-end">
-                        <button
-                            type="button"
-                            onClick={onInscribir}
-                            className="rounded bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                        >
-                            Inscribirse
-                        </button>
-                    </div>
-                )}
+                {!esAdmin(usuario) &&
+                    !esOrganizador(usuario) &&
+                    eventoInfo.abierto && (
+                        <div className="mt-4 flex justify-end">
+                            <button
+                                type="button"
+                                onClick={onInscribir}
+                                className="rounded bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            >
+                                Inscribirse
+                            </button>
+                        </div>
+                    )}
 
                 {/* Mostrar mensaje cuando las inscripciones están cerradas */}
-                {!esAdmin(usuario) && !esOrganizador(usuario) && !eventoInfo.abierto && (
-                    <div className="mt-4 flex justify-end">
-                        <div className="rounded bg-gray-100 px-4 py-2 text-gray-700">
-                            Las inscripciones están cerradas
+                {!esAdmin(usuario) &&
+                    !esOrganizador(usuario) &&
+                    !eventoInfo.abierto && (
+                        <div className="mt-4 flex justify-end">
+                            <div className="rounded bg-gray-100 px-4 py-2 text-gray-700">
+                                Las inscripciones están cerradas
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
             </div>
         </>
     ) : null

@@ -78,7 +78,10 @@ function EventoRow(evento: Evento) {
             <td className="px-4 py-2">{waitlist.length}</td>
             <td className="px-4 py-2">
                 <div className="flex items-center gap-2">
-                    <EventoActionMenu evento={evento} className="bg-transparent" />
+                    <EventoActionMenu
+                        evento={evento}
+                        className="bg-transparent"
+                    />
                     <a
                         href={`/organizador/eventos/${evento.id}`}
                         className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"

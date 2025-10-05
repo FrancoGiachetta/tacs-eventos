@@ -197,13 +197,11 @@ export default function GestionarEvento() {
                                     : 'Abrir inscripciones para este evento'
                             }
                         >
-                            {toggling ? (
-                                '⏳ Actualizando…'
-                            ) : evento.abierto ? (
-                                '🔒 Cerrar inscripciones'
-                            ) : (
-                                '🔓 Abrir inscripciones'
-                            )}
+                            {toggling
+                                ? '⏳ Actualizando…'
+                                : evento.abierto
+                                  ? '🔒 Cerrar inscripciones'
+                                  : '🔓 Abrir inscripciones'}
                         </button>
                         <button
                             onClick={handleCopyLink}
@@ -226,11 +224,22 @@ export default function GestionarEvento() {
 
                 {/* Sección de ayuda */}
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <h4 className="text-sm font-medium text-blue-900 mb-2">💡 Gestión del Evento</h4>
+                    <h4 className="text-sm font-medium text-blue-900 mb-2">
+                        💡 Gestión del Evento
+                    </h4>
                     <div className="text-xs text-blue-800 space-y-1">
-                        <p>• <strong>🔒 Cerrar inscripciones</strong>: Evita nuevas inscripciones al evento</p>
-                        <p>• <strong>🔓 Abrir inscripciones</strong>: Permite nuevas inscripciones</p>
-                        <p>• <strong>Quitar inscriptos</strong>: Los usuarios en waitlist serán promovidos automáticamente</p>
+                        <p>
+                            • <strong>🔒 Cerrar inscripciones</strong>: Evita
+                            nuevas inscripciones al evento
+                        </p>
+                        <p>
+                            • <strong>🔓 Abrir inscripciones</strong>: Permite
+                            nuevas inscripciones
+                        </p>
+                        <p>
+                            • <strong>Quitar inscriptos</strong>: Los usuarios
+                            en waitlist serán promovidos automáticamente
+                        </p>
                     </div>
                 </div>
             </div>
