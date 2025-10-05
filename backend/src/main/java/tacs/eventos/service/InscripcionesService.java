@@ -131,7 +131,15 @@ public class InscripcionesService {
     protected void inscribirProximo(Evento evento) {
         waitlistRepository.waitlist(evento).proximo().flatMap(inscripcionesRepository::getInscripcionPorId)
                 .filter(InscripcionEvento::estaPendiente) // Solo inscribo si sigue pendiente
-                .ifPresent(this::intentarInscribir);
+                .ifPresent(inscripcion -> {
+                    // Verifico si hay lugar disponible antes de promocionar
+                    synchronized (evento) {
+                        int inscriptos = this.inscripcionesRepository.cantidadInscriptos(evento);
+                        if (evento.permiteInscripcion(inscriptos)) {
+                            inscripcion.confirmar(); // Cambio el estado de PENDIENTE a CONFIRMADA (sin duplicar)
+                        }
+                    }
+                });
     }
 
     public Optional<InscripcionEvento> inscripcionParaUsuarioYEvento(Usuario usuarioInscripto, Evento evento) {
