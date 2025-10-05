@@ -33,7 +33,7 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
     @Override
     public List<InscripcionEvento> getInscripcionesNoCanceladasPorParticipante(Usuario participante) {
         return this.inscripciones.stream().filter(i -> i.getParticipante().equals(participante))
-                .filter(i -> i.getEstado() == EstadoInscripcion.CONFIRMADA).toList();
+                .filter(i -> i.getEstado() != EstadoInscripcion.CANCELADA).toList();
     }
 
     @Override
@@ -65,7 +65,9 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
     @Override
     public Optional<InscripcionEvento> getInscripcionParaUsuarioYEvento(Usuario usuarioInscripto, Evento evento) {
         return this.inscripciones.stream()
-                .filter(i -> i.getEvento().equals(evento) && i.getParticipante().equals(usuarioInscripto)).findFirst();
+                .filter(i -> i.getEvento().equals(evento) && i.getParticipante().equals(usuarioInscripto))
+                .filter(i -> i.getEstado() != EstadoInscripcion.CANCELADA)
+                .findFirst();
     }
 
     @Override

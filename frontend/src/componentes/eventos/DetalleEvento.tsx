@@ -100,8 +100,8 @@ export default function DetalleEvento() {
                     visualizar={true}
                 />
 
-                {/* Solo mostrar botón de inscribirse para usuarios normales (no organizadores ni admins) */}
-                {!esAdmin(usuario) && !esOrganizador(usuario) && (
+                {/* Solo mostrar botón de inscribirse para usuarios normales cuando el evento está abierto */}
+                {!esAdmin(usuario) && !esOrganizador(usuario) && eventoInfo.abierto && (
                     <div className="mt-4 flex justify-end">
                         <button
                             type="button"
@@ -110,6 +110,15 @@ export default function DetalleEvento() {
                         >
                             Inscribirse
                         </button>
+                    </div>
+                )}
+
+                {/* Mostrar mensaje cuando las inscripciones están cerradas */}
+                {!esAdmin(usuario) && !esOrganizador(usuario) && !eventoInfo.abierto && (
+                    <div className="mt-4 flex justify-end">
+                        <div className="rounded bg-gray-100 px-4 py-2 text-gray-700">
+                            Las inscripciones están cerradas
+                        </div>
                     </div>
                 )}
             </div>

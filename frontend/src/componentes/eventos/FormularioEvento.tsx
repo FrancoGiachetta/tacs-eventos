@@ -156,15 +156,21 @@ export default function FormularioEvento({
                             type="datetime-local"
                             id="fechaHoraInicio"
                             {...register('fechaHoraInicio')}
-                            className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                            className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 [color-scheme:light]"
                             min={new Date().toISOString().slice(0, 16)}
+                            defaultValue={new Date(Date.now() + 24*60*60*1000).toISOString().slice(0, 16)}
                             disabled={visualizar}
+                            step="60"
                         />
                         {!visualizar && (
-                            <p className="text-xs text-gray-500 mt-1">
-                                Los eventos deben programarse para fechas
-                                futuras
-                            </p>
+                            <div className="mt-1 space-y-1">
+                                <p className="text-xs text-gray-500">
+                                    📅 Los eventos deben programarse para fechas futuras
+                                </p>
+                                <p className="text-xs text-blue-600">
+                                    💡 Tip: Usa las flechas o escribe directamente la hora (ej: 14:30)
+                                </p>
+                            </div>
                         )}
                         {
                             <p
