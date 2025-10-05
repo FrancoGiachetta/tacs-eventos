@@ -2,17 +2,11 @@ package tacs.eventos.dto.errores;
 
 import java.time.LocalDateTime;
 
-import lombok.Getter;
+public record ErrorResponse(
+        String mensaje,
+        LocalDateTime momento) {
 
-@Getter
-public class ErrorResponse {
-    private String mensaje;
-    private int estado;
-    private LocalDateTime momento;
-
-    public ErrorResponse(String mensaje, int estado) {
-        this.mensaje = mensaje;
-        this.estado = estado;
-        this.momento = LocalDateTime.now();
+    public ErrorResponse(String mensaje) {
+        this(mensaje, LocalDateTime.now());
     }
 }
