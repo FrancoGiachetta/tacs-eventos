@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tacs.eventos.dto.UsuarioDto;
+import tacs.eventos.controller.error.handlers.AccesoDenegadoHandler;
 import tacs.eventos.dto.CambiarRolRequest;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
@@ -26,13 +27,13 @@ public class AdminController {
 
     @GetMapping("/usuarios")
     @Operation(summary = "Obtener todos los usuarios (solo admin)")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida exitosamente"),
-            @ApiResponse(responseCode = "403", description = "Acceso denegado") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida exitosamente") })
     public ResponseEntity<List<UsuarioDto>> obtenerTodosLosUsuarios(@RequestHeader("Authorization") String authHeader) {
 
         // Validar que el usuario es admin
         if (!esUsuarioAdmin(authHeader)) {
-            return ResponseEntity.status(403).build();
+            throw new AccesoDenegadoHandler("Acceso denegado - Solo admin");
         }
 
         List<Usuario> usuarios = usuarioService.obtenerTodosLosUsuarios();
@@ -42,15 +43,13 @@ public class AdminController {
 
     @PutMapping("/usuarios/{usuarioId}/rol")
     @Operation(summary = "Cambiar rol de un usuario (solo admin)")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Rol cambiado exitosamente"),
-            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
-            @ApiResponse(responseCode = "403", description = "Acceso denegado") })
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Rol cambiado exitosamente") })
     public ResponseEntity<UsuarioDto> cambiarRolUsuario(@PathVariable String usuarioId,
             @RequestBody CambiarRolRequest request, @RequestHeader("Authorization") String authHeader) {
 
         // Validar que el usuario es admin
         if (!esUsuarioAdmin(authHeader)) {
-            return ResponseEntity.status(403).build();
+            throw new AccesoDenegadoHandler("Acceso denegado - Solo admin");
         }
 
         Usuario usuario = usuarioService.cambiarRol(usuarioId, request.nuevoRol());
@@ -62,7 +61,7 @@ public class AdminController {
             String token = authHeader.replace("Bearer ", "");
             return sessionService.validate(token).map(usuario -> usuario.tieneRol(RolUsuario.ADMIN)).orElse(false);
         } catch (Exception e) {
-            return false;
+            throw e;
         }
     }
 

@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import tacs.eventos.controller.error.handlers.AccesoNoAutorizadoHandler;
 import tacs.eventos.dto.LoginRequest;
 import tacs.eventos.dto.RegistroRequest;
 import tacs.eventos.dto.SessionResponse;
@@ -35,13 +37,12 @@ public class AuthController {
     @PostMapping("/register")
     @Operation(summary = "Registra un usuario")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "El usuario se registro satifactoriamente"),
-            @ApiResponse(responseCode = "401", description = "No se pudo regisrar al usuario"), })
+            @ApiResponse(responseCode = "200", description = "El usuario se registro satifactoriamente") })
     public ResponseEntity<SessionResponse> register(@Valid @RequestBody RegistroRequest req) {
         usuarios.registrar(req.email(), req.password(), req.tipoUsuario());
         return sesiones.login(req.email(), req.password())
                 .map(s -> ResponseEntity.ok(new SessionResponse(s.getToken(), s.getExpiresAt())))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+                .orElseThrow(() -> new AccesoNoAutorizadoHandler("No se pudo regisrar al usuario"));
     }
 
     /**
@@ -54,15 +55,14 @@ public class AuthController {
      */
     @PostMapping("/login")
     @Operation(summary = "Login que devuelve token de sesión y expiración")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Se pudo genera token de sesión"),
-            @ApiResponse(responseCode = "401", description = "No se pudo regisrar al usuario"), })
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Se pudo genera token de sesión") })
     public ResponseEntity<SessionResponse> login(@Valid @RequestBody LoginRequest req) {
         System.out.println("Login attempt for " + req.email());
 
         return sesiones.login(req.email(), req.password()).map(s -> {
             System.out.println("Login successful for " + req.email() + ", token: " + s.getToken());
             return ResponseEntity.ok(new SessionResponse(s.getToken(), s.getExpiresAt()));
-        }).orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+        }).orElseThrow(() -> new AccesoNoAutorizadoHandler("No se pudo regisrar al usuario"));
     }
 
     /**
