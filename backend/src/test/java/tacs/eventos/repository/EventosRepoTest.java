@@ -1,15 +1,18 @@
 package tacs.eventos.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import tacs.eventos.model.Evento;
 import tacs.eventos.repository.evento.EventosRepository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @SpringBootTest
-class EventosInMemoryRepoTest {
+class EventosRepoTest { // Testea contra la base real
     @Autowired
     private EventosRepository repo;
 

@@ -1,5 +1,7 @@
 package tacs.eventos.model.waitlist;
 
+import tacs.eventos.model.inscripcion.InscripcionEvento;
+
 import java.util.Optional;
 
 /**
@@ -14,7 +16,7 @@ public interface Waitlist {
     void agregar(String idInscripcion);
 
     /**
-     * Saca y devuelve la próxima inscripción en la waitlist, o un Optional vacío si la waitlist está vacía.
+     * Devuelve la próxima inscripción pendiente en la waitlist.
      */
-    Optional<String> proximo();
+    Optional<InscripcionEvento> proxima();
 }

@@ -55,14 +55,19 @@ public class InscripcionesService {
      */
     public void cancelarInscripcion(Evento evento, Usuario usuario) {
         // Si el usuario estaba inscripto, cancela su inscripción. Si no, intenta sacarlo de la waitlist.
-        var inscripcionNoCancelada = inscripcionNoCancelada(evento, usuario);
-        var estabaConfirmada = inscripcionNoCancelada.map(InscripcionEvento::estaConfirmada).orElse(false);
-        inscripcionNoCancelada.ifPresent(InscripcionEvento::cancelar);
+        var optInscripcionACancelar = inscripcionNoCancelada(evento, usuario);
+        if (optInscripcionACancelar.isEmpty())
+            return; // Si ya está cancelada, no hago nada.
+        var inscripcion = optInscripcionACancelar.get();
+        var estabaConfirmada = inscripcion.estaConfirmada();
+        inscripcion.cancelar();
+        inscripcionesRepository.save(inscripcion);
         if (estabaConfirmada) { // Si se eliminó una inscripción confirmada (se liberó un lugar)
             /* Promueve al próximo de la waitlist (si hay alguien). Hace esto en forma asincrónica, porque es una acción
              que puede tardar (ya que la inscripción está sincronizada por evento), y al usuario que canceló su
              inscripción le tenemos que devolver en el momento el response confirmandole que su incscipción fue
              cancelada. */
+            cupoEventoService.devolverCupo(evento);
             inscribirProximo(evento);
         }
     }
@@ -115,15 +120,14 @@ public class InscripcionesService {
     }
 
     /**
-     * Promueve al próximo de la waitlist a inscripción, si es que hay alguien en la waitlist. Este métod0 es
-     * asincrónico.
+     * Confirma la siguiente inscripción no cancelada en la waitlist. Este métod0 es asincrónico.
      *
      * @param evento
      */
+    /* TODO: hacer esto N veces, por si por algún error en el sistema habían quedado lugares libres en el
+        evento sin llenar */
     @Async
     protected void inscribirProximo(Evento evento) {
-        waitlistService.waitlist(evento).proximo().flatMap(inscripcionesRepository::findById)
-                .filter(InscripcionEvento::estaPendiente) // Solo inscribo si sigue pendiente
-                .ifPresent(this::intentarInscribir);
+        waitlistService.waitlist(evento).proxima().ifPresent(this::intentarInscribir);
     }
 }

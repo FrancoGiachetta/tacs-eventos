@@ -6,16 +6,17 @@ import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import tacs.eventos.model.Evento;
+import tacs.eventos.model.inscripcion.EstadoInscripcion;
+import tacs.eventos.redis_utils.EstadoInicializacionRedis;
+import tacs.eventos.redis_utils.FlagsInicializacionRedis;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
-import tacs.redis_utils.EstadoInicializacionRedis;
-import tacs.redis_utils.FlagsInicializacionRedis;
 
 @Service
 @RequiredArgsConstructor
 public class CupoEventoService {
-    private RedissonClient redisson;
-    private InscripcionesRepository inscripcionesRepository;
-    private FlagsInicializacionRedis inicializacionRedis;
+    private final RedissonClient redisson;
+    private final InscripcionesRepository inscripcionesRepository;
+    private final FlagsInicializacionRedis inicializacionRedis;
 
     /* TODO: manejar caso de que el organizador del evento modifique el cupo máximo del evento. Tendríamos que volver
     a inicializar el semáforo, o invalidarlo seteándole el estado NO_INICIALIZADO */
@@ -67,7 +68,7 @@ public class CupoEventoService {
         latch.trySetCount(1); // Bloqueo para que otros hilos esperen a que termine de inicializar
         try {
             RSemaphore semaforo = getSemaforoCupos(evento);
-            int inscriptos = this.inscripcionesRepository.countByEvento(evento);
+            int inscriptos = this.inscripcionesRepository.countByEventoAndEstado(evento, EstadoInscripcion.CONFIRMADA);
             semaforo.trySetPermits(evento.getCupoMaximo() - inscriptos);
         } finally {
             latch.countDown(); // Desbloquea para que otros hilos sepan que ya inicialicé
@@ -81,15 +82,15 @@ public class CupoEventoService {
     }
 
     private String keyEstadoSemaforo(Evento evento) {
-        return getClass() + "_ESTADO_SEMAFORO_" + evento.getId();
+        return "estado-inicializacion-cupos:" + evento.getId();
     }
 
     private RSemaphore getSemaforoCupos(Evento evento) {
-        return redisson.getSemaphore(getClass() + "_SEMAFORO_" + evento.getId());
+        return redisson.getSemaphore("cupos-evento:" + evento.getId());
     }
 
     private RCountDownLatch sincronizacionInicializacionSemaforo(Evento evento) {
-        return redisson.getCountDownLatch(getClass() + "_SINCRONIZACION_INICIALIZACION_" + evento.getId());
+        return redisson.getCountDownLatch("sincronizacion-init-cupos-evento:" + evento.getId());
     }
 
 }

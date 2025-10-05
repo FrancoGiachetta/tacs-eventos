@@ -23,7 +23,7 @@ import java.util.UUID;
 public class InscripcionEvento {
     @Getter
     @NonNull
-    @Indexed(unique = true)
+    @Indexed
     private String id;
     @Getter
     @NonNull

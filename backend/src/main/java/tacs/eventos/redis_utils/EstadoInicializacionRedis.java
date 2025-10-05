@@ -1,4 +1,4 @@
-package tacs.redis_utils;
+package tacs.eventos.redis_utils;
 
 public enum EstadoInicializacionRedis {
     LISTO,
