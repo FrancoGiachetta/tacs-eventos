@@ -8,10 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
+
+import tacs.eventos.controller.error.ManejadorDeExcepciones;
 import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
@@ -37,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Mockea solamente repositorios.
  */
 @SpringBootTest
+@Import(ManejadorDeExcepciones.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class InscripcionesTest {
 
@@ -106,7 +110,7 @@ public class InscripcionesTest {
         @Test
         void siElEventoNoExisteRetorna404() throws Exception {
             mockMvc.perform(get("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
-                    .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
+                    .andExpect(status().isNotFound()).andExpect(jsonPath("$.mensaje").value("Evento no encontrado"));
         }
     }
 
@@ -144,7 +148,8 @@ public class InscripcionesTest {
             when(waitlistRepository.waitlist(e1)).thenReturn(w1);
             // Hace que el evento no tenga cupo
             when(inscripcionesRepository.cantidadInscriptos(e1)).thenReturn(2);
-            // Mockea el pedido POST y verifica que retorne 201 CREATED y apunte a la inscripción
+            // Mockea el pedido POST y verifica que retorne 201 CREATED y apunte a la
+            // inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
             mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
 
@@ -170,7 +175,7 @@ public class InscripcionesTest {
         void siElUsuarioNoExisteMuestraElErrorYNoRealizaLaInscripcion() throws Exception {
             mockMvc.perform(post("/api/v1/evento/" + e1.getId() + "/inscripcion/" + "esteUsuarioNoExiste"))
                     .andExpect(status().isForbidden())
-                    .andExpect(status().reason("Solamente pueden crear una inscripción "
+                    .andExpect(jsonPath("$.mensaje").value("Solamente pueden crear una inscripción "
                             + "el usuario que se va a inscribir, o el organizador del evento"));
 
             verify(inscripcionesRepository, never()).guardarInscripcion(any());
@@ -179,7 +184,7 @@ public class InscripcionesTest {
         @Test
         void siElEventoNoExisteMuestraElErrorYNoRealizaLaInscripcion() throws Exception {
             mockMvc.perform(post("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
-                    .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
+                    .andExpect(status().isNotFound()).andExpect(jsonPath("$.mensaje").value("Evento no encontrado"));
 
             verifyNoInteractions(inscripcionesRepository);
         }
@@ -258,7 +263,7 @@ public class InscripcionesTest {
         @Test
         void siElEventoNoExisteRetorna404NotFound() throws Exception {
             mockMvc.perform(delete("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
-                    .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
+                    .andExpect(status().isNotFound()).andExpect(jsonPath("$.mensaje").value("Evento no encontrado"));
 
             verifyNoInteractions(inscripcionesRepository, waitlistRepository);
         }

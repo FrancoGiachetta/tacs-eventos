@@ -15,6 +15,7 @@ import tacs.eventos.service.SessionService;
 import tacs.eventos.service.EventoService;
 import tacs.eventos.service.UsuarioService;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.controller.error.handlers.AccesoDenegadoHandler;
 import tacs.eventos.model.RolUsuario;
 import java.util.Optional;
 import java.util.Set;
@@ -89,9 +90,7 @@ class EstadisticasControllerTest {
         // Mock invalid token
         when(sessionService.validate("invalid-token")).thenReturn(Optional.empty());
 
-        ResponseEntity<Integer> response = controller.cantidadEventos("Bearer invalid-token");
-
-        assertEquals(403, response.getStatusCode().value());
+        assertThrows(AccesoDenegadoHandler.class, () -> controller.cantidadInscripciones("Bearer regular-token"));
         verify(estadisticaService, never()).cantidadEventos();
     }
 
@@ -101,9 +100,8 @@ class EstadisticasControllerTest {
         Usuario regularUser = new Usuario("user@test.com", "hashedPassword", Set.of(RolUsuario.USUARIO));
         when(sessionService.validate("regular-token")).thenReturn(Optional.of(regularUser));
 
-        ResponseEntity<Integer> response = controller.cantidadInscripciones("Bearer regular-token");
+        assertThrows(AccesoDenegadoHandler.class, () -> controller.cantidadInscripciones("Bearer regular-token"));
 
-        assertEquals(403, response.getStatusCode().value());
         verify(estadisticaService, never()).cantidadInscribiciones();
     }
 }
