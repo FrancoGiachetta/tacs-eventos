@@ -21,8 +21,6 @@ public class UsuarioInMemoryRepository implements UsuarioRepository {
                 Set.of(RolUsuario.ORGANIZADOR));
         this.guardar(admin);
         this.guardar(organizador);
-        System.out.println("Admin creado: admin@eventos.com / admin123");
-        System.out.println("Organizador creado: organizador@eventos.com / org123");
     }
 
     @Override
