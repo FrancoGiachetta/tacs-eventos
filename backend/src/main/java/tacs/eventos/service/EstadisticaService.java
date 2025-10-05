@@ -4,13 +4,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.EstadoEvento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Waitlist;
 import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.evento.EventosRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
-import java.util.Optional;
-import org.apache.logging.log4j.*;
 
 @Service
 public class EstadisticaService {
@@ -29,39 +28,30 @@ public class EstadisticaService {
 
     // TODO: la query deberia ir a la base count sobre inscripciones para tener una mejor performance
 
-    public int cantidadInscribiciones() {
+    public int cantidadInscripciones() {
         return this.inscripcionesRepository.todos().size();
     }
 
     public int cantidadEventos() throws Exception {
-        //
-
-        try {
-
-            return this.eventosRepository.cantidaEventos();
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno en servidor", e);
-        }
-
+        return this.eventosRepository.cantidaEventos();
     }
 
     // TODO: falta chequear si esta bien aplicado esta logica que pide de tasa de conversion de waitList
     public int calcularTasaConversionWL(String id) {
-        Optional<Evento> evento = this.eventosRepository.getEvento(id);
+        Evento evento = this.eventosRepository.getEvento(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
         int calculoTasa = 0;
 
-        try {
-            if (evento.isPresent() && evento.get().isAbierto()) {
-                int TotalInscripcionesEvento;
-                Waitlist eventoWaitlist;
-                int totalInscripcionesEnWaitlist;
-                TotalInscripcionesEvento = this.inscripcionesRepository.getInscripcionesPorEvento(evento.get()).size();
-                eventoWaitlist = this.waitlistRepository.waitlist(evento.get());
-                totalInscripcionesEnWaitlist = eventoWaitlist.getItems().size();
-                calculoTasa = (TotalInscripcionesEvento / totalInscripcionesEnWaitlist) * 100;
-            }
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno en servidor", e);
+        if (evento.getEstado() == EstadoEvento.ABIERTO) {
+            int TotalInscripcionesEvento;
+            Waitlist eventoWaitlist;
+            int totalInscripcionesEnWaitlist;
+            TotalInscripcionesEvento = this.inscripcionesRepository.getInscripcionesPorEvento(evento).size();
+            eventoWaitlist = this.waitlistRepository.waitlist(evento);
+            totalInscripcionesEnWaitlist = eventoWaitlist.cantidadEnCola(); // TODO: reemplazar por llamada a repo
+            calculoTasa = (TotalInscripcionesEvento / totalInscripcionesEnWaitlist) * 100;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "El evento ya fue cerrado");
         }
 
         return calculoTasa;

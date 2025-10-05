@@ -1,25 +1,24 @@
 package tacs.eventos.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import tacs.eventos.dto.EstadoInscripcionResponse;
 import tacs.eventos.dto.InscripcionResponse;
-import tacs.eventos.model.Evento;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
-import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import tacs.eventos.repository.WaitlistRepository;
+import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
 
-import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -28,24 +27,6 @@ public class UsuarioService {
     private final InscripcionesRepository inscripcionesRepository;
     private final WaitlistRepository waitlistRepository;
     private final PasswordEncoder encoder;
-
-    @PostConstruct
-    public void inicializarUsuariosIniciales() {
-        // Crear admin por defecto si no existe
-        if (repo.obtenerPorEmail("admin@eventos.com").isEmpty()) {
-            Usuario admin = new Usuario("admin@eventos.com", encoder.encode("admin123"), Set.of(RolUsuario.ADMIN));
-            repo.guardar(admin);
-            System.out.println("Admin creado: admin@eventos.com / admin123");
-        }
-
-        // Crear organizador de ejemplo si no existe
-        if (repo.obtenerPorEmail("organizador@eventos.com").isEmpty()) {
-            Usuario organizador = new Usuario("organizador@eventos.com", encoder.encode("org123"),
-                    Set.of(RolUsuario.ORGANIZADOR));
-            repo.guardar(organizador);
-            System.out.println("Organizador creado: organizador@eventos.com / org123");
-        }
-    }
 
     public Usuario registrar(String email, String password) {
         return registrar(email, password, "USUARIO");
@@ -90,20 +71,13 @@ public class UsuarioService {
 
     public List<InscripcionResponse> obtenerInscripcionesNoCanceladas(String usuarioId) {
         Usuario usuario = repo.obtenerPorId(usuarioId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "No se pudo encontrar el usuario no encontrado"));
         List<InscripcionEvento> inscripciones = inscripcionesRepository
-                .getInscripcionesConfirmadasPorParticipante(usuario);
+                .getInscripcionesNoCanceladasPorParticipante(usuario);
         List<InscripcionResponse> inscripcionResponses = inscripciones.stream()
-                .map(inscripcion -> new InscripcionResponse(inscripcion.getEvento().getId(),
-                        mapEstado(inscripcion.getEstado())))
-                .collect(Collectors.toList());
-
-        List<Evento> eventosEnWaitlist = waitlistRepository.eventosEnCuyasWaitlistEsta(usuario);
-        List<InscripcionResponse> waitlistResponses = eventosEnWaitlist.stream()
-                .map(evento -> new InscripcionResponse(evento.getId(), EstadoInscripcionResponse.PENDIENTE)).toList();
-
-        return Stream.concat(inscripcionResponses.stream(), waitlistResponses.stream()).collect(Collectors.toList());
+                .map(insc -> new InscripcionResponse(insc.getEvento().getId(), mapEstado(insc.getEstado()))).toList();
+        return inscripcionResponses;
     }
 
     private EstadoInscripcionResponse mapEstado(EstadoInscripcion estado) {

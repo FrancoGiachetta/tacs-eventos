@@ -100,7 +100,7 @@ export default function GestionarEvento() {
         try {
             // PATCH /api/v1/evento/:id/inscripciones  body: { abierto: boolean }
             const nuevoEstado = !evento.abierto
-            await api.put(`/api/v1/evento/${id}/estado`, {
+            await api.patch(`/api/v1/evento/${id}`, {
                 abierto: nuevoEstado,
             })
             setEvento({ ...evento, abierto: nuevoEstado })
@@ -190,18 +190,18 @@ export default function GestionarEvento() {
                         <button
                             onClick={handleToggleInscripciones}
                             disabled={toggling}
-                            className={`px-3 py-2 rounded-md text-white ${evento.abierto ? 'bg-rose-600' : 'bg-emerald-600'}`}
+                            className={`px-4 py-2 rounded-md text-white font-medium transition-colors ${evento.abierto ? 'bg-rose-600 hover:bg-rose-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}
                             title={
                                 evento.abierto
-                                    ? 'Cerrar inscripciones'
-                                    : 'Abrir inscripciones'
+                                    ? 'Cerrar inscripciones para este evento'
+                                    : 'Abrir inscripciones para este evento'
                             }
                         >
                             {toggling
-                                ? 'Actualizando…'
+                                ? '⏳ Actualizando…'
                                 : evento.abierto
-                                  ? 'Cerrar inscripciones'
-                                  : 'Abrir inscripciones'}
+                                  ? '🔒 Cerrar inscripciones'
+                                  : '🔓 Abrir inscripciones'}
                         </button>
                         <button
                             onClick={handleCopyLink}
@@ -220,6 +220,27 @@ export default function GestionarEvento() {
                         label="Inscripciones"
                         value={evento.abierto ? 'Abiertas' : 'Cerradas'}
                     />
+                </div>
+
+                {/* Sección de ayuda */}
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="text-sm font-medium text-blue-900 mb-2">
+                        💡 Gestión del Evento
+                    </h4>
+                    <div className="text-xs text-blue-800 space-y-1">
+                        <p>
+                            • <strong>🔒 Cerrar inscripciones</strong>: Evita
+                            nuevas inscripciones al evento
+                        </p>
+                        <p>
+                            • <strong>🔓 Abrir inscripciones</strong>: Permite
+                            nuevas inscripciones
+                        </p>
+                        <p>
+                            • <strong>Quitar inscriptos</strong>: Los usuarios
+                            en waitlist serán promovidos automáticamente
+                        </p>
+                    </div>
                 </div>
             </div>
 

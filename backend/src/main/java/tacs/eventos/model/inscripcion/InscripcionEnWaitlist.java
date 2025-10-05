@@ -1,7 +1,8 @@
-package tacs.eventos.model;
+package tacs.eventos.model.inscripcion;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import tacs.eventos.model.Usuario;
 
 import java.time.LocalDateTime;
 

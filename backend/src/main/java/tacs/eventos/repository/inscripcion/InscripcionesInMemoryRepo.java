@@ -1,7 +1,7 @@
 package tacs.eventos.repository.inscripcion;
 
 import org.springframework.stereotype.Repository;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
@@ -31,9 +31,9 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
     }
 
     @Override
-    public List<InscripcionEvento> getInscripcionesConfirmadasPorParticipante(Usuario participante) {
+    public List<InscripcionEvento> getInscripcionesNoCanceladasPorParticipante(Usuario participante) {
         return this.inscripciones.stream().filter(i -> i.getParticipante().equals(participante))
-                .filter(i -> i.getEstado() == EstadoInscripcion.CONFIRMADA).toList();
+                .filter(i -> i.getEstado() != EstadoInscripcion.CANCELADA).toList();
     }
 
     @Override
@@ -60,5 +60,23 @@ public class InscripcionesInMemoryRepo implements InscripcionesRepository {
 
         System.out.println("DEBUG cantidadInscriptos - Evento: " + evento.getId() + " | Cantidad: " + cantidad);
         return (int) cantidad;
+    }
+
+    @Override
+    public Optional<InscripcionEvento> getInscripcionParaUsuarioYEvento(Usuario usuarioInscripto, Evento evento) {
+        return this.inscripciones.stream()
+                .filter(i -> i.getEvento().equals(evento) && i.getParticipante().equals(usuarioInscripto))
+                .filter(i -> i.getEstado() != EstadoInscripcion.CANCELADA).findFirst();
+    }
+
+    @Override
+    public Optional<InscripcionEvento> getInscripcionPorId(String id) {
+        return this.inscripciones.stream().filter(i -> i.getId().equals(id)).findFirst();
+    }
+
+    @Override
+    public List<InscripcionEvento> getInscripcionesPendientes(Evento evento) {
+        return this.inscripciones.stream().filter(i -> i.getEvento().equals(evento))
+                .filter(InscripcionEvento::estaPendiente).toList();
     }
 }

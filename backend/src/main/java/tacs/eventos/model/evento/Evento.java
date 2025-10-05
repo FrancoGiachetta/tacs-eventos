@@ -1,11 +1,15 @@
-package tacs.eventos.model;
+package tacs.eventos.model.evento;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import tacs.eventos.model.Usuario;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
 @NoArgsConstructor
 @Getter
@@ -13,24 +17,29 @@ public class Evento {
     @Setter
     private String id;
     @Setter
+    @NotBlank
     private String titulo;
     @Setter
     private String descripcion;
     @Setter
     private LocalDateTime fechaHoraInicio;
     @Setter
+    @Positive
     private int duracionMinutos;
     @Setter
     private String ubicacion;
     @Setter
+    @Positive
     private int cupoMaximo;
     @Setter
+    @Positive
     private double precio; // TODO: cambiar el tipo de dato. Debería ser un número de precisión fija. Fijarme si no
     // puedo recibir directamente BigDecimal o algo así en el DTO. Si no, que el front mande un
     // String que cumpla la regex correcta, y el back lo transforme manualmente.
     @Setter
     private String categoria;
-    private boolean abierto = true;
+
+    private EstadoEvento estado = EstadoEvento.ABIERTO;
 
     @Setter
     private Usuario organizador;
@@ -57,19 +66,19 @@ public class Evento {
      *
      * @return true si el evento está abierto y no ha alcanzado el cupo máximo, false en caso contrario.
      */
-    public boolean permiteIncripcion(int inscritos) {
-        return abierto && (inscritos < cupoMaximo);
+    public boolean permiteInscripcion(int inscritos) {
+        return estado == EstadoEvento.ABIERTO && (inscritos < cupoMaximo);
     }
 
     /**
      * Marca el evento como cerrado, impidiendo nuevas inscripciones.
      */
     public void cerrarEvento() {
-        this.abierto = false;
+        this.estado = EstadoEvento.CERRADO;
     }
 
     public void abrirEvento() {
-        this.abierto = true;
+        this.estado = EstadoEvento.ABIERTO;
     }
 
     @Override

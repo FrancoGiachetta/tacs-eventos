@@ -26,6 +26,7 @@ export default function FormularioEvento({
         formState: { errors },
         getValues,
         reset,
+        setValue,
     } = useForm<InputCrearEvento>({
         resolver: zodResolver(SchemaCrearEvento),
         defaultValues: valoresPorDefecto,
@@ -99,7 +100,8 @@ export default function FormularioEvento({
                                 id="titulo"
                                 {...register('titulo')}
                                 className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                                placeholder="Título"
+                                placeholder="Ej: Conferencia de Tecnología 2025"
+                                maxLength={100}
                             />
                             {
                                 <p
@@ -121,12 +123,18 @@ export default function FormularioEvento({
                         </label>
                         <textarea
                             id="descripcion"
-                            rows={3}
+                            rows={4}
                             {...register('descripcion')}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 resize-y min-h-32"
-                            placeholder="Descripción"
+                            placeholder="Describe tu evento: qué incluye, quién puede participar, qué deben traer los asistentes, etc."
+                            maxLength={1000}
                             readOnly={visualizar}
                         />
+                        {!visualizar && (
+                            <p className="text-xs text-gray-500 mt-1">
+                                Entre 10 y 1000 caracteres
+                            </p>
+                        )}
                         {
                             <p
                                 className="mt-1 text-sm text-red-600"
@@ -148,9 +156,28 @@ export default function FormularioEvento({
                             type="datetime-local"
                             id="fechaHoraInicio"
                             {...register('fechaHoraInicio')}
-                            className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                            className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 [color-scheme:light]"
+                            min={new Date().toISOString().slice(0, 16)}
+                            defaultValue={new Date(
+                                Date.now() + 24 * 60 * 60 * 1000
+                            )
+                                .toISOString()
+                                .slice(0, 16)}
                             disabled={visualizar}
+                            step="60"
                         />
+                        {!visualizar && (
+                            <div className="mt-1 space-y-1">
+                                <p className="text-xs text-gray-500">
+                                    📅 Los eventos deben programarse para fechas
+                                    futuras
+                                </p>
+                                <p className="text-xs text-blue-600">
+                                    💡 Tip: Usa las flechas o escribe
+                                    directamente la hora (ej: 14:30)
+                                </p>
+                            </div>
+                        )}
                         {
                             <p
                                 className="mt-1 text-sm text-red-600"
@@ -168,16 +195,58 @@ export default function FormularioEvento({
                         >
                             Duración (minutos)
                         </label>
-                        <input
-                            type="number"
-                            id="duracionMinutos"
-                            {...register('duracionMinutos', {
-                                valueAsNumber: true,
-                            })}
-                            className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                            placeholder="Duración (minutos)"
-                            disabled={visualizar}
-                        />
+                        <div className="space-y-2">
+                            <input
+                                type="number"
+                                id="duracionMinutos"
+                                {...register('duracionMinutos', {
+                                    valueAsNumber: true,
+                                })}
+                                className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                                placeholder="Ej: 120"
+                                disabled={visualizar}
+                            />
+                            {!visualizar && (
+                                <div className="flex gap-2 text-xs">
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setValue('duracionMinutos', 60)
+                                        }
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        1 hora
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setValue('duracionMinutos', 120)
+                                        }
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        2 horas
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setValue('duracionMinutos', 180)
+                                        }
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        3 horas
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setValue('duracionMinutos', 480)
+                                        }
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        8 horas
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                         {
                             <p
                                 className="mt-1 text-sm text-red-600"
@@ -200,7 +269,7 @@ export default function FormularioEvento({
                             id="ubicacion"
                             {...register('ubicacion')}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                            placeholder="Ubicación"
+                            placeholder="Ej: Auditorio Principal UTN, Av. Medrano 951, CABA"
                             disabled={visualizar}
                         />
                         {
@@ -225,9 +294,15 @@ export default function FormularioEvento({
                             id="cupoMaximo"
                             {...register('cupoMaximo', { valueAsNumber: true })}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                            placeholder="Cupo máximo"
+                            placeholder="Ej: 50"
+                            min="1"
                             disabled={visualizar}
                         />
+                        {!visualizar && (
+                            <p className="text-xs text-gray-500 mt-1">
+                                Número máximo de personas que pueden inscribirse
+                            </p>
+                        )}
                         {
                             <p
                                 className="mt-1 text-sm text-red-600"
@@ -243,16 +318,59 @@ export default function FormularioEvento({
                             htmlFor="precio"
                             className="text-sm font-medium text-slate-700"
                         >
-                            Precio
+                            Precio (ARS)
                         </label>
-                        <input
-                            type="number"
-                            id="precio"
-                            {...register('precio', { valueAsNumber: true })}
-                            className="w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                            placeholder="Precio"
-                            disabled={visualizar}
-                        />
+                        <div className="space-y-2">
+                            <div className="relative">
+                                <span className="absolute left-3 top-2 text-gray-500">
+                                    $
+                                </span>
+                                <input
+                                    type="number"
+                                    id="precio"
+                                    {...register('precio', {
+                                        valueAsNumber: true,
+                                    })}
+                                    className="w-full rounded-md border border-slate-300 pl-8 pr-3 py-2 shadow-sm placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                                    placeholder="0.00"
+                                    step="0.01"
+                                    min="0"
+                                    disabled={visualizar}
+                                />
+                            </div>
+                            {!visualizar && (
+                                <div className="flex gap-2 text-xs">
+                                    <button
+                                        type="button"
+                                        onClick={() => setValue('precio', 0)}
+                                        className="px-2 py-1 bg-green-100 text-green-800 rounded hover:bg-green-200"
+                                    >
+                                        Gratis
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setValue('precio', 1000)}
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        $1,000
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setValue('precio', 2500)}
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        $2,500
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setValue('precio', 5000)}
+                                        className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
+                                    >
+                                        $5,000
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                         {
                             <p
                                 className="mt-1 text-sm text-red-600"

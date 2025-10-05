@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import BarraSup from './componentes/BarraSuperior'
-import ListaEventos from './componentes/eventos/ListaEventos'
+import ListaEventos from './componentes/ListaEventos'
 import Login from './componentes/Login'
 import Registro from './componentes/Registro'
 import Admin from './componentes/admin/Admin'
@@ -10,6 +10,8 @@ import GestionarEvento from './componentes/eventos/GestionarEvento'
 import FormularioEvento from './componentes/eventos/FormularioEvento'
 import DetalleEvento from './componentes/eventos/DetalleEvento'
 import { AuthProvider } from './contexts/AuthContext'
+import { NotificationProvider } from './contexts/NotificationContext'
+import ToastNotifications from './componentes/ToastNotifications'
 import {
     ProtectedRoute,
     AdminRoute,
@@ -19,7 +21,9 @@ import {
 function App() {
     return (
         <AuthProvider>
-            <AppContent />
+            <NotificationProvider>
+                <AppContent />
+            </NotificationProvider>
         </AuthProvider>
     )
 }
@@ -32,6 +36,7 @@ function AppContent() {
     return (
         <>
             {!isAuthPage && <BarraSup />}
+            <ToastNotifications />
             <Routes>
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="/login" element={<Login />} />

@@ -2,8 +2,9 @@ package tacs.eventos.model.inscripcion;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Usuario;
 
 import java.time.LocalDateTime;
@@ -12,23 +13,22 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@Getter
 public class InscripcionEvento {
-    @Getter
     private String id = UUID.randomUUID().toString();
-    @Getter
     private final Usuario participante;
-    @Getter
     private final Evento evento;
     // TODO: agregar cuando este definido
     // private DatosDePago datosDePago;
-    @Getter
     private final Optional<LocalDateTime> fechaHoraIngresoAWaitlist;
-    @Getter
     private LocalDateTime fechahoraConfirmacion = LocalDateTime.now();
-    @Getter
     private Optional<LocalDateTime> fechaHoraCancelacion = Optional.empty();
     // TODO: agregar cuando este definido
     // private Optional<String> errorDePago;
+
+    @Getter
+    @NonNull
+    private EstadoInscripcion estado;
 
     private void setFechaHoraCancelacion(LocalDateTime fechaHoraCancelacion) {
         this.fechaHoraCancelacion = Optional.of(fechaHoraCancelacion);
@@ -38,18 +38,32 @@ public class InscripcionEvento {
      * Cancela la inscripción si no está ya cancelada.
      */
     public void cancelar() {
-        if (!getEstado().equals(EstadoInscripcion.CANCELADA)) // Si no está cancelada
+        if (!estaCancelada()) { // Si no está cancelada
+            estado = EstadoInscripcion.CANCELADA;
             setFechaHoraCancelacion(LocalDateTime.now()); // La cancela
+        }
     }
 
     /**
-     * @return el estado de la inscripción
+     * Confirma la inscripción si está pendiente.
      */
-    public EstadoInscripcion getEstado() {
-        if (fechaHoraCancelacion.isPresent())
-            return EstadoInscripcion.CANCELADA;
-        else
-            return EstadoInscripcion.CONFIRMADA;
+    public void confirmar() {
+        if (estaPendiente()) {
+            estado = EstadoInscripcion.CONFIRMADA;
+            fechahoraConfirmacion = LocalDateTime.now();
+        }
+    }
+
+    public boolean estaConfirmada() {
+        return estado.equals(EstadoInscripcion.CONFIRMADA);
+    }
+
+    public boolean estaPendiente() {
+        return estado.equals(EstadoInscripcion.PENDIENTE);
+    }
+
+    public boolean estaCancelada() {
+        return estado.equals(EstadoInscripcion.CANCELADA);
     }
 
     @Override

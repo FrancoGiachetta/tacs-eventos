@@ -27,15 +27,4 @@ public class EventosApplication {
         return new BCryptPasswordEncoder(12);
     }
 
-    // seeder: crea admin si no existe
-    @Bean
-    CommandLineRunner seedAdmin(UsuarioRepository users, PasswordEncoder pe) {
-        return args -> {
-            users.obtenerPorEmail("admin@events.local").orElseGet(() -> {
-                Usuario u = new Usuario("admin@events.local", pe.encode("Admin1234"), Set.of(RolUsuario.ADMIN));
-                users.guardar(u);
-                return u;
-            });
-        };
-    }
 }
