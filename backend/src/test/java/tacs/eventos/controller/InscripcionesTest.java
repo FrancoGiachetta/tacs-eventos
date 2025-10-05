@@ -36,8 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * Test funcional del controller + capa de dominio (servicios y modelos), de los
- * endpoints de InscripcionesController.
+ * Test funcional del controller + capa de dominio (servicios y modelos), de los endpoints de InscripcionesController.
  * Mockea solamente repositorios.
  */
 @SpringBootTest
