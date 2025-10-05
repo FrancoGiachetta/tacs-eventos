@@ -36,10 +36,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * Test funcional del controller + capa de dominio (servicios y modelos), de los endpoints de InscripcionesController.
+ * Test funcional del controller + capa de dominio (servicios y modelos), de los
+ * endpoints de InscripcionesController.
  * Mockea solamente repositorios.
  */
 @SpringBootTest
+@Import(ManejadorDeExcepciones.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class InscripcionesTest {
 
@@ -109,7 +111,7 @@ public class InscripcionesTest {
         @Test
         void siElEventoNoExisteRetorna404() throws Exception {
             mockMvc.perform(get("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
-                    .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
+                    .andExpect(status().isNotFound()).andExpect(jsonPath("$.mensaje").value("Evento no encontrado"));
         }
     }
 
@@ -174,7 +176,7 @@ public class InscripcionesTest {
         void siElUsuarioNoExisteMuestraElErrorYNoRealizaLaInscripcion() throws Exception {
             mockMvc.perform(post("/api/v1/evento/" + e1.getId() + "/inscripcion/" + "esteUsuarioNoExiste"))
                     .andExpect(status().isForbidden())
-                    .andExpect(status().reason("Solamente pueden crear una inscripción "
+                    .andExpect(jsonPath("$.mensaje").value("Solamente pueden crear una inscripción "
                             + "el usuario que se va a inscribir, o el organizador del evento"));
 
             verify(inscripcionesRepository, never()).guardarInscripcion(any());
@@ -183,7 +185,7 @@ public class InscripcionesTest {
         @Test
         void siElEventoNoExisteMuestraElErrorYNoRealizaLaInscripcion() throws Exception {
             mockMvc.perform(post("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
-                    .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
+                    .andExpect(status().isNotFound()).andExpect(jsonPath("$.mensaje").value("Evento no encontrado"));
 
             verifyNoInteractions(inscripcionesRepository);
         }
@@ -262,7 +264,7 @@ public class InscripcionesTest {
         @Test
         void siElEventoNoExisteRetorna404NotFound() throws Exception {
             mockMvc.perform(delete("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
-                    .andExpect(status().isNotFound()).andExpect(status().reason("Evento no encontrado"));
+                    .andExpect(status().isNotFound()).andExpect(jsonPath("$.mensaje").value("Evento no encontrado"));
 
             verifyNoInteractions(inscripcionesRepository, waitlistRepository);
         }

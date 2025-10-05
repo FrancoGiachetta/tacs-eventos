@@ -369,6 +369,6 @@ public class EventoController {
 
     private Evento buscarEvento(String id) {
         return this.eventoService.buscarEventoPorId(id)
-                .orElseThrow(() -> new RecursoNoEncontradoHandler("Evento No Encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoHandler("Evento no encontrado"));
     }
 }

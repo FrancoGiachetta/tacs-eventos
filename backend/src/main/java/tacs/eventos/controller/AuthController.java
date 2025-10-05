@@ -37,7 +37,8 @@ public class AuthController {
     @PostMapping("/register")
     @Operation(summary = "Registra un usuario")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "El usuario se registro satifactoriamente") })
+            @ApiResponse(responseCode = "200", description = "El usuario se registro satifactoriamente"),
+            @ApiResponse(responseCode = "401", description = "No se pudo regisrar al usuario"), })
     public ResponseEntity<SessionResponse> register(@Valid @RequestBody RegistroRequest req) {
         usuarios.registrar(req.email(), req.password(), req.tipoUsuario());
         return sesiones.login(req.email(), req.password())

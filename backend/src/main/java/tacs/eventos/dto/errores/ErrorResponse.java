@@ -2,6 +2,9 @@ package tacs.eventos.dto.errores;
 
 import java.time.LocalDateTime;
 
+import lombok.Getter;
+
+@Getter
 public class ErrorResponse {
     private String mensaje;
     private int estado;
