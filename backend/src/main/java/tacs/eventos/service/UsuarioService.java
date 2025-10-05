@@ -28,24 +28,6 @@ public class UsuarioService {
     private final WaitlistRepository waitlistRepository;
     private final PasswordEncoder encoder;
 
-    @PostConstruct
-    public void inicializarUsuariosIniciales() {
-        // Crear admin por defecto si no existe
-        if (repo.obtenerPorEmail("admin@eventos.com").isEmpty()) {
-            Usuario admin = new Usuario("admin@eventos.com", encoder.encode("admin123"), Set.of(RolUsuario.ADMIN));
-            repo.guardar(admin);
-            System.out.println("Admin creado: admin@eventos.com / admin123");
-        }
-
-        // Crear organizador de ejemplo si no existe
-        if (repo.obtenerPorEmail("organizador@eventos.com").isEmpty()) {
-            Usuario organizador = new Usuario("organizador@eventos.com", encoder.encode("org123"),
-                    Set.of(RolUsuario.ORGANIZADOR));
-            repo.guardar(organizador);
-            System.out.println("Organizador creado: organizador@eventos.com / org123");
-        }
-    }
-
     public Usuario registrar(String email, String password) {
         return registrar(email, password, "USUARIO");
     }

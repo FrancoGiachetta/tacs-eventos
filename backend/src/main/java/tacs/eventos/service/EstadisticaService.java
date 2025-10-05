@@ -4,7 +4,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.EstadoEvento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Waitlist;
 import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.evento.EventosRepository;
@@ -27,7 +28,7 @@ public class EstadisticaService {
 
     // TODO: la query deberia ir a la base count sobre inscripciones para tener una mejor performance
 
-    public int cantidadInscribiciones() {
+    public int cantidadInscripciones() {
         return this.inscripcionesRepository.todos().size();
     }
 
@@ -41,7 +42,7 @@ public class EstadisticaService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
         int calculoTasa = 0;
 
-        if (evento.isAbierto()) {
+        if (evento.getEstado() == EstadoEvento.ABIERTO) {
             int TotalInscripcionesEvento;
             Waitlist eventoWaitlist;
             int totalInscripcionesEnWaitlist;
@@ -54,5 +55,7 @@ public class EstadisticaService {
         }
 
         return calculoTasa;
+
     }
+
 }

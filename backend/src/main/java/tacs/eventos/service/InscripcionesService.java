@@ -3,7 +3,7 @@ package tacs.eventos.service;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
@@ -114,7 +114,7 @@ public class InscripcionesService {
         // el ETag.
         synchronized (inscripcion.getEvento()) {
             int inscriptos = this.inscripcionesRepository.cantidadInscriptos(inscripcion.getEvento());
-            if (!inscripcion.getEvento().permiteIncripcion(inscriptos))
+            if (!inscripcion.getEvento().permiteInscripcion(inscriptos))
                 return Optional.empty();
             inscripcionesRepository.guardarInscripcion(inscripcion);
             return Optional.of(inscripcion);
@@ -135,7 +135,7 @@ public class InscripcionesService {
                     // Verifico si hay lugar disponible antes de promocionar
                     synchronized (evento) {
                         int inscriptos = this.inscripcionesRepository.cantidadInscriptos(evento);
-                        if (evento.permiteIncripcion(inscriptos)) {
+                        if (evento.permiteInscripcion(inscriptos)) {
                             inscripcion.confirmar(); // Cambio el estado de PENDIENTE a CONFIRMADA (sin duplicar)
                         }
                     }

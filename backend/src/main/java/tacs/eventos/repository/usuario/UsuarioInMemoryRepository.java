@@ -1,12 +1,11 @@
 package tacs.eventos.repository.usuario;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
+import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
@@ -14,6 +13,15 @@ public class UsuarioInMemoryRepository implements UsuarioRepository {
     // thread-safe
     // mail como key TODO: temporalmente en memoria pasar a NO SQL || ver si conviene el mail como key o la id
     private final Map<String, Usuario> usuarios = new ConcurrentHashMap<>();
+
+    public UsuarioInMemoryRepository(PasswordEncoder pe) {
+        // seeder: crea admin si no existe
+        Usuario admin = new Usuario("admin@events.local", pe.encode("Admin1234"), Set.of(RolUsuario.ADMIN));
+        Usuario organizador = new Usuario("organizador@eventos.com", pe.encode("org123"),
+                Set.of(RolUsuario.ORGANIZADOR));
+        this.guardar(admin);
+        this.guardar(organizador);
+    }
 
     @Override
     public List<Usuario> obtenerTodos() {

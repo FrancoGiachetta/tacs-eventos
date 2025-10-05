@@ -1,8 +1,12 @@
 package tacs.eventos.config;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tacs.eventos.dto.EventoResponse;
+import tacs.eventos.model.evento.EstadoEvento;
+import tacs.eventos.model.evento.Evento;
 
 @Configuration
 public class ModelMapperConfig {
@@ -17,6 +21,15 @@ public class ModelMapperConfig {
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
+
+        mapper.addMappings(new PropertyMap<Evento, EventoResponse>() {
+            @Override
+            protected void configure() {
+                // All other fields will map automatically by default
+                map().setAbierto(source.getEstado() == EstadoEvento.ABIERTO);
+            }
+        });
+
         return mapper;
     }
 }

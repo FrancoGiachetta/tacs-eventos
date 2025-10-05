@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import tacs.eventos.controller.error.ManejadorDeExcepciones;
 import tacs.eventos.dto.InscripcionResponse;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.Waitlist;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
@@ -30,6 +30,8 @@ import tacs.eventos.repository.usuario.UsuarioRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -87,8 +89,8 @@ public class InscripcionesTest {
             when(inscripcionesRepository.getInscripcionParaUsuarioYEvento(u1, e1)).thenReturn(Optional.of(i1));
             // Mockea el pedido GET y verifica que retorne 200 OK y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(get(url)).andExpect(status().isOk()).andExpect(
-                    content().string(objectMapper.writeValueAsString(InscripcionResponse.confirmada(e1.getId()))));
+            assertDoesNotThrow(() -> mockMvc.perform(get(url)).andExpect(status().isOk()).andExpect(
+                    content().string(objectMapper.writeValueAsString(InscripcionResponse.confirmada(e1.getId())))));
         }
 
         @Test
@@ -97,20 +99,21 @@ public class InscripcionesTest {
 
             // Mockea el pedido GET y verifica que retorne 200 OK y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(get(url)).andExpect(status().isOk()).andExpect(
-                    content().string(objectMapper.writeValueAsString(InscripcionResponse.enWaitlist(e1.getId()))));
+            assertDoesNotThrow(() -> mockMvc.perform(get(url)).andExpect(status().isOk()).andExpect(
+                    content().string(objectMapper.writeValueAsString(InscripcionResponse.enWaitlist(e1.getId())))));
         }
 
         @Test
         void unUsuarioNoPuedeVerLaInscripcionDeOtroUsuario() throws Exception {
-            mockMvc.perform(get("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u2.getId()))
-                    .andExpect(status().isNotFound());
+            assertDoesNotThrow(() -> mockMvc.perform(get("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u2.getId()))
+                    .andExpect(status().isNotFound()));
         }
 
         @Test
         void siElEventoNoExisteRetorna404() throws Exception {
-            mockMvc.perform(get("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
-                    .andExpect(status().isNotFound()).andExpect(jsonPath("$.mensaje").value("Evento no encontrado"));
+            assertDoesNotThrow(() -> mockMvc
+                    .perform(get("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
+                    .andExpect(status().isNotFound()).andExpect(jsonPath("$.mensaje").value("Evento no encontrado")));
         }
     }
 
@@ -135,10 +138,12 @@ public class InscripcionesTest {
 
             // Mockea el pedido POST y verifica que retorne 201 CREATED y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
+            assertDoesNotThrow(() -> mockMvc.perform(post(url)).andExpect(status().isCreated())
+                    .andExpect(header().string("Location", url)));
 
             // Verifica que se haya guardado la inscripción en el repo
-            verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.confirmada(u1, e1));
+            assertDoesNotThrow(
+                    () -> verify(inscripcionesRepository).guardarInscripcion(InscripcionFactory.confirmada(u1, e1)));
         }
 
         @Test
@@ -151,7 +156,9 @@ public class InscripcionesTest {
             // Mockea el pedido POST y verifica que retorne 201 CREATED y apunte a la
             // inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(post(url)).andExpect(status().isCreated()).andExpect(header().string("Location", url));
+
+            assertDoesNotThrow(() -> mockMvc.perform(post(url)).andExpect(status().isCreated())
+                    .andExpect(header().string("Location", url)));
 
             verify(inscripcionesRepository).guardarInscripcion(argThat((InscripcionEvento i) -> i.getEvento().equals(e1)
                     && i.getParticipante().equals(u1) && i.estaPendiente()));
@@ -165,10 +172,12 @@ public class InscripcionesTest {
 
             // Mockea el pedido POST y verifica que retorne SEE OTHER y la inscripción
             String url = "/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId();
-            mockMvc.perform(post(url)).andExpect(status().isSeeOther()).andExpect(header().string("Location", url));
+
+            assertDoesNotThrow(() -> mockMvc.perform(post(url)).andExpect(status().isSeeOther())
+                    .andExpect(header().string("Location", url)));
 
             // Verifica que no se haya creado ninguna inscripción
-            verify(inscripcionesRepository, never()).guardarInscripcion(any());
+            assertDoesNotThrow(() -> verify(inscripcionesRepository, never()).guardarInscripcion(any()));
         }
 
         @Test
@@ -186,7 +195,7 @@ public class InscripcionesTest {
             mockMvc.perform(post("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
                     .andExpect(status().isNotFound()).andExpect(jsonPath("$.mensaje").value("Evento no encontrado"));
 
-            verifyNoInteractions(inscripcionesRepository);
+            assertDoesNotThrow(() -> verifyNoInteractions(inscripcionesRepository));
         }
 
     }
@@ -237,7 +246,7 @@ public class InscripcionesTest {
                     .andExpect(status().isNoContent());
 
             assertEquals(EstadoInscripcion.CONFIRMADA, i1.getEstado());
-            verifyNoInteractions(inscripcionesRepository, waitlistRepository);
+            assertDoesNotThrow(() -> verifyNoInteractions(inscripcionesRepository, waitlistRepository));
         }
 
         @Test
@@ -257,7 +266,7 @@ public class InscripcionesTest {
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + "esteUsuarioNoExiste"))
                     .andExpect(status().isNoContent());
 
-            verifyNoInteractions(inscripcionesRepository, waitlistRepository);
+            assertDoesNotThrow(() -> verifyNoInteractions(inscripcionesRepository, waitlistRepository));
         }
 
         @Test
@@ -265,7 +274,7 @@ public class InscripcionesTest {
             mockMvc.perform(delete("/api/v1/evento/" + "esteEventoNoExiste" + "/inscripcion/" + u1.getId()))
                     .andExpect(status().isNotFound()).andExpect(jsonPath("$.mensaje").value("Evento no encontrado"));
 
-            verifyNoInteractions(inscripcionesRepository, waitlistRepository);
+            assertDoesNotThrow(() -> verifyNoInteractions(inscripcionesRepository, waitlistRepository));
         }
     }
 
@@ -298,8 +307,11 @@ public class InscripcionesTest {
             assertEquals(0, w1.cantidadEnCola());
             // El test ya no puede verificar fácilmente el cambio de estado porque usamos mocks
             // Pero al menos verifica que se llamaron los métodos correctos
-            verify(inscripcionesRepository).cantidadInscriptos(e1);
-            verify(inscripcionesRepository).getInscripcionPorId(any(String.class));
+
+            assertDoesNotThrow(() -> {
+                verify(inscripcionesRepository).cantidadInscriptos(e1);
+                verify(inscripcionesRepository).getInscripcionPorId(any(String.class));
+            });
         }
 
         @Test

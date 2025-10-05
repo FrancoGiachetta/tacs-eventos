@@ -59,18 +59,18 @@ class EstadisticasControllerTest {
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(10, response.getBody());
-        verify(estadisticaService).cantidadEventos();
+        assertDoesNotThrow(() -> verify(estadisticaService).cantidadEventos());
     }
 
     @Test
     void testCantidadInscripciones() {
-        when(estadisticaService.cantidadInscribiciones()).thenReturn(20);
+        when(estadisticaService.cantidadInscripciones()).thenReturn(20);
 
         ResponseEntity<Integer> response = controller.cantidadInscripciones(VALID_AUTH_HEADER);
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(20, response.getBody());
-        verify(estadisticaService).cantidadInscribiciones();
+        assertDoesNotThrow(() -> verify(estadisticaService).cantidadInscripciones());
     }
 
     @Test
@@ -82,7 +82,7 @@ class EstadisticasControllerTest {
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(50, response.getBody());
-        verify(estadisticaService).calcularTasaConversionWL(eventoId);
+        assertDoesNotThrow(() -> verify(estadisticaService).calcularTasaConversionWL(eventoId));
     }
 
     @Test
@@ -101,7 +101,6 @@ class EstadisticasControllerTest {
         when(sessionService.validate("regular-token")).thenReturn(Optional.of(regularUser));
 
         assertThrows(AccesoDenegadoHandler.class, () -> controller.cantidadInscripciones("Bearer regular-token"));
-
-        verify(estadisticaService, never()).cantidadInscribiciones();
+        verify(estadisticaService, never()).cantidadInscripciones();
     }
 }

@@ -43,7 +43,7 @@ public class EstadisticasController {
         if (!esUsuarioAdmin(authHeader)) {
             throw new AccesoDenegadoHandler("Acceso denegado - Solo admin");
         }
-        return ResponseEntity.ok(estadisticaService.cantidadInscribiciones());
+        return ResponseEntity.ok(estadisticaService.cantidadInscripciones());
     }
 
     @GetMapping("/eventos/{eventoId}/tasa-conversionwl")

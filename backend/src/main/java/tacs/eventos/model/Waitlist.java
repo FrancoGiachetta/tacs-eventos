@@ -1,6 +1,8 @@
 package tacs.eventos.model;
 
 import lombok.Getter;
+import tacs.eventos.model.evento.Evento;
+import tacs.eventos.model.inscripcion.InscripcionEnWaitlist;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
