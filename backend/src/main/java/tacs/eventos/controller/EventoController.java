@@ -154,7 +154,7 @@ public class EventoController {
     @PutMapping("/{eventoId}/estado")
     @ApiResponse(responseCode = "404", description = "Evento no encontrado")
     public ResponseEntity<Void> actualizarEstadoEvento(@AuthenticationPrincipal Usuario usuario,
-            @PathVariable String eventoId, EventoEstadoDTO estadoDTO) {
+            @PathVariable String eventoId, @RequestBody EventoEstadoDTO estadoDTO) {
         Evento evento = this.buscarEvento(eventoId);
 
         Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());

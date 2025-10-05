@@ -44,6 +44,16 @@ public class InscripcionEvento {
         }
     }
 
+    /**
+     * Confirma la inscripción si está pendiente.
+     */
+    public void confirmar() {
+        if (estaPendiente()) {
+            estado = EstadoInscripcion.CONFIRMADA;
+            fechahoraConfirmacion = LocalDateTime.now();
+        }
+    }
+
     public boolean estaConfirmada() {
         return estado.equals(EstadoInscripcion.CONFIRMADA);
     }
