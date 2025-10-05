@@ -120,7 +120,8 @@ public class InscripcionesTest {
     private WaitlistEnMemoriaCompartida mockearInscripcionEnWatilist(Usuario u, Evento e) {
         // Crea una waitlist de prueba, en la que está el usuario
         InscripcionEvento i1 = InscripcionFactory.pendiente(u, e);
-        WaitlistEnMemoriaCompartida w1 = new WaitlistEnMemoriaCompartida(e, new LinkedList<>(), inscripcionesRepository);
+        WaitlistEnMemoriaCompartida w1 = new WaitlistEnMemoriaCompartida(e, new LinkedList<>(),
+                inscripcionesRepository);
         w1.agregar(i1.getId());
         when(waitlistService.waitlist(e)).thenReturn(w1);
         when(inscripcionesRepository.noCanceladaParaParticipanteYEvento(u, e)).thenReturn(Optional.of(i1));
@@ -133,7 +134,8 @@ public class InscripcionesTest {
         @Test
         void unUsuarioSePuedeInscribirDirectamenteAUnEventoConCupo() throws Exception {
             // Waitlist vacía
-            WaitlistEnMemoriaCompartida w1 = new WaitlistEnMemoriaCompartida(e1, new LinkedList<>(), inscripcionesRepository);
+            WaitlistEnMemoriaCompartida w1 = new WaitlistEnMemoriaCompartida(e1, new LinkedList<>(),
+                    inscripcionesRepository);
             when(waitlistService.waitlist(e1)).thenReturn(w1);
 
             // Mockea el pedido POST y verifica que retorne 201 CREATED y la inscripción
@@ -199,7 +201,8 @@ public class InscripcionesTest {
         @Test
         void unUsuarioPuedeCancelarSuInscripcionConfirmada() throws Exception {
             // Waitlist vacía
-            WaitlistEnMemoriaCompartida w1 = new WaitlistEnMemoriaCompartida(e1, new LinkedList<>(), inscripcionesRepository);
+            WaitlistEnMemoriaCompartida w1 = new WaitlistEnMemoriaCompartida(e1, new LinkedList<>(),
+                    inscripcionesRepository);
             when(waitlistService.waitlist(e1)).thenReturn(w1);
 
             // Deja al usuario inscripto
@@ -218,7 +221,8 @@ public class InscripcionesTest {
             SecurityContextHolder.getContext().setAuthentication(auth);
 
             // Waitlist vacía
-            WaitlistEnMemoriaCompartida w1 = new WaitlistEnMemoriaCompartida(e1, new LinkedList<>(), inscripcionesRepository);
+            WaitlistEnMemoriaCompartida w1 = new WaitlistEnMemoriaCompartida(e1, new LinkedList<>(),
+                    inscripcionesRepository);
             when(waitlistService.waitlist(e1)).thenReturn(w1);
 
             // Deja al usuario inscripto
@@ -289,11 +293,14 @@ public class InscripcionesTest {
             // Crea una inscripción pendiente (en waitlist) para u2
             InscripcionEvento inscripcionWaitlist = InscripcionFactory.pendiente(u2, e1);
             inscripcionWaitlist.cancelar();
-            WaitlistEnMemoriaCompartida w1 = new WaitlistEnMemoriaCompartida(e1, new LinkedList<>(), inscripcionesRepository);
+            WaitlistEnMemoriaCompartida w1 = new WaitlistEnMemoriaCompartida(e1, new LinkedList<>(),
+                    inscripcionesRepository);
             w1.agregar(inscripcionWaitlist.getId());
             when(waitlistService.waitlist(e1)).thenReturn(w1);
-            when(inscripcionesRepository.noCanceladaParaParticipanteYEvento(u2, e1)).thenReturn(Optional.of(inscripcionWaitlist));
-            when(inscripcionesRepository.findById(inscripcionWaitlist.getId())).thenReturn(Optional.of(inscripcionWaitlist));
+            when(inscripcionesRepository.noCanceladaParaParticipanteYEvento(u2, e1))
+                    .thenReturn(Optional.of(inscripcionWaitlist));
+            when(inscripcionesRepository.findById(inscripcionWaitlist.getId()))
+                    .thenReturn(Optional.of(inscripcionWaitlist));
 
             // Ahora cancela la inscripción confirmada de u1 (debería intentar promover a u2, pero está cancelada)
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId()))
@@ -301,7 +308,8 @@ public class InscripcionesTest {
 
             // Verifica que la inscripción de u2 sigue cancelada y no fue promovida
             assertEquals(EstadoInscripcion.CANCELADA, inscripcionWaitlist.getEstado());
-            verify(inscripcionesRepository, never()).save(argThat((InscripcionEvento i) -> i.getParticipante().equals(u2) && i.estaConfirmada()));
+            verify(inscripcionesRepository, never())
+                    .save(argThat((InscripcionEvento i) -> i.getParticipante().equals(u2) && i.estaConfirmada()));
         }
 
         @Test
@@ -323,7 +331,8 @@ public class InscripcionesTest {
         @Test
         void sePuedeCancelarUnaInscripcionAunqueNoHayaNadieEnLaWaitlistParaSerPromovido() throws Exception {
             // La waitlist está vacía
-            when(waitlistService.waitlist(e1)).thenReturn(new WaitlistEnMemoriaCompartida(e1, new LinkedList<>(), inscripcionesRepository));
+            when(waitlistService.waitlist(e1))
+                    .thenReturn(new WaitlistEnMemoriaCompartida(e1, new LinkedList<>(), inscripcionesRepository));
 
             mockMvc.perform(delete("/api/v1/evento/" + e1.getId() + "/inscripcion/" + u1.getId()));
 

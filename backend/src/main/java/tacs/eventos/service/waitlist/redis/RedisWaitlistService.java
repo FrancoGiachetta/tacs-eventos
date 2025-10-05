@@ -31,7 +31,8 @@ public class RedisWaitlistService implements WaitlistService {
     }
 
     private @NonNull WaitlistEnMemoriaCompartida watilistPermanente(Evento evento) {
-        return new WaitlistEnMemoriaCompartida(evento, redisson.getQueue("evento:waitlist:" + evento.getId()), inscripcionesRepository);
+        return new WaitlistEnMemoriaCompartida(evento, redisson.getQueue("evento:waitlist:" + evento.getId()),
+                inscripcionesRepository);
     }
 
     private @NonNull WaitlistMongo waitlistTemporal(Evento evento) {

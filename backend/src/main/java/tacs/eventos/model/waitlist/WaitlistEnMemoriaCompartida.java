@@ -9,8 +9,8 @@ import java.util.Optional;
 import java.util.Queue;
 
 /**
- * Waitlist que guarda la cola como una Queue en una memoria compartida entre
- * instancias del servicio, como por ejemplo Redis.
+ * Waitlist que guarda la cola como una Queue en una memoria compartida entre instancias del servicio, como por ejemplo
+ * Redis.
  */
 @RequiredArgsConstructor
 public class WaitlistEnMemoriaCompartida implements Waitlist {
