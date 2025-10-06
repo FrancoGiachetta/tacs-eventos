@@ -1,4 +1,5 @@
 package tacs.eventos.config;
+
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -23,11 +24,13 @@ public class TestRedisConfiguration {
     public TestRedisConfiguration() {
         this.redisServer = new RedisServer(redisPort);
     }
+
     @Bean
     @Primary
     public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         return new StringRedisTemplate(redisConnectionFactory);
     }
+
     @PostConstruct
     public void postConstruct() throws IOException {
         try {
@@ -59,8 +62,7 @@ public class TestRedisConfiguration {
     @Primary
     public RedissonClient redisson() {
         Config config = new Config();
-        config.useSingleServer()
-                .setAddress("redis://localhost:" + redisPort);
+        config.useSingleServer().setAddress("redis://localhost:" + redisPort);
         return Redisson.create(config);
     }
 }

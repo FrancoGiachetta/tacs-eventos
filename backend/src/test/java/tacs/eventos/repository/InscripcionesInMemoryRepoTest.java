@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Testcontainers
-@Import({TestRedisConfiguration.class, TestMongoConfiguration.class})
+@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class })
 @ActiveProfiles("test")
 class InscripcionesInMemoryRepoTest {
     private InscripcionesInMemoryRepo repo;

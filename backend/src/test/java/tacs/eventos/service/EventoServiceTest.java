@@ -29,7 +29,7 @@ import java.util.List;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Import({TestRedisConfiguration.class, TestMongoConfiguration.class})
+@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class })
 @ActiveProfiles("test")
 @Testcontainers
 public class EventoServiceTest {

@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Testcontainers
-@Import({ TestMongoConfiguration.class})
+@Import({ TestMongoConfiguration.class })
 @ActiveProfiles("test")
 class EventosRepoTest { // Testea contra la base real
     @Autowired
@@ -38,19 +38,20 @@ class EventosRepoTest { // Testea contra la base real
     @Autowired
     private EventosRepositoryImpl eventosRepository; // Tu implementación con MongoTemplate
 
-
     @MockBean
     private StringRedisTemplate stringRedisTemplate;
 
     private Evento e1;
     private Evento e2;
     private Evento e3;
+
     @Test
     void testConexion() {
         assertNotNull(mongoTemplate);
         // Verificar que podemos realizar operaciones
         mongoTemplate.getDb().getName();
     }
+
     @BeforeEach
     void setUp() {
         this.e1 = new Evento("Evento 1", "", null, 1, "", 0, 0, "Deporte");

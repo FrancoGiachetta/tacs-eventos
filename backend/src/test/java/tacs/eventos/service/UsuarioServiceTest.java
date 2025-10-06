@@ -28,10 +28,9 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Import({TestRedisConfiguration.class, TestMongoConfiguration.class})
+@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class })
 @ActiveProfiles("test")
 @Testcontainers
 class UsuarioServiceTest {
