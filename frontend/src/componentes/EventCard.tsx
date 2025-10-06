@@ -55,7 +55,7 @@ export default function EventCard({ evento, onVerDetalle }: EventCardProps) {
 
                 <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">
-                        {evento.cupoMaximo} lugares disponibles
+                        Capacidad máxima: {evento.cupoMaximo} usuarios
                     </span>
                     <button
                         onClick={() => onVerDetalle(evento.id)}

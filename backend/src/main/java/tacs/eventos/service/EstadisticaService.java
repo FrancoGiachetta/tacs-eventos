@@ -1,61 +1,46 @@
 package tacs.eventos.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import tacs.eventos.model.evento.EstadoEvento;
 import tacs.eventos.model.evento.Evento;
-import tacs.eventos.model.Waitlist;
-import tacs.eventos.repository.WaitlistRepository;
+import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.repository.evento.EventosRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 
 @Service
+@AllArgsConstructor
 public class EstadisticaService {
-
     private final EventosRepository eventosRepository;
     private final InscripcionesRepository inscripcionesRepository;
-    private final WaitlistRepository waitlistRepository;
 
-    public EstadisticaService(@Qualifier("eventosInMemoryRepo") EventosRepository eventosRepository,
-            @Qualifier("inscripcionesInMemoryRepo") InscripcionesRepository inscripcionesRepository,
-            @Qualifier("waitlistsInMemoryRepo") WaitlistRepository waitlistRepository) {
-        this.eventosRepository = eventosRepository;
-        this.inscripcionesRepository = inscripcionesRepository;
-        this.waitlistRepository = waitlistRepository;
-    }
-
-    // TODO: la query deberia ir a la base count sobre inscripciones para tener una mejor performance
-
-    public int cantidadInscripciones() {
-        return this.inscripcionesRepository.todos().size();
+    public long cantidadInscripciones() {
+        return this.inscripcionesRepository.count();
     }
 
     public int cantidadEventos() throws Exception {
-        return this.eventosRepository.cantidaEventos();
+        return Math.toIntExact(this.eventosRepository.count());
     }
 
     // TODO: falta chequear si esta bien aplicado esta logica que pide de tasa de conversion de waitList
     public int calcularTasaConversionWL(String id) {
-        Evento evento = this.eventosRepository.getEvento(id)
+        Evento evento = this.eventosRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
         int calculoTasa = 0;
 
         if (evento.getEstado() == EstadoEvento.ABIERTO) {
             int TotalInscripcionesEvento;
-            Waitlist eventoWaitlist;
             int totalInscripcionesEnWaitlist;
-            TotalInscripcionesEvento = this.inscripcionesRepository.getInscripcionesPorEvento(evento).size();
-            eventoWaitlist = this.waitlistRepository.waitlist(evento);
-            totalInscripcionesEnWaitlist = eventoWaitlist.cantidadEnCola(); // TODO: reemplazar por llamada a repo
+            TotalInscripcionesEvento = this.inscripcionesRepository.countByEvento(evento);
+            totalInscripcionesEnWaitlist = this.inscripcionesRepository.countByEventoAndEstado(evento,
+                    EstadoInscripcion.PENDIENTE);
             calculoTasa = (TotalInscripcionesEvento / totalInscripcionesEnWaitlist) * 100;
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "El evento ya fue cerrado");
         }
 
         return calculoTasa;
-
     }
-
 }

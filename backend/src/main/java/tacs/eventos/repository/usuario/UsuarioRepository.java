@@ -1,15 +1,15 @@
 package tacs.eventos.repository.usuario;
 
+import org.springframework.data.mongodb.repository.MongoRepository;
 import tacs.eventos.model.Usuario;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface UsuarioRepository {
+public interface UsuarioRepository extends MongoRepository<Usuario, String> {
     /**
      * @return todos los usuarios.
      */
-    List<Usuario> obtenerTodos();
+    // List<Usuario> obtenerTodos();
 
     /**
      * @param email
@@ -17,7 +17,7 @@ public interface UsuarioRepository {
      *
      * @return el usuario al que le corresponde el email.
      */
-    Optional<Usuario> obtenerPorEmail(String email);
+    Optional<Usuario> findByEmail(String email);
 
     /**
      * @param id
@@ -25,7 +25,7 @@ public interface UsuarioRepository {
      *
      * @return el usuario al que le corresponde el id.
      */
-    Optional<Usuario> obtenerPorId(String id);
+    // Optional<Usuario> obtenerPorId(String id);
 
     /**
      * Guarda un usuario.
@@ -33,7 +33,7 @@ public interface UsuarioRepository {
      * @param usuario
      *            usuario a guardar.
      */
-    void guardar(Usuario usuario);
+    // void guardar(Usuario usuario);
 
     /**
      * Elimina un usuario.
@@ -41,5 +41,5 @@ public interface UsuarioRepository {
      * @param usuario
      *            usuario a eliminar.
      */
-    void eliminar(Usuario usuario);
+    // void eliminar(Usuario usuario);
 }

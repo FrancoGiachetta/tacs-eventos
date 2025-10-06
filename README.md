@@ -60,6 +60,18 @@ docker-compose build eventos-frontend
 
 ## 🔧 Desarrollo Local
 
+## Levantar bases de datos
+### Levantar Redis
+Ejecutar el siguiente comando de docker:
+```bash
+docker run -p 6379:6379 --name redis-app-eventos-sin-compose -d redis:8.2 redis-server --save "" --appendonly no
+```
+### Levantar MongoDB
+Ejecutar el siguiente comando de docker:
+```bash
+docker run -d -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=nraboy -e MONGO_INITDB_ROOT_PASSWORD=password1234 --name mongodb-sin-compose mongodb/mongodb-community-server
+```
+
 ## Backend
 
 ### Requisitos Previos

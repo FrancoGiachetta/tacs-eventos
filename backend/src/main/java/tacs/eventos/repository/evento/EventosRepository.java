@@ -11,14 +11,14 @@ public interface EventosRepository {
     /**
      * @return todos los eventos
      */
-    List<Evento> todos();
+    List<Evento> findAll();
 
     /**
      * @param eventoId
      *
      * @return evento con ese id, u Optional.empty() si no existe
      */
-    Optional<Evento> getEvento(String eventoId);
+    Optional<Evento> findById(String eventoId);
 
     // TODO: si vamos a terminar modelando usuarios cambiarlo a la entidad Usuario
 
@@ -27,39 +27,26 @@ public interface EventosRepository {
      *
      * @return los eventos cuyo organizador es el usuario pasado por parámetro
      */
-    List<Evento> getEventosPorOrganizador(String organizadorId);
-
-    /**
-     * Filtra los eventos según los filtros de búsqueda proporcionados.
-     *
-     * @param filtrosBusqueda
-     *            Lista de filtros de búsqueda a aplicar.
-     *
-     * @return Lista de eventos que cumplen con todos los filtros de búsqueda.
-     */
-    List<Evento> filtrarEventos(List<FiltroBusqueda<Evento>> filtrosBusqueda);
+    List<Evento> findByOrganizador(String organizadorId);
 
     /**
      * @param categoria
      *
      * @return los eventos que pertenecen a esa cateogoria
      */
-    List<Evento> getEventosPorCategoria(String categoria);
-
-    /**
-     * Guarda el evento si este no está ya guardado.
-     *
-     * @param evento
-     */
-    void guardarEvento(Evento evento);
+    List<Evento> findByCategoria(String categoria);
 
     /**
      * Elimina el evento, si es que existe
      *
      * @param evento
      */
-    void eliminarEvento(Evento evento);
+    void delete(Evento evento);
 
-    int cantidaEventos();
+    long count();
+
+    void save(Evento evento);
+
+    List<Evento> findByFiltroBusqueda(List<FiltroBusqueda<Evento>> filtrosBusqueda);
 
 }

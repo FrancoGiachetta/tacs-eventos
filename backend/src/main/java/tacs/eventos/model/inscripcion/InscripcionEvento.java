@@ -1,37 +1,64 @@
 package tacs.eventos.model.inscripcion;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import tacs.eventos.model.evento.Evento;
+import com.mongodb.lang.Nullable;
+import lombok.*;
+import org.springframework.data.annotation.PersistenceCreator;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.evento.Evento;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-@Getter
+/* Constructor de todos los argumentos, para que use Spring Data para crear objetos desde documentos de la DB */
+@AllArgsConstructor(access = AccessLevel.PROTECTED, onConstructor_ = @PersistenceCreator)
+@Document(collection = "inscripciones")
+@CompoundIndex(name = "evento_participante_estado_idx", def = "{'evento': 1, 'participante': 1, 'estado': 1}")
+@CompoundIndex(name = "participante_estado_idx", def = "{'participante': 1, 'estado': 1}")
+@CompoundIndex(name = "evento_estado_idx", def = "{'evento': 1, 'estado': 1}")
 public class InscripcionEvento {
-    private String id = UUID.randomUUID().toString();
+    @Getter
+    @NonNull
+    @Indexed
+    private String id;
+    @Getter
+    @NonNull
     private final Usuario participante;
+    @Getter
+    @NonNull
+    @Indexed
     private final Evento evento;
-    // TODO: agregar cuando este definido
-    // private DatosDePago datosDePago;
-    private final Optional<LocalDateTime> fechaHoraIngresoAWaitlist;
-    private LocalDateTime fechahoraConfirmacion = LocalDateTime.now();
-    private Optional<LocalDateTime> fechaHoraCancelacion = Optional.empty();
-    // TODO: agregar cuando este definido
-    // private Optional<String> errorDePago;
-
+    @Nullable
+    private final LocalDateTime fechaHoraIngresoAWaitlist;
+    @Setter
+    @Nullable
+    private LocalDateTime fechahoraConfirmacion;
+    @Nullable
+    @Setter
+    private LocalDateTime fechaHoraCancelacion;
     @Getter
     @NonNull
     private EstadoInscripcion estado;
 
-    private void setFechaHoraCancelacion(LocalDateTime fechaHoraCancelacion) {
-        this.fechaHoraCancelacion = Optional.of(fechaHoraCancelacion);
+    /**
+     * NO USAR, PUBLICA PARA TESTING, usar los métod0s de la clase InscripcionFactory. Crea una nueva inscripción.
+     *
+     * @param participante
+     * @param evento
+     * @param fechaHoraIngresoAWaitlist
+     * @param fechaHoraConfirmacion
+     * @param estado
+     *
+     * @return
+     */
+    public static InscripcionEvento crearNueva(Usuario participante, Evento evento,
+            LocalDateTime fechaHoraIngresoAWaitlist, LocalDateTime fechaHoraConfirmacion, EstadoInscripcion estado) {
+        return new InscripcionEvento(UUID.randomUUID().toString(), participante, evento, fechaHoraIngresoAWaitlist,
+                fechaHoraConfirmacion, null, estado);
     }
 
     /**
@@ -41,16 +68,6 @@ public class InscripcionEvento {
         if (!estaCancelada()) { // Si no está cancelada
             estado = EstadoInscripcion.CANCELADA;
             setFechaHoraCancelacion(LocalDateTime.now()); // La cancela
-        }
-    }
-
-    /**
-     * Confirma la inscripción si está pendiente.
-     */
-    public void confirmar() {
-        if (estaPendiente()) {
-            estado = EstadoInscripcion.CONFIRMADA;
-            fechahoraConfirmacion = LocalDateTime.now();
         }
     }
 
@@ -66,6 +83,18 @@ public class InscripcionEvento {
         return estado.equals(EstadoInscripcion.CANCELADA);
     }
 
+    public Optional<LocalDateTime> getFechaHoraCancelacion() {
+        return Optional.ofNullable(fechaHoraCancelacion);
+    }
+
+    public Optional<LocalDateTime> getFechaHoraIngresoAWaitlist() {
+        return Optional.ofNullable(fechaHoraIngresoAWaitlist);
+    }
+
+    public Optional<LocalDateTime> getFechahoraConfirmacion() {
+        return Optional.ofNullable(fechahoraConfirmacion);
+    }
+
     @Override
     public boolean equals(Object o) {
         return o instanceof InscripcionEvento inscripcion && this.participante.equals(inscripcion.getParticipante())
@@ -75,5 +104,12 @@ public class InscripcionEvento {
     @Override
     public int hashCode() {
         return Objects.hash(participante, evento);
+    }
+
+    public void confirmar() {
+        if (!estaConfirmada()) { // Si no está confirmada, la confirma
+            estado = EstadoInscripcion.CONFIRMADA;
+            setFechahoraConfirmacion(LocalDateTime.now());
+        }
     }
 }
