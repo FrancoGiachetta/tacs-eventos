@@ -86,7 +86,6 @@ class InscripcionesServiceTest {
         inscripcionesService.cancelarInscripcion(e2, u2);
         assertEquals(EstadoInscripcion.CANCELADA, i2.getEstado());
         assertDoesNotThrow(() -> Mockito.verify(waitlistService, Mockito.atLeastOnce()).waitlist(e2));
-        assertDoesNotThrow(
-                () -> Mockito.verify(inscripcionesRepository, Mockito.atLeastOnce()).findById("proximo2"));
+        assertDoesNotThrow(() -> Mockito.verify(inscripcionesRepository, Mockito.atLeastOnce()).findById("proximo2"));
     }
 }

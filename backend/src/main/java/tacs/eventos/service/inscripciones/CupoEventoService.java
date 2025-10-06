@@ -27,6 +27,7 @@ public class CupoEventoService {
      * Intenta obtener un cupo para el evento. Si no hay cupo, retorna false. Si hay cupo, reserva uno y retorna true.
      *
      * @param evento
+     *
      * @return si se logró obtener un cupo
      */
     public boolean obtenerCupo(Evento evento) {

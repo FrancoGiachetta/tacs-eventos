@@ -50,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Import({TestRedisConfiguration.class, TestMongoConfiguration.class, ManejadorDeExcepciones.class})
+@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class, ManejadorDeExcepciones.class })
 @ActiveProfiles("test")
 @Testcontainers
 public class InscripcionesTest {
@@ -158,8 +158,7 @@ public class InscripcionesTest {
                     .andExpect(header().string("Location", url)));
 
             // Verifica que se haya guardado la inscripción en el repo
-            assertDoesNotThrow(
-                    () -> verify(inscripcionesRepository).save(InscripcionFactory.confirmada(u1, e1)));
+            assertDoesNotThrow(() -> verify(inscripcionesRepository).save(InscripcionFactory.confirmada(u1, e1)));
         }
 
         // todo: arreglar este test

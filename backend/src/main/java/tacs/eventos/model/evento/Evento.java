@@ -50,7 +50,7 @@ public class Evento {
     private Usuario organizador;
 
     public Evento(String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
-                  String ubicacion, int cupoMaximo, double precio, String categoria) {
+            String ubicacion, int cupoMaximo, double precio, String categoria) {
 
         this.id = UUID.randomUUID().toString();
         this.titulo = titulo;
@@ -66,7 +66,9 @@ public class Evento {
     /**
      * Verifica si el evento permite nuevas inscripciones.
      *
-     * @param inscritos Número actual de inscritos en el evento.
+     * @param inscritos
+     *            Número actual de inscritos en el evento.
+     *
      * @return true si el evento está abierto y no ha alcanzado el cupo máximo, false en caso contrario.
      */
     public boolean permiteInscripcion(int inscritos) {

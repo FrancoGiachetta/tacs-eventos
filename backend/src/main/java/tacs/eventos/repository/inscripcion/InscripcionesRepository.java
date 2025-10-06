@@ -24,15 +24,17 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
      *
      * @param participante
      * @param estado
+     *
      * @return
      */
     List<InscripcionEvento> findByParticipanteAndEstadoNot(Usuario participante, EstadoInscripcion estado);
 
     Optional<InscripcionEvento> findFirstByParticipanteAndEventoAndEstadoNot(Usuario participante, Evento evento,
-                                                                             EstadoInscripcion estado);
+            EstadoInscripcion estado);
 
     /**
      * @param evento
+     *
      * @return todas las inscripciones (confirmadas, canceladas, o pendientes) de ese evento
      */
     List<InscripcionEvento> findByEventoAndEstado(Evento evento, EstadoInscripcion estado);
@@ -43,10 +45,11 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
      *
      * @param evento
      * @param fechaHoraIngresoAWaitlist
+     *
      * @return
      */
     default List<InscripcionEvento> pendientesPosterioresALaFechaOrdenados(Evento evento,
-                                                                           LocalDateTime fechaHoraIngresoAWaitlist) {
+            LocalDateTime fechaHoraIngresoAWaitlist) {
         return findByEventoAndEstadoAndFechaHoraIngresoAWaitlistGreaterThanEqualOrderByFechaHoraIngresoAWaitlist(evento,
                 EstadoInscripcion.PENDIENTE, fechaHoraIngresoAWaitlist);
     }
@@ -58,6 +61,7 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
      * @param evento
      * @param estado
      * @param fechaHoraIngresoAWaitlist
+     *
      * @return
      */
     List<InscripcionEvento> findByEventoAndEstadoAndFechaHoraIngresoAWaitlistGreaterThanEqualOrderByFechaHoraIngresoAWaitlist(
@@ -68,13 +72,15 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
      *
      * @param evento
      * @param estado
+     *
      * @return
      */
     List<InscripcionEvento> findByEventoAndEstadoOrderByFechaHoraIngresoAWaitlist(Evento evento,
-                                                                                  EstadoInscripcion estado);
+            EstadoInscripcion estado);
 
     /**
      * @param evento
+     *
      * @return cantidad de inscripciones confirmadas para ese evento
      */
     int countByEvento(Evento evento);
@@ -84,6 +90,7 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
      *
      * @param usuarioInscripto
      * @param evento
+     *
      * @return la inscripción, o un Optional vacío si no existe una que no cumpla con las condiciones
      */
     default Optional<InscripcionEvento> noCanceladaParaParticipanteYEvento(Usuario usuarioInscripto, Evento evento) {
@@ -92,6 +99,7 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
 
     /**
      * @param participante
+     *
      * @return las inscripciones no canceladas de ese participante
      */
     default List<InscripcionEvento> noCanceladasDeParticipante(Usuario participante) {
@@ -101,6 +109,7 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
     /**
      * @param evento
      * @param estadoInscripcion
+     *
      * @return cantidad de inscripciones en ese estado para ese evento
      */
     int countByEventoAndEstado(Evento evento, EstadoInscripcion estadoInscripcion);
@@ -112,6 +121,6 @@ public interface InscripcionesRepository extends MongoRepository<InscripcionEven
     /**
      * @return todos los eventos que tengan inscripciones creadas (en cualquier estado)
      */
-    @Aggregation(pipeline = {"{ '$group': { '_id': '$evento' } }", "{ '$replaceRoot': { 'newRoot': '$_id' } }"})
+    @Aggregation(pipeline = { "{ '$group': { '_id': '$evento' } }", "{ '$replaceRoot': { 'newRoot': '$_id' } }" })
     Stream<Evento> eventosConInscripciones();
 }

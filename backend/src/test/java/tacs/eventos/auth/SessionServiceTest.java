@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Import({TestRedisConfiguration.class, TestMongoConfiguration.class})
+@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class })
 @ActiveProfiles("test")
 @Testcontainers
 class SessionServiceTest {

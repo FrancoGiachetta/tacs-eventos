@@ -15,6 +15,7 @@ public interface EventosRepository {
 
     /**
      * @param eventoId
+     *
      * @return evento con ese id, u Optional.empty() si no existe
      */
     Optional<Evento> findById(String eventoId);
@@ -23,12 +24,14 @@ public interface EventosRepository {
 
     /**
      * @param organizadorId
+     *
      * @return los eventos cuyo organizador es el usuario pasado por parámetro
      */
     List<Evento> findByOrganizador(String organizadorId);
 
     /**
      * @param categoria
+     *
      * @return los eventos que pertenecen a esa cateogoria
      */
     List<Evento> findByCategoria(String categoria);

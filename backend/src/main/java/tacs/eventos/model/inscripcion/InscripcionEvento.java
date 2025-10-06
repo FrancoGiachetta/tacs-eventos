@@ -52,10 +52,11 @@ public class InscripcionEvento {
      * @param fechaHoraIngresoAWaitlist
      * @param fechaHoraConfirmacion
      * @param estado
+     *
      * @return
      */
     public static InscripcionEvento crearNueva(Usuario participante, Evento evento,
-                                               LocalDateTime fechaHoraIngresoAWaitlist, LocalDateTime fechaHoraConfirmacion, EstadoInscripcion estado) {
+            LocalDateTime fechaHoraIngresoAWaitlist, LocalDateTime fechaHoraConfirmacion, EstadoInscripcion estado) {
         return new InscripcionEvento(UUID.randomUUID().toString(), participante, evento, fechaHoraIngresoAWaitlist,
                 fechaHoraConfirmacion, null, estado);
     }

@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Testcontainers
-@Import({TestMongoConfiguration.class, TestRedisConfiguration.class})
+@Import({ TestMongoConfiguration.class, TestRedisConfiguration.class })
 @ActiveProfiles("test")
 class EventosRepoTest { // Testea contra la base real
     @Autowired
