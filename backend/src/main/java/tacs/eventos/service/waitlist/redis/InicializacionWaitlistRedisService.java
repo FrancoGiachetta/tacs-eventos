@@ -3,7 +3,7 @@ package tacs.eventos.service.waitlist.redis;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.waitlist.Waitlist;

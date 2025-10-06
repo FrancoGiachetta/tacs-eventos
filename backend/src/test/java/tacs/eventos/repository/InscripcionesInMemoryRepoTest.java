@@ -8,8 +8,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import tacs.eventos.config.TestMongoConfiguration;
 import tacs.eventos.config.TestRedisConfiguration;
-import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
 import tacs.eventos.repository.inscripcion.InscripcionesInMemoryRepo;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Testcontainers
-@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class })
+@Import({TestRedisConfiguration.class, TestMongoConfiguration.class})
 @ActiveProfiles("test")
 class InscripcionesInMemoryRepoTest {
     private InscripcionesInMemoryRepo repo;

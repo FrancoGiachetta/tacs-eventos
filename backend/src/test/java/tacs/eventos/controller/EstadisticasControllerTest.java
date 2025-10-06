@@ -1,18 +1,22 @@
 package tacs.eventos.controller;
 
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import tacs.eventos.model.RolUsuario;
-import tacs.eventos.model.Usuario;
-import tacs.eventos.service.EstadisticaService;
-import tacs.eventos.service.EventoService;
-import tacs.eventos.service.SessionService;
-import tacs.eventos.service.UsuarioService;
 
+import tacs.eventos.service.EstadisticaService;
+import tacs.eventos.service.SessionService;
+import tacs.eventos.service.EventoService;
+import tacs.eventos.service.UsuarioService;
+import tacs.eventos.model.Usuario;
+import tacs.eventos.controller.error.handlers.AccesoDenegadoHandler;
+import tacs.eventos.model.RolUsuario;
 import java.util.Optional;
 import java.util.Set;
 
@@ -58,7 +62,7 @@ class EstadisticasControllerTest {
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(10, response.getBody());
-        verify(estadisticaService).cantidadEventos();
+        assertDoesNotThrow(() -> verify(estadisticaService).cantidadEventos());
     }
 
     @Test
@@ -69,7 +73,7 @@ class EstadisticasControllerTest {
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(20, response.getBody());
-        verify(estadisticaService).cantidadInscripciones();
+        assertDoesNotThrow(() -> verify(estadisticaService).cantidadInscripciones());
     }
 
     @Test
@@ -81,7 +85,7 @@ class EstadisticasControllerTest {
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(50, response.getBody());
-        verify(estadisticaService).calcularTasaConversionWL(eventoId);
+        assertDoesNotThrow(() -> verify(estadisticaService).calcularTasaConversionWL(eventoId));
     }
 
     @Test
@@ -89,9 +93,7 @@ class EstadisticasControllerTest {
         // Mock invalid token
         when(sessionService.validate("invalid-token")).thenReturn(Optional.empty());
 
-        ResponseEntity<Integer> response = controller.cantidadEventos("Bearer invalid-token");
-
-        assertEquals(403, response.getStatusCode().value());
+        assertThrows(AccesoDenegadoHandler.class, () -> controller.cantidadInscripciones("Bearer regular-token"));
         verify(estadisticaService, never()).cantidadEventos();
     }
 
@@ -101,9 +103,7 @@ class EstadisticasControllerTest {
         Usuario regularUser = new Usuario("user@test.com", "hashedPassword", Set.of(RolUsuario.USUARIO));
         when(sessionService.validate("regular-token")).thenReturn(Optional.of(regularUser));
 
-        var response = controller.cantidadInscripciones("Bearer regular-token");
-
-        assertEquals(403, response.getStatusCode().value());
+        assertThrows(AccesoDenegadoHandler.class, () -> controller.cantidadInscripciones("Bearer regular-token"));
         verify(estadisticaService, never()).cantidadInscripciones();
     }
 }

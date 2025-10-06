@@ -1,7 +1,7 @@
 package tacs.eventos.model.waitlist;
 
 import lombok.RequiredArgsConstructor;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 

@@ -6,8 +6,8 @@ import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.evento.Evento;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -52,11 +52,10 @@ public class InscripcionEvento {
      * @param fechaHoraIngresoAWaitlist
      * @param fechaHoraConfirmacion
      * @param estado
-     *
      * @return
      */
     public static InscripcionEvento crearNueva(Usuario participante, Evento evento,
-            LocalDateTime fechaHoraIngresoAWaitlist, LocalDateTime fechaHoraConfirmacion, EstadoInscripcion estado) {
+                                               LocalDateTime fechaHoraIngresoAWaitlist, LocalDateTime fechaHoraConfirmacion, EstadoInscripcion estado) {
         return new InscripcionEvento(UUID.randomUUID().toString(), participante, evento, fechaHoraIngresoAWaitlist,
                 fechaHoraConfirmacion, null, estado);
     }

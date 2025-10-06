@@ -10,12 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import tacs.eventos.controller.error.handlers.AccesoDenegadoHandler;
+import tacs.eventos.controller.error.handlers.RecursoNoEncontradoHandler;
 import tacs.eventos.controller.validadores.Validador;
 import tacs.eventos.controller.validadores.ValidadorAutorizacionUsuario;
 import tacs.eventos.dto.*;
-import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorCategoria;
@@ -46,16 +47,14 @@ public class EventoController {
     /**
      * Crea un nuevo evento.
      *
-     * @param dto
-     *            datos del evento a crear.
-     *
+     * @param dto datos del evento a crear.
      * @return ResponseEntity devuelve el código 204 NO_CONTENT y un body vacio.
      *
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> crearEvento(@AuthenticationPrincipal Usuario usuario,
-            @Valid @RequestBody CreacionEventoRequest dto, HttpServletRequest request) {
+                                            @Valid @RequestBody CreacionEventoRequest dto, HttpServletRequest request) {
         Evento evento = modelMapper.map(dto, Evento.class);
         evento.setId(UUID.randomUUID().toString()); // No se estaba creando
         evento.setOrganizador(usuario);
@@ -66,15 +65,13 @@ public class EventoController {
     /**
      * Devuelve el evento con el id en el url
      *
-     * @param eventoId
-     *            id del evento que se quiere obtener
-     *
+     * @param eventoId id del evento que se quiere obtener
      * @return ResponseEntity devuelve el código 200 OK y un body con los datos del evento pedido. Si el evento se
-     *         existe, devuelve NOT_FOUND 404.
+     * existe, devuelve NOT_FOUND 404.
      */
     @GetMapping("/{eventoId}")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Evento encontrado"),
-            @ApiResponse(responseCode = "404", description = "Evento no encontrado"), })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Evento encontrado"),
+            @ApiResponse(responseCode = "404", description = "Evento no encontrado"),})
     public ResponseEntity<EventoResponse> obtenerEvento(@PathVariable String eventoId) {
         Evento evento = this.buscarEvento(eventoId);
 
@@ -84,21 +81,14 @@ public class EventoController {
     /**
      * Devuelve todos los eventos vigentes. Aplica filtros si los hubiera.
      *
-     * @param precioMinimoParam
-     *            precio mínimo del evento.
-     * @param precioMaximoParam
-     *            precio máximo del evento.
-     * @param fechaMinParam
-     *            fecha mínima de creación del evento.
-     * @param fechaMaxParam
-     *            fecha máxima de creación del evento
-     * @param categoriaParam
-     *            categoría buscada del evento.
-     * @param palabrasClaveParam
-     *            palabras que definen características del evento buscado.
-     *
+     * @param precioMinimoParam  precio mínimo del evento.
+     * @param precioMaximoParam  precio máximo del evento.
+     * @param fechaMinParam      fecha mínima de creación del evento.
+     * @param fechaMaxParam      fecha máxima de creación del evento
+     * @param categoriaParam     categoría buscada del evento.
+     * @param palabrasClaveParam palabras que definen características del evento buscado.
      * @return ResponseEntity devuelve el código 200 OK y un body con la lista de eventos que cumplan con los filtros
-     *         utilizados, si los hay.
+     * utilizados, si los hay.
      */
     @GetMapping
     @ApiResponse(responseCode = "200", description = "Lista de eventos disponibles")
@@ -141,27 +131,23 @@ public class EventoController {
     /**
      * Cambia el estado de un evento entre abierto y cerrado.
      *
-     * @param usuario
-     *            usuario logueado
-     * @param eventoId
-     *            id del evento cuyo estado se quiere actualizar
-     * @param estadoDTO
-     *            DTO representando el estado del evento
-     *
+     * @param usuario   usuario logueado
+     * @param eventoId  id del evento cuyo estado se quiere actualizar
+     * @param estadoDTO DTO representando el estado del evento
      * @return ResponseEntity devuelve el código 204 NO_CONTENT y un body vacio. Si el evento se existe, devuelve
-     *         NOT_FOUND 404.
+     * NOT_FOUND 404.
      */
-    @PutMapping("/{eventoId}/estado")
+    @PatchMapping("/{eventoId}")
     @ApiResponse(responseCode = "404", description = "Evento no encontrado")
     public ResponseEntity<Void> actualizarEstadoEvento(@AuthenticationPrincipal Usuario usuario,
-            @PathVariable String eventoId, EventoEstadoDTO estadoDTO) {
+                                                       @PathVariable String eventoId, @RequestBody EventoEstadoDTO estadoDTO) {
         Evento evento = this.buscarEvento(eventoId);
 
         Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
 
         // Si el usuario no es el organizador, devolver 403.
         if (!validador.validar()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no está inscripto al evento");
+            throw new AccesoDenegadoHandler("El usuario no está inscripto al evento");
         }
         ;
 
@@ -177,26 +163,23 @@ public class EventoController {
     /**
      * Devuelve las inscripciones para un evento.
      *
-     * @param usuario
-     *            usuario logueado
-     * @param eventoId
-     *            id del evento cuyas inscripciones se quiere consultar
-     *
+     * @param usuario  usuario logueado
+     * @param eventoId id del evento cuyas inscripciones se quiere consultar
      * @return ResponseEntity devuelve el código 200 OK y un body con la lista de inscriptos solicitada. Si el evento se
-     *         existe, devuelve NOT_FOUND 404.
+     * existe, devuelve NOT_FOUND 404.
      */
     @GetMapping("/{eventoId}/inscripcion")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista de incripciones para el evento"),
-            @ApiResponse(responseCode = "404", description = "Evento no encontrado"), })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Lista de incripciones para el evento"),
+            @ApiResponse(responseCode = "404", description = "Evento no encontrado"),})
     public ResponseEntity<List<InscripcionResponse>> getInscriptosAEvento(@AuthenticationPrincipal Usuario usuario,
-            @PathVariable String eventoId) {
+                                                                          @PathVariable String eventoId) {
         Evento evento = this.buscarEvento(eventoId);
 
         Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
 
         // Si el usuario no es el organizador, devolver 403.
         if (!validador.validar()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador");
+            throw new AccesoDenegadoHandler("El usuario no es organizador");
         }
 
         return ResponseEntity.ok(this.inscripcionesService.inscripcionesConfirmadas(evento).stream()
@@ -207,39 +190,36 @@ public class EventoController {
      * Devuelve la infromación sobre una inscripcion especifica. El usuario debe ser organizador del evento para poder
      * ver esto.
      *
-     * @param usuarioLogueado
-     *            usuario logueado al sistema
-     * @param eventoId
-     *            id del evento al que pertenece la inscripción que se está consultando
-     * @param usuarioId
-     *            id del usuario al que pertenece la inscripción que se está consultando
-     *
+     * @param usuarioLogueado usuario logueado al sistema
+     * @param eventoId        id del evento al que pertenece la inscripción que se está consultando
+     * @param usuarioId       id del usuario al que pertenece la inscripción que se está consultando
      * @return ResponseEntity devuelve el código 200 OK y un body con la inscripcion solicitada. Si una se cumple alguna
-     *         de las siguientes condiciones, devuelve NOT_FOUND 404: * El usuario buscado no esta inscripto. * El
-     *         evento se existe. * El usuario que desato la accion no es el organizador.
+     * de las siguientes condiciones, devuelve NOT_FOUND 404: * El usuario buscado no esta inscripto. * El
+     * evento se existe. * El usuario que desato la accion no es el organizador.
      */
     @GetMapping("/{eventoId}/inscripcion/{usuarioId}")
     @ApiResponse(responseCode = "200", description = "Inscripcion encontrada")
     public ResponseEntity<InscripcionResponse> getInscripcion(@AuthenticationPrincipal Usuario usuarioLogueado,
-            @PathVariable String eventoId, @PathVariable String usuarioId) {
+                                                              @PathVariable String eventoId, @PathVariable String usuarioId) {
         Evento evento = this.buscarEvento(eventoId);
-        // Si el usuario no existe, retorno que no está inscripto para no revelar si existe o no el usuario
-        Usuario usuarioInscripto = usuarioService.buscarPorId(usuarioId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "El usuario no está inscripto al evento"));
+        // Si el usuario no existe, retorno que no está inscripto para no revelar si
+        // existe o no el usuario
+        Usuario usuarioInscripto = usuarioService.buscarPorId(usuarioId)
+                .orElseThrow(() -> new RecursoNoEncontradoHandler("El usuario no está inscripto al evento"));
 
         List<Usuario> autorizados = Arrays.asList(evento.getOrganizador(), usuarioInscripto);
 
         Validador validador = new ValidadorAutorizacionUsuario(usuarioLogueado, autorizados);
 
-        // Si el usuario no es el organizador, devolver 404. Devolvemos 404 para no revelar informacion sensible.
+        // Si el usuario no es el organizador, devolver 404. Devolvemos 404 para no
+        // revelar informacion sensible.
         if (!validador.validar()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new RecursoNoEncontradoHandler("Recurso no encontrado");
         }
 
         Optional<InscripcionEvento> inscripcion = inscripcionesService.inscripcionNoCancelada(evento, usuarioInscripto);
         return inscripcion.map(i -> new InscripcionResponse(i.getEvento().getId(), mapEstado(i.getEstado())))
-                .map(ResponseEntity::ok).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "El usuario no está inscripto al evento"));
+                .map(ResponseEntity::ok).orElseThrow(() -> new RecursoNoEncontradoHandler("El usuario no está inscripto al evento"));
     }
 
     /**
@@ -250,26 +230,25 @@ public class EventoController {
      * <p>
      * Devuelve el status code 204 NO_CONTENT
      *
-     * @param usuarioLogueado
-     *            usuario logueado en el sistema
-     * @param eventoId
-     *            id del evento cuya inscripción se quiere cancelar
-     * @param usuarioId
-     *            id del usuario que se quiere desinscribir
+     * @param usuarioLogueado usuario logueado en el sistema
+     * @param eventoId        id del evento cuya inscripción se quiere cancelar
+     * @param usuarioId       id del usuario que se quiere desinscribir
      */
     @DeleteMapping("/{eventoId}/inscripcion/{usuarioId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> cancelarInscripcion(@AuthenticationPrincipal Usuario usuarioLogueado,
-            @PathVariable String eventoId, @PathVariable String usuarioId) {
+                                                    @PathVariable String eventoId, @PathVariable String usuarioId) {
         Optional<Usuario> usuario = usuarioService.buscarPorId(usuarioId);
         Evento evento = this.buscarEvento(eventoId);
 
-        // Si el usuario no existe, también retorno NO_CONTENT, para no revelar que existe el usuario
+        // Si el usuario no existe, también retorno NO_CONTENT, para no revelar que
+        // existe el usuario
         usuario.ifPresent((u) -> {
             Validador validador = new ValidadorAutorizacionUsuario(usuarioLogueado,
                     List.of(evento.getOrganizador(), u));
 
-            // Solo hago la acción si el usuario está autorizado. Si no está autorizado, digo igual NO_CONTENT, para no
+            // Solo hago la acción si el usuario está autorizado. Si no está autorizado,
+            // digo igual NO_CONTENT, para no
             // revelar información sensible (si el usuario existe, si está inscripto, etc)
             if (validador.validar()) {
                 inscripcionesService.cancelarInscripcion(evento, u);
@@ -283,22 +262,17 @@ public class EventoController {
      * Inscribe a un usuario a un evento. Solo el mismo usuario o el organizador del evento pueden crear una
      * inscripción.
      *
-     * @param usuarioLogueado
-     *            usuario logueado al sistema
-     * @param eventoId
-     *            id del evento sobre el cual se quiere crear una inscripción
-     * @param usuarioId
-     *            id del usuario que se quiere inscribir
-     *
+     * @param usuarioLogueado usuario logueado al sistema
+     * @param eventoId        id del evento sobre el cual se quiere crear una inscripción
+     * @param usuarioId       id del usuario que se quiere inscribir
      * @return ResponseEntity devuelve el código 201 CREATED y un body vacío, o 303 SEE_OTHER si ya existe la
-     *         inscripción
+     * inscripción
      */
     @PostMapping("/{eventoId}/inscripcion/{usuarioId}")
     public ResponseEntity<Void> inscribirUsuarioAEvento(@AuthenticationPrincipal Usuario usuarioLogueado,
-            @PathVariable String eventoId, @PathVariable String usuarioId) throws EventoCerradoException {
+                                                        @PathVariable String eventoId, @PathVariable String usuarioId) throws EventoCerradoException {
         var evento = this.buscarEvento(eventoId);
-        var usuario = usuarioService.buscarPorId(usuarioId).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.FORBIDDEN,
+        var usuario = usuarioService.buscarPorId(usuarioId).orElseThrow(() -> new AccesoDenegadoHandler(
                 "Solamente pueden crear una inscripción el usuario que se va a inscribir, o el organizador del evento"));
 
         Validador validador = new ValidadorAutorizacionUsuario(usuarioLogueado,
@@ -314,17 +288,15 @@ public class EventoController {
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist
         inscripcionesService.inscribirOMandarAWaitlist(evento, usuario);
+
         return ResponseEntity.created(URI.create(location)).build();
     }
 
     /**
      * Permite obtener las inscripciones en waitlist.
      *
-     * @param usuario
-     *            usuario logueado al sistema
-     * @param eventoId
-     *            id del evento cuya waitlist se quiere consultar
-     *
+     * @param usuario  usuario logueado al sistema
+     * @param eventoId id del evento cuya waitlist se quiere consultar
      * @return Las inscripciones de la waitlist.
      */
     @GetMapping("/{eventoId}/waitlist")
@@ -337,7 +309,7 @@ public class EventoController {
 
         // Si el usuario no es el organizador, devolver 403.
         if (!validador.validar()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador");
+            throw new AccesoDenegadoHandler("El usuario no es organizador");
         }
 
         return ResponseEntity
@@ -346,14 +318,14 @@ public class EventoController {
                             i.getParticipante().getEmail(), i.getParticipante().getRoles());
                     return new InscripcionEnWaitlistResponse(usuarioResponse, i.getFechaHoraIngresoAWaitlist().orElse(
                             null)); /*
-                                     * La fechaHora de ingreso a watilist no debería ser nunca null en este caso, porque
-                                     * estamos buscando las inscripciones pendientes, o sea, las que están en watilist
-                                     */
+                     * La fechaHora de ingreso a watilist no debería ser nunca null en este caso, porque
+                     * estamos buscando las inscripciones pendientes, o sea, las que están en watilist
+                     */
                 }).toList());
     }
 
     private Evento buscarEvento(String id) {
         return this.eventoService.buscarEventoPorId(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoHandler("Evento no encontrado"));
     }
 }

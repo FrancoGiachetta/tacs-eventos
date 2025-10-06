@@ -7,12 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
-
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import tacs.eventos.config.TestMongoConfiguration;
 import tacs.eventos.config.TestRedisConfiguration;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.repository.evento.EventosRepository;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorCategoria;
@@ -20,16 +19,16 @@ import tacs.eventos.repository.evento.busqueda.FiltradoPorFechaInicio;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorPalabrasClave;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorPrecio;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class })
+@Import({TestRedisConfiguration.class, TestMongoConfiguration.class})
 @ActiveProfiles("test")
 @Testcontainers
 public class EventoServiceTest {

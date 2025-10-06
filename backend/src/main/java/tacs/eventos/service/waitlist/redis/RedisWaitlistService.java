@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.waitlist.Waitlist;
 import tacs.eventos.model.waitlist.WaitlistEnMemoriaCompartida;
 import tacs.eventos.model.waitlist.WaitlistMongo;

@@ -1,18 +1,18 @@
-package tacs.eventos.model;
+package tacs.eventos.model.evento;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import lombok.*;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import tacs.eventos.model.Usuario;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
-
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED, onConstructor_ = @PersistenceCreator)
 @Getter
 @Document(collection = "eventos")
 public class Evento {
@@ -44,28 +44,13 @@ public class Evento {
     @Setter
     @Indexed
     private String categoria;
-    private boolean abierto = true;
+    private EstadoEvento estado = EstadoEvento.ABIERTO;
 
     @Setter
     private Usuario organizador;
 
-    public Evento(String id, String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
-            String ubicacion, int cupoMaximo, double precio, String categoria, boolean abierto, Usuario organizador) {
-        this.id = id;
-        this.titulo = titulo;
-        this.descripcion = descripcion;
-        this.fechaHoraInicio = fechaHoraInicio;
-        this.duracionMinutos = duracionMinutos;
-        this.ubicacion = ubicacion;
-        this.cupoMaximo = cupoMaximo;
-        this.precio = precio;
-        this.categoria = categoria;
-        this.abierto = abierto;
-        this.organizador = organizador;
-    }
-
     public Evento(String titulo, String descripcion, LocalDateTime fechaHoraInicio, int duracionMinutos,
-            String ubicacion, int cupoMaximo, double precio, String categoria) {
+                  String ubicacion, int cupoMaximo, double precio, String categoria) {
 
         this.id = UUID.randomUUID().toString();
         this.titulo = titulo;
@@ -81,24 +66,22 @@ public class Evento {
     /**
      * Verifica si el evento permite nuevas inscripciones.
      *
-     * @param inscritos
-     *            Número actual de inscritos en el evento.
-     *
+     * @param inscritos Número actual de inscritos en el evento.
      * @return true si el evento está abierto y no ha alcanzado el cupo máximo, false en caso contrario.
      */
-    public boolean permiteIncripcion(int inscritos) {
-        return abierto && (inscritos < cupoMaximo);
+    public boolean permiteInscripcion(int inscritos) {
+        return estado == EstadoEvento.ABIERTO && (inscritos < cupoMaximo);
     }
 
     /**
      * Marca el evento como cerrado, impidiendo nuevas inscripciones.
      */
     public void cerrarEvento() {
-        this.abierto = false;
+        this.estado = EstadoEvento.CERRADO;
     }
 
     public void abrirEvento() {
-        this.abierto = true;
+        this.estado = EstadoEvento.ABIERTO;
     }
 
     @Override

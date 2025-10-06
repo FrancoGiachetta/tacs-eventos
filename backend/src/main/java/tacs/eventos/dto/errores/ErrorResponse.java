@@ -1,6 +1,10 @@
 package tacs.eventos.dto.errores;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
-public record ErrorResponse(List<Error> errores) {
+public record ErrorResponse(String mensaje, LocalDateTime momento) {
+
+    public ErrorResponse(String mensaje) {
+        this(mensaje, LocalDateTime.now());
+    }
 }
