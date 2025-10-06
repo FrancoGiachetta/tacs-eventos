@@ -6,7 +6,7 @@ use teloxide::{
     types::{ChatId, Message},
 };
 
-use crate::{bot::BotResult, request_client::RequestClient};
+use crate::{bot::BotResult, dialogue::MyDialogue, request_client::RequestClient};
 
 /// Utility struct which centralizes most of the actions we need to perform.
 #[derive(Clone)]
@@ -14,20 +14,28 @@ pub struct Controller {
     chat_id: ChatId,
     bot: Arc<Bot>,
     req_client: Arc<RequestClient>,
-    msg: Arc<Message>,
+    msg: Message,
+    dialogue: MyDialogue,
 }
 
 impl Controller {
-    pub fn new(msg: Arc<Message>, bot: Arc<Bot>, req_client: Arc<RequestClient>) -> Self {
-        Self {
+    pub fn new(
+        msg: Message,
+        bot: Arc<Bot>,
+        req_client: Arc<RequestClient>,
+
+        dialogue: MyDialogue,
+    ) -> Option<Self> {
+        Some(Self {
             chat_id: msg.chat.id,
             msg,
             bot,
             req_client,
-        }
+            dialogue,
+        })
     }
 
-    pub fn message(&self) -> Arc<Message> {
+    pub fn message(&self) -> Message {
         self.msg.clone()
     }
 
