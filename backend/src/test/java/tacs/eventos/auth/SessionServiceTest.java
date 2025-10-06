@@ -9,7 +9,10 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import tacs.eventos.model.RolUsuario;
@@ -18,8 +21,17 @@ import tacs.eventos.model.Usuario;
 import tacs.eventos.repository.sesion.SessionRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
 import tacs.eventos.service.SessionService;
+import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import tacs.eventos.config.TestRedisConfiguration;
+import tacs.eventos.config.TestMongoConfiguration;
 
 @SpringBootTest
+@AutoConfigureMockMvc(addFilters = false)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class })
+@ActiveProfiles("test")
+@Testcontainers
 class SessionServiceTest {
 
     private UsuarioRepository usuarios;

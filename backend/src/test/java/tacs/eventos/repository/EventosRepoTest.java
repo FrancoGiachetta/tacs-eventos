@@ -3,22 +3,55 @@ package tacs.eventos.repository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import tacs.eventos.config.TestMongoConfiguration;
+import tacs.eventos.config.TestRedisConfiguration;
 import tacs.eventos.model.Evento;
 import tacs.eventos.repository.evento.EventosRepository;
+import tacs.eventos.repository.evento.EventosRepositoryImpl;
 
+import static com.mongodb.assertions.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
+@Testcontainers
+@Import({ TestMongoConfiguration.class, TestRedisConfiguration.class })
+@ActiveProfiles("test")
 class EventosRepoTest { // Testea contra la base real
     @Autowired
     private EventosRepository repo;
 
+    @MockBean
+    private RedissonClient redissonClient;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private EventosRepositoryImpl eventosRepository; // Tu implementación con MongoTemplate
+
+    @MockBean
+    private StringRedisTemplate stringRedisTemplate;
+
     private Evento e1;
     private Evento e2;
     private Evento e3;
+
+    @Test
+    void testConexion() {
+        assertNotNull(mongoTemplate);
+        // Verificar que podemos realizar operaciones
+        mongoTemplate.getDb().getName();
+    }
 
     @BeforeEach
     void setUp() {

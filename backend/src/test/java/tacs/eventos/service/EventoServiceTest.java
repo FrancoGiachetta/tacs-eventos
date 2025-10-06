@@ -5,8 +5,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 
+import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import tacs.eventos.config.TestMongoConfiguration;
+import tacs.eventos.config.TestRedisConfiguration;
 import tacs.eventos.model.Evento;
 import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.repository.evento.EventosRepository;
@@ -24,6 +29,9 @@ import java.util.List;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class })
+@ActiveProfiles("test")
+@Testcontainers
 public class EventoServiceTest {
     @Autowired
     EventoService eventoService;
