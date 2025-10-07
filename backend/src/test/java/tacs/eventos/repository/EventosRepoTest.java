@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Testcontainers
 @Import({ TestMongoConfiguration.class, TestRedisConfiguration.class })
 @ActiveProfiles("test")
-class EventosRepoTest { // Testea contra la base real
+class EventosRepoTest {
     @Autowired
     private EventosRepository repo;
 
