@@ -24,8 +24,8 @@ public class ModelMapperConfig {
         ModelMapper mapper = new ModelMapper();
 
         // Convertidor para EstadoEvento a boolean
-        Converter<EstadoEvento, Boolean> estadoEventoToBooleanConverter = ctx -> 
-            ctx.getSource() == EstadoEvento.ABIERTO;
+        Converter<EstadoEvento, Boolean> estadoEventoToBooleanConverter = ctx -> ctx
+                .getSource() == EstadoEvento.ABIERTO;
 
         mapper.addMappings(new PropertyMap<Evento, EventoResponse>() {
             @Override
