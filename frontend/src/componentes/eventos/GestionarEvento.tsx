@@ -303,7 +303,7 @@ function InscriptosTable({
                         <th className="text-left px-3 py-2">
                             Fecha de inscripción
                         </th>
-                        <th className="text-left px-3 py-2">Acciones</th>
+                        {/* <th className="text-left px-3 py-2">Acciones</th> */}
                     </tr>
                 </thead>
                 <tbody>
@@ -317,14 +317,15 @@ function InscriptosTable({
                                       })
                                     : '—'}
                             </td>
-                            <td className="px-3 py-2">
+                            {/*TODO: volver a agregar esto*/}
+                            {/* <td className="px-3 py-2">
                                 <button
                                     onClick={() => onQuitar(i.id)}
                                     className="px-2 py-1 rounded-md bg-rose-600 text-white hover:bg-rose-700"
                                 >
                                     Quitar
                                 </button>
-                            </td>
+                            </td> */}
                         </tr>
                     ))}
                     {inscriptos.length === 0 && (

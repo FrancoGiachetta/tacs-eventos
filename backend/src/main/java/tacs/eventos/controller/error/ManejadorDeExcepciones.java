@@ -1,16 +1,11 @@
 package tacs.eventos.controller.error;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import tacs.eventos.controller.error.handlers.AccesoDenegadoHandler;
-import tacs.eventos.controller.error.handlers.AccesoNoAutorizadoHandler;
-import tacs.eventos.controller.error.handlers.ErrorInternoHandler;
-import tacs.eventos.controller.error.handlers.RecursoNoEncontradoHandler;
+import tacs.eventos.controller.error.handlers.*;
 import tacs.eventos.dto.errores.ErrorResponse;
 
 @RestControllerAdvice
@@ -45,6 +40,12 @@ public class ManejadorDeExcepciones {
     public ResponseEntity<ErrorResponse> handleErrorInterno(ErrorInternoHandler ex) {
         ErrorResponse error = new ErrorResponse(ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
+    @ExceptionHandler(EventoCerradoHandler.class)
+    public ResponseEntity<ErrorResponse> handleEventoCerrado(EventoCerradoHandler ex) {
+        ErrorResponse error = new ErrorResponse(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(error);
     }
 
     @ExceptionHandler(Exception.class)

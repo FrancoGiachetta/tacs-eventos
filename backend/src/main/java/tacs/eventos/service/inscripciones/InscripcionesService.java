@@ -3,6 +3,7 @@ package tacs.eventos.service.inscripciones;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import tacs.eventos.controller.error.handlers.EventoCerradoHandler;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.evento.EstadoEvento;
 import tacs.eventos.model.evento.Evento;
@@ -31,16 +32,12 @@ public class InscripcionesService {
      *
      * @param evento
      * @param usuario
-     *
      * @return la inscripción generada si pudo inscribirlo, o un Optional vacío si lo mandó a la waitlist.
-     *
-     * @throws EventoCerradoException
-     *             si el evento está cerrado y ya no recibe inscripciones
+     * @throws EventoCerradoHandler si el evento está cerrado y ya no recibe inscripciones
      */
-    public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario)
-            throws EventoCerradoException {
+    public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario) {
         if (evento.getEstado() != EstadoEvento.ABIERTO)
-            throw new EventoCerradoException(evento);
+            throw new EventoCerradoHandler(evento);
         // Primero intenta inscribirlo directamente. Si no, lo manda a la waitlist.
         return intentarInscribir(InscripcionFactory.confirmada(usuario, evento)).or(() -> {
             InscripcionEvento inscripcionEvento = InscripcionFactory.pendiente(usuario, evento);
@@ -82,7 +79,6 @@ public class InscripcionesService {
     /**
      * @param evento
      * @param usuario
-     *
      * @return si el usuario está en la waitlist o tiene una inscripción confirmada para ese evento
      */
     public Optional<InscripcionEvento> inscripcionNoCancelada(Evento evento, Usuario usuario) {
@@ -91,7 +87,6 @@ public class InscripcionesService {
 
     /**
      * @param evento
-     *
      * @return todas las inscripciones (confirmadas, canceladas, o pendientes) de ese evento
      */
     public List<InscripcionEvento> inscripcionesConfirmadas(Evento evento) {
@@ -100,7 +95,6 @@ public class InscripcionesService {
 
     /**
      * @param evento
-     *
      * @return las inscripciones pendientes de ese evento
      */
     public List<InscripcionEvento> inscripcionesPendientes(Evento evento) {
@@ -110,11 +104,9 @@ public class InscripcionesService {
     /**
      * Intenta inscribir al usuario directamente al evento (sin pasar por la waitlist).
      *
-     * @param inscripcion
-     *            la inscripción que se quiere intentar realizar
-     *
+     * @param inscripcion la inscripción que se quiere intentar realizar
      * @return la inscripción realizada, o un Optional vacío si no pudo realizar la inscripción porque no había lugar o
-     *         porque el evento fue cerrado.
+     * porque el evento fue cerrado.
      */
     private Optional<InscripcionEvento> intentarInscribir(InscripcionEvento inscripcion) {
         boolean hayCupo = cupoEventoService.obtenerCupo(inscripcion.getEvento());

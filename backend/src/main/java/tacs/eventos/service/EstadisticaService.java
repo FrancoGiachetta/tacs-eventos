@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import tacs.eventos.controller.error.handlers.RecursoNoEncontradoHandler;
 import tacs.eventos.model.evento.EstadoEvento;
 import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
@@ -26,8 +27,10 @@ public class EstadisticaService {
 
     // TODO: falta chequear si esta bien aplicado esta logica que pide de tasa de conversion de waitList
     public int calcularTasaConversionWL(String id) {
+        // TODO: en casos como este, el front muestra el status code pero no el mensaje. Arreglarlo.
+        // TODO: esto está devolviendo un error 500 en lugar del que se arroja en el handler. Arreglarlo.
         Evento evento = this.eventosRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoHandler("Evento no encontrado"));
         int calculoTasa = 0;
 
         if (evento.getEstado() == EstadoEvento.ABIERTO) {
@@ -40,6 +43,7 @@ public class EstadisticaService {
                 calculoTasa = (TotalInscripcionesEvento / totalInscripcionesEnWaitlist) * 100;
             }
         } else {
+            // TODO: tirar una excepción de dominio y manejarlas en los handlers
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "El evento ya fue cerrado");
         }
 

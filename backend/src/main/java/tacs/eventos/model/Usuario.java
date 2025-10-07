@@ -13,8 +13,8 @@ import java.util.Set;
 
 public class Usuario implements Serializable {
     private static final long serialVersionUID = 1L;
-
     private String id;
+    // TODO: crear un indice unico por este campo
     private String email; // almacenadr normalizado (lowercase)
     private String passwordHash; // BCrypt
     private Set<RolUsuario> roles = new HashSet<>();
