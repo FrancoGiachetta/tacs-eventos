@@ -33,7 +33,7 @@ public class EventosRepositoryImpl implements EventosRepository {
     @Override
     public List<Evento> findByOrganizador(String organizadorId) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("organizador").is(organizadorId));
+        query.addCriteria(Criteria.where("organizador._id").is(organizadorId));
         return new ArrayList<>(eventos.find(query, Evento.class));
 
     }
