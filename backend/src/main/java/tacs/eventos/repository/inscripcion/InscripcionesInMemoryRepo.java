@@ -1,7 +1,7 @@
 package tacs.eventos.repository.inscripcion;
 
 import org.springframework.stereotype.Repository;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
@@ -26,7 +26,7 @@ public class InscripcionesInMemoryRepo {
 
     public List<InscripcionEvento> getInscripcionesNoCanceladasPorParticipante(Usuario participante) {
         return this.inscripciones.stream().filter(i -> i.getParticipante().equals(participante))
-                .filter(i -> i.getEstado() == EstadoInscripcion.CONFIRMADA).toList();
+                .filter(i -> i.getEstado() != EstadoInscripcion.CANCELADA).toList();
     }
 
     public List<InscripcionEvento> getInscripcionesPorEvento(Evento evento) {
@@ -54,7 +54,8 @@ public class InscripcionesInMemoryRepo {
 
     public Optional<InscripcionEvento> getInscripcionParaUsuarioYEvento(Usuario usuarioInscripto, Evento evento) {
         return this.inscripciones.stream()
-                .filter(i -> i.getEvento().equals(evento) && i.getParticipante().equals(usuarioInscripto)).findFirst();
+                .filter(i -> i.getEvento().equals(evento) && i.getParticipante().equals(usuarioInscripto))
+                .filter(i -> i.getEstado() != EstadoInscripcion.CANCELADA).findFirst();
     }
 
     public Optional<InscripcionEvento> getInscripcionPorId(String id) {

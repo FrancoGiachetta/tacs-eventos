@@ -3,8 +3,9 @@ package tacs.eventos.service.inscripciones;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.evento.EstadoEvento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
@@ -38,7 +39,7 @@ public class InscripcionesService {
      */
     public Optional<InscripcionEvento> inscribirOMandarAWaitlist(Evento evento, Usuario usuario)
             throws EventoCerradoException {
-        if (!evento.isAbierto())
+        if (evento.getEstado() != EstadoEvento.ABIERTO)
             throw new EventoCerradoException(evento);
         // Primero intenta inscribirlo directamente. Si no, lo manda a la waitlist.
         return intentarInscribir(InscripcionFactory.confirmada(usuario, evento)).or(() -> {

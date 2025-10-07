@@ -1,6 +1,8 @@
 package tacs.eventos.auth;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,15 +18,25 @@ import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import tacs.eventos.config.TestMongoConfiguration;
+import tacs.eventos.config.TestRedisConfiguration;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.service.SessionService;
 
 @SpringBootTest
+@AutoConfigureMockMvc(addFilters = false)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class })
+@ActiveProfiles("test")
+@Testcontainers
 public class SessionAuthFilterTest {
 
     private SessionService sessions;

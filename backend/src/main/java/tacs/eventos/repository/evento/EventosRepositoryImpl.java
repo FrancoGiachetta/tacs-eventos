@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import tacs.eventos.model.Evento;
-import tacs.eventos.repository.FiltroBusqueda;
 import org.springframework.stereotype.Repository;
+import tacs.eventos.model.evento.Evento;
+import tacs.eventos.repository.FiltroBusqueda;
 
 import java.util.ArrayList;
 import java.util.List;

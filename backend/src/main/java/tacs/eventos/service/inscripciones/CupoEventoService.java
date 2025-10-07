@@ -5,7 +5,7 @@ import org.redisson.api.RCountDownLatch;
 import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.redis_utils.EstadoInicializacionRedis;
 import tacs.eventos.redis_utils.FlagsInicializacionRedis;

@@ -1,7 +1,6 @@
 package tacs.eventos.repository.evento;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.repository.FiltroBusqueda;
 
 import java.util.List;

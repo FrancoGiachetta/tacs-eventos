@@ -10,12 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import tacs.eventos.controller.error.handlers.AccesoDenegadoHandler;
+import tacs.eventos.controller.error.handlers.RecursoNoEncontradoHandler;
 import tacs.eventos.controller.validadores.Validador;
 import tacs.eventos.controller.validadores.ValidadorAutorizacionUsuario;
 import tacs.eventos.dto.*;
-import tacs.eventos.model.Evento;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorCategoria;
@@ -151,17 +152,17 @@ public class EventoController {
      * @return ResponseEntity devuelve el código 204 NO_CONTENT y un body vacio. Si el evento se existe, devuelve
      *         NOT_FOUND 404.
      */
-    @PutMapping("/{eventoId}/estado")
+    @PatchMapping("/{eventoId}")
     @ApiResponse(responseCode = "404", description = "Evento no encontrado")
     public ResponseEntity<Void> actualizarEstadoEvento(@AuthenticationPrincipal Usuario usuario,
-            @PathVariable String eventoId, EventoEstadoDTO estadoDTO) {
+            @PathVariable String eventoId, @RequestBody EventoEstadoDTO estadoDTO) {
         Evento evento = this.buscarEvento(eventoId);
 
         Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
 
         // Si el usuario no es el organizador, devolver 403.
         if (!validador.validar()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no está inscripto al evento");
+            throw new AccesoDenegadoHandler("El usuario no está inscripto al evento");
         }
         ;
 
@@ -196,7 +197,7 @@ public class EventoController {
 
         // Si el usuario no es el organizador, devolver 403.
         if (!validador.validar()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador");
+            throw new AccesoDenegadoHandler("El usuario no es organizador");
         }
 
         return ResponseEntity.ok(this.inscripcionesService.inscripcionesConfirmadas(evento).stream()
@@ -223,23 +224,25 @@ public class EventoController {
     public ResponseEntity<InscripcionResponse> getInscripcion(@AuthenticationPrincipal Usuario usuarioLogueado,
             @PathVariable String eventoId, @PathVariable String usuarioId) {
         Evento evento = this.buscarEvento(eventoId);
-        // Si el usuario no existe, retorno que no está inscripto para no revelar si existe o no el usuario
-        Usuario usuarioInscripto = usuarioService.buscarPorId(usuarioId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "El usuario no está inscripto al evento"));
+        // Si el usuario no existe, retorno que no está inscripto para no revelar si
+        // existe o no el usuario
+        Usuario usuarioInscripto = usuarioService.buscarPorId(usuarioId)
+                .orElseThrow(() -> new RecursoNoEncontradoHandler("El usuario no está inscripto al evento"));
 
         List<Usuario> autorizados = Arrays.asList(evento.getOrganizador(), usuarioInscripto);
 
         Validador validador = new ValidadorAutorizacionUsuario(usuarioLogueado, autorizados);
 
-        // Si el usuario no es el organizador, devolver 404. Devolvemos 404 para no revelar informacion sensible.
+        // Si el usuario no es el organizador, devolver 404. Devolvemos 404 para no
+        // revelar informacion sensible.
         if (!validador.validar()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new RecursoNoEncontradoHandler("Recurso no encontrado");
         }
 
         Optional<InscripcionEvento> inscripcion = inscripcionesService.inscripcionNoCancelada(evento, usuarioInscripto);
         return inscripcion.map(i -> new InscripcionResponse(i.getEvento().getId(), mapEstado(i.getEstado())))
-                .map(ResponseEntity::ok).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "El usuario no está inscripto al evento"));
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new RecursoNoEncontradoHandler("El usuario no está inscripto al evento"));
     }
 
     /**
@@ -264,12 +267,14 @@ public class EventoController {
         Optional<Usuario> usuario = usuarioService.buscarPorId(usuarioId);
         Evento evento = this.buscarEvento(eventoId);
 
-        // Si el usuario no existe, también retorno NO_CONTENT, para no revelar que existe el usuario
+        // Si el usuario no existe, también retorno NO_CONTENT, para no revelar que
+        // existe el usuario
         usuario.ifPresent((u) -> {
             Validador validador = new ValidadorAutorizacionUsuario(usuarioLogueado,
                     List.of(evento.getOrganizador(), u));
 
-            // Solo hago la acción si el usuario está autorizado. Si no está autorizado, digo igual NO_CONTENT, para no
+            // Solo hago la acción si el usuario está autorizado. Si no está autorizado,
+            // digo igual NO_CONTENT, para no
             // revelar información sensible (si el usuario existe, si está inscripto, etc)
             if (validador.validar()) {
                 inscripcionesService.cancelarInscripcion(evento, u);
@@ -297,8 +302,7 @@ public class EventoController {
     public ResponseEntity<Void> inscribirUsuarioAEvento(@AuthenticationPrincipal Usuario usuarioLogueado,
             @PathVariable String eventoId, @PathVariable String usuarioId) throws EventoCerradoException {
         var evento = this.buscarEvento(eventoId);
-        var usuario = usuarioService.buscarPorId(usuarioId).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.FORBIDDEN,
+        var usuario = usuarioService.buscarPorId(usuarioId).orElseThrow(() -> new AccesoDenegadoHandler(
                 "Solamente pueden crear una inscripción el usuario que se va a inscribir, o el organizador del evento"));
 
         Validador validador = new ValidadorAutorizacionUsuario(usuarioLogueado,
@@ -314,6 +318,7 @@ public class EventoController {
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist
         inscripcionesService.inscribirOMandarAWaitlist(evento, usuario);
+
         return ResponseEntity.created(URI.create(location)).build();
     }
 
@@ -337,7 +342,7 @@ public class EventoController {
 
         // Si el usuario no es el organizador, devolver 403.
         if (!validador.validar()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no es organizador");
+            throw new AccesoDenegadoHandler("El usuario no es organizador");
         }
 
         return ResponseEntity
@@ -354,6 +359,6 @@ public class EventoController {
 
     private Evento buscarEvento(String id) {
         return this.eventoService.buscarEventoPorId(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoHandler("Evento no encontrado"));
     }
 }

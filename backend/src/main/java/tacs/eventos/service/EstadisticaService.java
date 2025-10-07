@@ -4,7 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.EstadoEvento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.repository.evento.EventosRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
@@ -12,7 +13,6 @@ import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 @Service
 @AllArgsConstructor
 public class EstadisticaService {
-
     private final EventosRepository eventosRepository;
     private final InscripcionesRepository inscripcionesRepository;
 
@@ -30,7 +30,7 @@ public class EstadisticaService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado"));
         int calculoTasa = 0;
 
-        if (evento.isAbierto()) {
+        if (evento.getEstado() == EstadoEvento.ABIERTO) {
             int TotalInscripcionesEvento;
             int totalInscripcionesEnWaitlist;
             TotalInscripcionesEvento = this.inscripcionesRepository.countByEvento(evento);
@@ -42,7 +42,5 @@ public class EstadisticaService {
         }
 
         return calculoTasa;
-
     }
-
 }

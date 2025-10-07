@@ -2,8 +2,14 @@ package tacs.eventos.repository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import tacs.eventos.model.Evento;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import tacs.eventos.config.TestMongoConfiguration;
+import tacs.eventos.config.TestRedisConfiguration;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
 import tacs.eventos.repository.inscripcion.InscripcionesInMemoryRepo;
@@ -11,6 +17,10 @@ import tacs.eventos.repository.inscripcion.InscripcionesInMemoryRepo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SpringBootTest
+@Testcontainers
+@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class })
+@ActiveProfiles("test")
 class InscripcionesInMemoryRepoTest {
     private InscripcionesInMemoryRepo repo;
     private Evento e;

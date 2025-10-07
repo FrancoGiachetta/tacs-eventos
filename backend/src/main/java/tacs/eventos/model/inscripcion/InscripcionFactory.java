@@ -1,6 +1,6 @@
 package tacs.eventos.model.inscripcion;
 
-import tacs.eventos.model.Evento;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.Usuario;
 
 import java.time.LocalDateTime;
