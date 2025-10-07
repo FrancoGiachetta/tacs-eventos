@@ -21,10 +21,10 @@ export default function MisInscripciones() {
 
     return (
         <div className="mt-10 w-[90%] mx-auto">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-2">
                 <h1 className="text-4xl">Mis inscripciones</h1>
             </div>
-            <div className="mt-5 w-full mx-auto rounded-lg bg-gray-100 p-10 flex flex-col gap-4">
+            <div className="w-full mx-auto rounded-lg bg-white p-10 flex flex-col gap-4">
                 {loaded &&
                     (inscripciones.length > 0 ? (
                         inscripciones.map(

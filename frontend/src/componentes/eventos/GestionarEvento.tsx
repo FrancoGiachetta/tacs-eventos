@@ -36,7 +36,7 @@ export default function GestionarEvento() {
 
     const publicLink = useMemo(() => {
         // Si tu backend te devuelve una URL pública, preferila. Mientras, construimos una razonable:
-        return `${window.location.origin}/evento/${id}`
+        return `${window.location.origin}/eventos/${id}`
     }, [id])
 
     const fetchAll = async () => {
