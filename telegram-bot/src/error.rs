@@ -18,4 +18,6 @@ pub enum BotError {
     RequestError(#[from] RequestClientError),
     #[error(transparent)]
     DialogueError(#[from] InMemStorageError),
+    #[error("{}", .0)]
+    CustomError(String),
 }

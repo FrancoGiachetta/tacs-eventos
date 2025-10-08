@@ -1,14 +1,35 @@
 use lazy_static::lazy_static;
 use regex::Regex;
+use tracing::trace;
 
-use crate::{
-    bot::BotResult,
-    controller::Controller,
-    dialogue::{MyDialogue, State},
-    schemas::user::UserOut,
-};
+use crate::{bot::BotResult, controller::Controller, dialogue::State, schemas::user::UserOut};
 
-pub async fn handle_register_email(ctl: Controller, dialogue: MyDialogue) -> BotResult<()> {
+// User first choice, either registering a new account logging with an existing
+// one.
+
+pub async fn check_user_auth_selection(ctl: Controller) -> BotResult<()> {
+    match &ctl.message().text().map(|m| m.to_lowercase()) {
+        Some(m) if m == "a" => {
+            let message = "Okay! Elegiste crearte una cuenta nueva. Para eso voy a necesitar que me envies un mail";
+
+            ctl.send_message(message).await?;
+            ctl.update_dialogue_state(State::RegisterEmail).await?
+        }
+        Some(m) if m == "b" => {
+            let message = "Okay! Parece que ya tenes una cuenta registrada. Para eso voy a necesitar que me envies tu mail";
+
+            ctl.send_message(message).await?;
+            // TODO: Add a State for registering already created mail.
+        }
+        _ => {}
+    }
+
+    Ok(())
+}
+
+// User registration dialogue.
+
+pub async fn handle_register_email(ctl: Controller) -> BotResult<()> {
     lazy_static! {
         static ref EMAIL_REGEX: Regex = Regex::new(r"/^[^\s@]+@[^\s@]+\.[^\s@]+$/").unwrap();
     }
@@ -17,11 +38,10 @@ pub async fn handle_register_email(ctl: Controller, dialogue: MyDialogue) -> Bot
         Some(email) if EMAIL_REGEX.is_match(email) => {
             ctl.send_message("Ahora necesito una contrasena").await?;
 
-            dialogue
-                .update(State::RegisterPassword {
-                    email: email.to_string(),
-                })
-                .await?;
+            ctl.update_dialogue_state(State::RegisterPassword {
+                email: email.to_string(),
+            })
+            .await?;
         }
         _ => {
             ctl.send_message("Ese email no es valido!").await?;
@@ -31,11 +51,7 @@ pub async fn handle_register_email(ctl: Controller, dialogue: MyDialogue) -> Bot
     Ok(())
 }
 
-pub async fn handle_register_password(
-    ctl: Controller,
-    dialogue: MyDialogue,
-    email: String,
-) -> BotResult<()> {
+pub async fn handle_register_password(ctl: Controller, email: String) -> BotResult<()> {
     lazy_static! {
         static ref PASSWORD_REGEX: Regex =
             Regex::new(r"/^(?=.*[A-Za-z])(?=.*\d).{8,72}$/").unwrap();
@@ -46,12 +62,11 @@ pub async fn handle_register_password(
             ctl.send_message("Ahora necesito que confirmes las contrasena")
                 .await?;
 
-            dialogue
-                .update(State::ConfirmPassword {
-                    email,
-                    password: password.to_string(),
-                })
-                .await?;
+            ctl.update_dialogue_state(State::ConfirmPassword {
+                email,
+                password: password.to_string(),
+            })
+            .await?;
         }
         _ => {
             ctl.send_message("Esa contrasena es invalida!").await?;
@@ -63,7 +78,6 @@ pub async fn handle_register_password(
 
 pub async fn handle_confirm_password(
     ctl: Controller,
-    dialogue: MyDialogue,
     (email, password): (String, String),
 ) -> BotResult<()> {
     match ctl.message().text() {
@@ -80,6 +94,8 @@ pub async fn handle_confirm_password(
                 })
                 .await?;
 
+            trace!("TOKEN: {:?}", &token);
+
             ctl.send_message(&format!("Your token! {}", token.token))
                 .await?;
         }
@@ -88,7 +104,8 @@ pub async fn handle_confirm_password(
         }
     }
 
-    dialogue.exit().await?;
+    // Change back to State::Start so that the user can perform commands.
+    ctl.update_dialogue_state(State::Start).await?;
 
     Ok(())
 }

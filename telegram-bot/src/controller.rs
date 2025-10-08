@@ -6,7 +6,11 @@ use teloxide::{
     types::{ChatId, Message},
 };
 
-use crate::{bot::BotResult, dialogue::MyDialogue, request_client::RequestClient};
+use crate::{
+    bot::BotResult,
+    dialogue::{MyDialogue, State},
+    request_client::RequestClient,
+};
 
 /// Utility struct which centralizes most of the actions we need to perform.
 #[derive(Clone)]
@@ -53,6 +57,12 @@ impl Controller {
         self.bot
             .send_message(self.chat_id, format!("❌ {}", msg))
             .await?;
+
+        Ok(())
+    }
+
+    pub async fn update_dialogue_state(&self, state: State) -> BotResult<()> {
+        self.dialogue.update(state).await?;
 
         Ok(())
     }

@@ -10,17 +10,12 @@ use teloxide::{
 };
 
 mod event;
-mod user;
 
 #[derive(BotCommands, Clone)]
 #[command(rename_rule = "lowercase")]
 pub enum Command {
     #[command(description = "Display help message.")]
     Help,
-    #[command(description = "Register a with account.")]
-    Register,
-    #[command(description = "Login with an existing account.")]
-    Login,
     #[command(
         description = "List the available events",
         // Tell teloxide how to parse filters.
@@ -37,8 +32,6 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
         // A command can only be handled if the current State is State::Start.
         dptree::case![State::Start]
             .branch(dptree::case![Command::ListEvents(filters)].endpoint(event::handle_list_events))
-            .branch(dptree::case![Command::Register].endpoint(user::handle_register))
-            .branch(dptree::case![Command::Login])
             .branch(dptree::case![Command::Help].endpoint(handle_help_command)),
     )
 }
