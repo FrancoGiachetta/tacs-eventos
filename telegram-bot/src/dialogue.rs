@@ -32,6 +32,7 @@ pub enum State {
         email: String,
         password: String,
     },
+    Authenticated,
 }
 
 /// Creates a handler for commands.
@@ -86,6 +87,7 @@ B) Registrarme ✍️
 ", username, &Command::descriptions());
 
     ctl.send_message(&greetings_message).await?;
+    ctl.update_dialogue_state(State::CheckUser).await?;
 
     Ok(())
 }

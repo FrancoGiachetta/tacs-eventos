@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
 use chrono::NaiveDate;
+use fancy_regex::Regex;
 use lazy_static::lazy_static;
-use regex::Regex;
 use reqwest::StatusCode;
 use teloxide::utils::command::ParseError;
 use tracing::{error, info};
@@ -73,14 +73,17 @@ pub fn parse_event_filters(input: String) -> Result<(EventFilter,), ParseError> 
 
     let min_price = MIN_PRICE_PREFIX
         .captures(&input)
+        .map_err(|e| ParseError::Custom(format!("Error running regex: {e}").into()))?
         .and_then(|caps| caps.get(1))
         .and_then(|p| p.as_str().parse::<f32>().ok());
     let max_price = MAX_PRICE_PREFIX
         .captures(&input)
+        .map_err(|e| ParseError::Custom(format!("Error running regex: {e}").into()))?
         .and_then(|caps| caps.get(1))
         .and_then(|p| p.as_str().parse::<f32>().ok());
     let min_date = MIN_DATE_PREFIX
         .captures(&input)
+        .map_err(|e| ParseError::Custom(format!("Error running regex: {e}").into()))?
         .and_then(|caps| caps.get(1))
         .and_then(|date| {
             let mut date = date.as_str().split("-").collect::<Vec<&str>>();
@@ -91,6 +94,7 @@ pub fn parse_event_filters(input: String) -> Result<(EventFilter,), ParseError> 
         });
     let max_date = MAX_DATE_PREFIX
         .captures(&input)
+        .map_err(|e| ParseError::Custom(format!("Error running regex: {e}").into()))?
         .and_then(|caps| caps.get(1))
         .and_then(|date| {
             let mut date = date.as_str().split("-").collect::<Vec<&str>>();
@@ -101,10 +105,12 @@ pub fn parse_event_filters(input: String) -> Result<(EventFilter,), ParseError> 
         });
     let category = CATEGORY_PREFIX
         .captures(&input)
+        .map_err(|e| ParseError::Custom(format!("Error running regex: {e}").into()))?
         .and_then(|c| c.get(1))
         .map(|c| c.as_str().to_string());
     let keywords = KEYWORDS_PREFIX
         .captures(&input)
+        .map_err(|e| ParseError::Custom(format!("Error running regex: {e}").into()))?
         .and_then(|ks| ks.get(1))
         .map(|ks| {
             ks.as_str()

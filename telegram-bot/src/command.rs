@@ -30,7 +30,7 @@ pub enum Command {
 pub fn create_command_handler() -> UpdateHandler<BotError> {
     dptree::entry().filter_command::<Command>().branch(
         // A command can only be handled if the current State is State::Start.
-        dptree::case![State::Start]
+        dptree::case![State::Authenticated]
             .branch(dptree::case![Command::ListEvents(filters)].endpoint(event::handle_list_events))
             .branch(dptree::case![Command::Help].endpoint(handle_help_command)),
     )

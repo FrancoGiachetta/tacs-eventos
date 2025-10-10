@@ -1,6 +1,6 @@
+use fancy_regex::Regex;
 use lazy_static::lazy_static;
-use regex::Regex;
-use tracing::trace;
+use tracing::info;
 
 use crate::{bot::BotResult, controller::Controller, dialogue::State, schemas::user::UserOut};
 
@@ -29,13 +29,14 @@ pub async fn check_user_auth_selection(ctl: Controller) -> BotResult<()> {
 
 // User registration dialogue.
 
-pub async fn handle_register_email(ctl: Controller) -> BotResult<()> {
-    lazy_static! {
-        static ref EMAIL_REGEX: Regex = Regex::new(r"/^[^\s@]+@[^\s@]+\.[^\s@]+$/").unwrap();
-    }
+lazy_static! {
+    static ref EMAIL_REGEX: Regex = Regex::new(r"^[^\s@]+@[^\s@]+\.[^\s@]+$").unwrap();
+    static ref PASSWORD_REGEX: Regex = Regex::new(r"^(?=.*[A-Za-z])(?=.*\d).{8,72}$").unwrap();
+}
 
+pub async fn handle_register_email(ctl: Controller) -> BotResult<()> {
     match ctl.message().text() {
-        Some(email) if EMAIL_REGEX.is_match(email) => {
+        Some(email) if EMAIL_REGEX.is_match(email)? => {
             ctl.send_message("Ahora necesito una contrasena").await?;
 
             ctl.update_dialogue_state(State::RegisterPassword {
@@ -52,13 +53,8 @@ pub async fn handle_register_email(ctl: Controller) -> BotResult<()> {
 }
 
 pub async fn handle_register_password(ctl: Controller, email: String) -> BotResult<()> {
-    lazy_static! {
-        static ref PASSWORD_REGEX: Regex =
-            Regex::new(r"/^(?=.*[A-Za-z])(?=.*\d).{8,72}$/").unwrap();
-    }
-
     match ctl.message().text() {
-        Some(password) if PASSWORD_REGEX.is_match(password) => {
+        Some(password) if PASSWORD_REGEX.is_match(password)? => {
             ctl.send_message("Ahora necesito que confirmes las contrasena")
                 .await?;
 
@@ -82,9 +78,6 @@ pub async fn handle_confirm_password(
 ) -> BotResult<()> {
     match ctl.message().text() {
         Some(confirm_pass) if password == confirm_pass => {
-            ctl.send_message("Ahora necesito que confirmes las contrasena")
-                .await?;
-
             let token = ctl
                 .request_client()
                 .send_user_registration_request(UserOut {
@@ -94,18 +87,17 @@ pub async fn handle_confirm_password(
                 })
                 .await?;
 
-            trace!("TOKEN: {:?}", &token);
+            info!("TOKEN: {:?}", &token);
 
-            ctl.send_message(&format!("Your token! {}", token.token))
-                .await?;
+            ctl.send_message("Ya creaste tu cuenta!").await?;
+
+            // Change to State::Authenticated so that the user can perform commands.
+            ctl.update_dialogue_state(State::Authenticated).await?;
         }
         _ => {
-            ctl.send_message("Esa contrasena es invalida!").await?;
+            ctl.send_message("Las contrasenas no coinciden!").await?;
         }
     }
-
-    // Change back to State::Start so that the user can perform commands.
-    ctl.update_dialogue_state(State::Start).await?;
 
     Ok(())
 }
