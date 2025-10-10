@@ -1,5 +1,6 @@
 package tacs.eventos.repository.evento.busqueda;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import tacs.eventos.model.evento.Evento;
 import tacs.eventos.repository.FiltroBusqueda;
@@ -8,7 +9,9 @@ import java.time.LocalDate;
 
 @AllArgsConstructor
 public class FiltradoPorFechaInicio implements FiltroBusqueda<Evento> {
+    @NotNull
     private LocalDate fechaMinima;
+    @NotNull
     private LocalDate fechaMaxima;
 
     @Override

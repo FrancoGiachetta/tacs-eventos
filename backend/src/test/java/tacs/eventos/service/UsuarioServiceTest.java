@@ -2,7 +2,14 @@ package tacs.eventos.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import tacs.eventos.config.TestMongoConfiguration;
+import tacs.eventos.config.TestRedisConfiguration;
 import tacs.eventos.dto.EstadoInscripcionResponse;
 import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.model.evento.Evento;
@@ -10,7 +17,6 @@ import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
-import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
 
@@ -22,23 +28,25 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class })
+@ActiveProfiles("test")
+@Testcontainers
 class UsuarioServiceTest {
 
     private UsuarioRepository usuarioRepository;
     private InscripcionesRepository inscripcionesRepository;
     private PasswordEncoder passwordEncoder;
     private UsuarioService usuarioService;
-    private WaitlistRepository waitlistRepository;
 
     @BeforeEach
     void setUp() {
         usuarioRepository = mock(UsuarioRepository.class);
         inscripcionesRepository = mock(InscripcionesRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
-        waitlistRepository = mock(WaitlistRepository.class);
 
-        usuarioService = new UsuarioService(usuarioRepository, inscripcionesRepository, waitlistRepository,
-                passwordEncoder);
+        usuarioService = new UsuarioService(usuarioRepository, inscripcionesRepository, passwordEncoder);
     }
 
     @Test
@@ -47,7 +55,7 @@ class UsuarioServiceTest {
         String password = "password123";
         String encodedPassword = "encodedPassword";
 
-        when(usuarioRepository.obtenerPorEmail(email)).thenReturn(Optional.empty());
+        when(usuarioRepository.findByEmail(email)).thenReturn(Optional.empty());
         when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
 
         Usuario usuario = usuarioService.registrar(email, password);
@@ -55,7 +63,7 @@ class UsuarioServiceTest {
         assertEquals(email, usuario.getEmail());
         assertTrue(usuario.getRoles().contains(RolUsuario.USUARIO));
 
-        verify(usuarioRepository).guardar(usuario);
+        verify(usuarioRepository).save(usuario);
     }
 
     @Test
@@ -63,7 +71,7 @@ class UsuarioServiceTest {
         String email = "test@example.com";
         String password = "password123";
 
-        when(usuarioRepository.obtenerPorEmail(email))
+        when(usuarioRepository.findByEmail(email))
                 .thenReturn(Optional.of(new Usuario(email, password, Set.of(RolUsuario.USUARIO))));
 
         Exception exception = assertThrows(IllegalArgumentException.class,
@@ -77,7 +85,7 @@ class UsuarioServiceTest {
         String email = "test@example.com";
         Usuario usuario = new Usuario(email, "pass", Set.of(RolUsuario.USUARIO));
 
-        when(usuarioRepository.obtenerPorEmail(email)).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.findByEmail(email)).thenReturn(Optional.of(usuario));
 
         Optional<Usuario> result = usuarioService.buscarPorEmail(email);
 
@@ -88,7 +96,10 @@ class UsuarioServiceTest {
     @Test
     void obtenerInscripcionesNoCanceladasRetornaListaDeEventosConInscripcionNoCancelada() {
         Usuario usuario = new Usuario("asd@mail.com", "asd", Set.of(RolUsuario.USUARIO));
-        when(usuarioRepository.obtenerPorId(usuario.getId())).thenReturn(Optional.of(usuario));
+
+        usuarioRepository.save(usuario);
+        when(usuarioRepository.findByEmail(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
         Evento evento1 = new Evento("Evento 1", "Desc 1", null, 60, "Ubicacion", 100, 500, "Categoria");
         Evento evento2 = new Evento("Evento 2", "Desc 2", null, 120, "Ubicacion", 50, 1000, "Categoria");
         Evento evento3 = new Evento("Evento 3", "Desc 3", null, 120, "Ubicacion", 50, 1000, "Categoria");
@@ -96,7 +107,7 @@ class UsuarioServiceTest {
         List<InscripcionEvento> inscripciones = List.of(InscripcionFactory.confirmada(usuario, evento1),
                 InscripcionFactory.confirmada(usuario, evento2), InscripcionFactory.pendiente(usuario, evento3));
 
-        when(inscripcionesRepository.getInscripcionesNoCanceladasPorParticipante(usuario)).thenReturn(inscripciones);
+        when(inscripcionesRepository.noCanceladasDeParticipante(usuario)).thenReturn(inscripciones);
 
         var result = usuarioService.obtenerInscripcionesNoCanceladas(usuario.getId());
 

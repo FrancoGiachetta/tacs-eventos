@@ -10,18 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
 import tacs.eventos.controller.error.handlers.AccesoDenegadoHandler;
-import tacs.eventos.controller.error.handlers.ErrorInternoHandler;
 import tacs.eventos.controller.error.handlers.RecursoNoEncontradoHandler;
 import tacs.eventos.controller.validadores.Validador;
 import tacs.eventos.controller.validadores.ValidadorAutorizacionUsuario;
 import tacs.eventos.dto.*;
-import tacs.eventos.model.evento.Evento;
-import tacs.eventos.model.inscripcion.InscripcionEnWaitlist;
 import tacs.eventos.model.Usuario;
-import tacs.eventos.model.inscripcion.EstadoInscripcion;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.repository.FiltroBusqueda;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorCategoria;
@@ -29,15 +24,14 @@ import tacs.eventos.repository.evento.busqueda.FiltradoPorFechaInicio;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorPalabrasClave;
 import tacs.eventos.repository.evento.busqueda.FiltradoPorPrecio;
 import tacs.eventos.service.EventoService;
-import tacs.eventos.service.InscripcionesService;
 import tacs.eventos.service.UsuarioService;
+import tacs.eventos.service.inscripciones.InscripcionesService;
 
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.*;
 
 import static tacs.eventos.dto.EstadoInscripcionMapper.mapEstado;
-import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/v1/evento")
@@ -79,7 +73,8 @@ public class EventoController {
      *         existe, devuelve NOT_FOUND 404.
      */
     @GetMapping("/{eventoId}")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Evento encontrado") })
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Evento encontrado"),
+            @ApiResponse(responseCode = "404", description = "Evento no encontrado"), })
     public ResponseEntity<EventoResponse> obtenerEvento(@PathVariable String eventoId) {
         Evento evento = this.buscarEvento(eventoId);
 
@@ -122,13 +117,13 @@ public class EventoController {
             List<FiltroBusqueda<Evento>> filtros = new ArrayList<>();
 
             // Solo agregar filtros si los parámetros están presentes
-            if (fechaMinParam != null || fechaMaxParam != null) {
-                filtros.add(new FiltradoPorFechaInicio(fechaMinParam, fechaMaxParam));
-            }
+            // TODO: hacer que no se pueda pasar por parámetro una fecha minima o maxima en el pasado
+            // (en el back y en el front)
+            filtros.add(new FiltradoPorFechaInicio(fechaMinParam == null ? LocalDate.MIN : fechaMinParam,
+                    fechaMaxParam == null ? LocalDate.MAX : fechaMaxParam));
 
-            if (precioMinimoParam != null || precioMaximoParam != null) {
-                filtros.add(new FiltradoPorPrecio(precioMinimoParam, precioMaximoParam));
-            }
+            filtros.add(new FiltradoPorPrecio(precioMinimoParam == null ? 0 : precioMinimoParam,
+                    precioMaximoParam == null ? Double.MAX_VALUE : precioMaximoParam));
 
             if (categoriaParam != null && !categoriaParam.trim().isEmpty()) {
                 filtros.add(new FiltradoPorCategoria(categoriaParam));
@@ -191,7 +186,8 @@ public class EventoController {
      *         existe, devuelve NOT_FOUND 404.
      */
     @GetMapping("/{eventoId}/inscripcion")
-    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista de incripciones para el evento") })
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista de incripciones para el evento"),
+            @ApiResponse(responseCode = "404", description = "Evento no encontrado"), })
     public ResponseEntity<List<InscripcionResponse>> getInscriptosAEvento(@AuthenticationPrincipal Usuario usuario,
             @PathVariable String eventoId) {
         Evento evento = this.buscarEvento(eventoId);
@@ -203,8 +199,7 @@ public class EventoController {
             throw new AccesoDenegadoHandler("El usuario no es organizador");
         }
 
-        return ResponseEntity.ok(this.inscripcionesService.buscarInscripcionesDeEvento(evento).stream()
-                .filter((InscripcionEvento i) -> i.getEstado() == EstadoInscripcion.CONFIRMADA)
+        return ResponseEntity.ok(this.inscripcionesService.inscripcionesConfirmadas(evento).stream()
                 .map((InscripcionEvento i) -> InscripcionResponse.confirmada(evento.getId(), i)).toList());
     }
 
@@ -243,10 +238,8 @@ public class EventoController {
             throw new RecursoNoEncontradoHandler("Recurso no encontrado");
         }
 
-        Optional<InscripcionEvento> inscripcion = inscripcionesService.inscripcionParaUsuarioYEvento(usuarioInscripto,
-                evento);
-        return inscripcion.filter(i -> i.getEstado() != EstadoInscripcion.CANCELADA)
-                .map(i -> new InscripcionResponse(i.getEvento().getId(), mapEstado(i.getEstado())))
+        Optional<InscripcionEvento> inscripcion = inscripcionesService.inscripcionNoCancelada(evento, usuarioInscripto);
+        return inscripcion.map(i -> new InscripcionResponse(i.getEvento().getId(), mapEstado(i.getEstado())))
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new RecursoNoEncontradoHandler("El usuario no está inscripto al evento"));
     }
@@ -318,9 +311,8 @@ public class EventoController {
 
         String location = "/api/v1/evento/" + eventoId + "/inscripcion/" + usuarioId;
 
-        // Si el usuario ya está inscripto o en la waitlist, devuelve SEE_OTHER y
-        // redirige a la inscripción existente
-        if (inscripcionesService.inscripcionConfirmadaOEnWaitlist(evento, usuario))
+        // Si el usuario ya está inscripto o en la waitlist, devuelve SEE_OTHER y redirige a la inscripción existente
+        if (inscripcionesService.inscripcionNoCancelada(evento, usuario).isPresent())
             return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create(location)).build();
 
         // Si no estaba inscripto, intenta inscribirlo o mandarlo a la waitlist

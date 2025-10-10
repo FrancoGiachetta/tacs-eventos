@@ -2,17 +2,14 @@ package tacs.eventos.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import tacs.eventos.dto.EstadoInscripcionResponse;
 import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
-import tacs.eventos.repository.WaitlistRepository;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
 
@@ -25,15 +22,32 @@ import java.util.Set;
 public class UsuarioService {
     private final UsuarioRepository repo;
     private final InscripcionesRepository inscripcionesRepository;
-    private final WaitlistRepository waitlistRepository;
     private final PasswordEncoder encoder;
+
+    @PostConstruct
+    public void inicializarUsuariosIniciales() {
+        // Crear admin por defecto si no existe
+        if (repo.findByEmail("admin@eventos.com").isEmpty()) {
+            Usuario admin = new Usuario("admin@eventos.com", encoder.encode("admin123"), Set.of(RolUsuario.ADMIN));
+            repo.save(admin);
+            System.out.println("Admin creado: admin@eventos.com / admin123");
+        }
+
+        // Crear organizador de ejemplo si no existe
+        if (repo.findByEmail("organizador@eventos.com").isEmpty()) {
+            Usuario organizador = new Usuario("organizador@eventos.com", encoder.encode("org123"),
+                    Set.of(RolUsuario.ORGANIZADOR));
+            repo.save(organizador);
+            System.out.println("Organizador creado: organizador@eventos.com / org123");
+        }
+    }
 
     public Usuario registrar(String email, String password) {
         return registrar(email, password, "USUARIO");
     }
 
     public Usuario registrar(String email, String password, String tipoUsuario) {
-        Optional<Usuario> existente = repo.obtenerPorEmail(email);
+        Optional<Usuario> existente = repo.findByEmail(email);
         if (existente.isPresent())
             throw new IllegalArgumentException("Email ya registrado");
 
@@ -41,7 +55,7 @@ public class UsuarioService {
         Set<RolUsuario> roles = determinarRoles(tipoUsuario);
 
         var u = new Usuario(email, encoder.encode(password), roles);
-        repo.guardar(u);
+        repo.save(u);
         System.out.println("usuario ID: " + u.getId() + " con roles: " + roles);
         return u;
     }
@@ -62,19 +76,18 @@ public class UsuarioService {
     }
 
     public Optional<Usuario> buscarPorEmail(String email) {
-        return repo.obtenerPorEmail(email);
+        return repo.findByEmail(email);
     }
 
     public Optional<Usuario> buscarPorId(String id) {
-        return repo.obtenerPorId(id);
+        return repo.findById(id);
     }
 
     public List<InscripcionResponse> obtenerInscripcionesNoCanceladas(String usuarioId) {
-        Usuario usuario = repo.obtenerPorId(usuarioId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "No se pudo encontrar el usuario no encontrado"));
-        List<InscripcionEvento> inscripciones = inscripcionesRepository
-                .getInscripcionesNoCanceladasPorParticipante(usuario);
+        Usuario usuario = repo.findById(usuarioId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        List<InscripcionEvento> inscripciones = inscripcionesRepository.noCanceladasDeParticipante(usuario);
         List<InscripcionResponse> inscripcionResponses = inscripciones.stream()
                 .map(insc -> new InscripcionResponse(insc.getEvento().getId(), mapEstado(insc.getEstado()))).toList();
         return inscripcionResponses;
@@ -90,15 +103,15 @@ public class UsuarioService {
 
     // Métodos para gestión de roles (solo admin)
     public List<Usuario> obtenerTodosLosUsuarios() {
-        return repo.obtenerTodos();
+        return repo.findAll();
     }
 
     public Usuario cambiarRol(String usuarioId, RolUsuario nuevoRol) {
-        Usuario usuario = repo.obtenerPorId(usuarioId)
+        Usuario usuario = repo.findById(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         usuario.setRoles(Set.of(nuevoRol));
-        repo.guardar(usuario);
+        repo.save(usuario);
         System.out.println("Rol cambiado para usuario " + usuario.getEmail() + " a: " + nuevoRol);
         return usuario;
     }

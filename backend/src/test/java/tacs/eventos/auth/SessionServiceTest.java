@@ -1,18 +1,17 @@
 package tacs.eventos.auth;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.time.Instant;
-import java.util.Optional;
-import java.util.Set;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
+import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import tacs.eventos.config.TestMongoConfiguration;
+import tacs.eventos.config.TestRedisConfiguration;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Session;
 import tacs.eventos.model.Usuario;
@@ -20,7 +19,19 @@ import tacs.eventos.repository.sesion.SessionRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
 import tacs.eventos.service.SessionService;
 
+import java.time.Instant;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 @SpringBootTest
+@AutoConfigureMockMvc(addFilters = false)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class })
+@ActiveProfiles("test")
+@Testcontainers
 class SessionServiceTest {
 
     private UsuarioRepository usuarios;
@@ -36,10 +47,9 @@ class SessionServiceTest {
         this.service = new SessionService(usuarios, sesiones, encoder, 30);
 
         var u = new Usuario("user@mail.com", "hash", Set.of(RolUsuario.USUARIO));
-        when(usuarios.obtenerPorEmail("user@mail.com")).thenReturn(Optional.of(u));
-        when(usuarios.obtenerPorEmail("userNoExiste@mail.com")).thenReturn(Optional.empty());
+        when(usuarios.findByEmail("user@mail.com")).thenReturn(Optional.of(u));
+        when(usuarios.findByEmail("userNoExiste@mail.com")).thenReturn(Optional.empty());
         when(encoder.matches("pass", "hash")).thenReturn(true);
-
     }
 
     @Test
@@ -79,7 +89,7 @@ class SessionServiceTest {
             var s = new Session("tok", u2.getId(), Instant.now().plusSeconds(300));
             var sExp = new Session("tokExp", u2.getId(), Instant.now().minusSeconds(1));
 
-            when(usuarios.obtenerPorId(u2.getId())).thenReturn(Optional.of(u2));
+            when(usuarios.findById(u2.getId())).thenReturn(Optional.of(u2));
             when(sesiones.findByToken("tok")).thenReturn(Optional.of(s));
             when(sesiones.findByToken("tokExp")).thenReturn(Optional.of(sExp));
         }

@@ -8,17 +8,17 @@ import org.springframework.http.HttpStatus;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
 
-/**
- * @param autenticado
- *            usuario autenticado en el sistema
- * @param autorizados
- *            usuarios con permiso para realizar la acción
- */
 public class ValidadorAutorizacionUsuario implements Validador {
     private Usuario autenticado;
     private List<Usuario> autorizados;
     private HttpStatus errorARetornar;
 
+    /**
+     * @param autenticado
+     *            usuario autenticado en el sistema
+     * @param autorizado
+     *            usuarios con permiso para realizar la acción
+     */
     public ValidadorAutorizacionUsuario(Usuario autenticado, Usuario autorizado) {
         this.autenticado = autenticado;
         this.autorizados = Arrays.asList(autorizado);

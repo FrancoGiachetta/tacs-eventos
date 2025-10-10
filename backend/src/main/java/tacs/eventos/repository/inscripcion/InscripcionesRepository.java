@@ -1,71 +1,126 @@
 package tacs.eventos.repository.inscripcion;
 
-import tacs.eventos.model.evento.Evento;
+import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.evento.Evento;
+import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Guarda las inscripciones confirmadas o canceladas.
  */
-public interface InscripcionesRepository {
+@Repository
+public interface InscripcionesRepository extends MongoRepository<InscripcionEvento, String> {
 
     /**
-     * @return todas las inscripciones para todos los eventos, que estén canceladas o confirmadas.
-     */
-    List<InscripcionEvento> todos();
-
-    /**
-     * @param participante
-     * @param evento
+     * Busca una inscripción de ese participante, que esté en un estado distinto al pasado por parámetro.
      *
-     * @return la inscripción (cancelada o confirmada) de un participante a un evento, si es que esta existe
-     */
-    Optional<InscripcionEvento> getInscripcionConfirmada(Usuario participante, Evento evento);
-
-    /**
      * @param participante
+     * @param estado
      *
-     * @return las inscripciones no canceladas de ese participante
+     * @return
      */
-    List<InscripcionEvento> getInscripcionesNoCanceladasPorParticipante(Usuario participante);
+    List<InscripcionEvento> findByParticipanteAndEstadoNot(Usuario participante, EstadoInscripcion estado);
+
+    Optional<InscripcionEvento> findFirstByParticipanteAndEventoAndEstadoNot(Usuario participante, Evento evento,
+            EstadoInscripcion estado);
 
     /**
      * @param evento
      *
      * @return todas las inscripciones (confirmadas, canceladas, o pendientes) de ese evento
      */
-    List<InscripcionEvento> getInscripcionesPorEvento(Evento evento);
+    List<InscripcionEvento> findByEventoAndEstado(Evento evento, EstadoInscripcion estado);
 
     /**
-     * Guarda una inscripcion si esta todavía no existe. NO USAR DIRECTAMENTE, USAR InscripcionService.
+     * Obtiene todas las inscripciones pendientes para ese evento que hayan sido agregadas a la waitlist después de la
+     * fecha pasada por parámetro, ordenadas por fecha de adición.
+     *
+     * @param evento
+     * @param fechaHoraIngresoAWaitlist
+     *
+     * @return
      */
-    void guardarInscripcion(InscripcionEvento inscripcion);
+    default List<InscripcionEvento> pendientesPosterioresALaFechaOrdenados(Evento evento,
+            LocalDateTime fechaHoraIngresoAWaitlist) {
+        return findByEventoAndEstadoAndFechaHoraIngresoAWaitlistGreaterThanEqualOrderByFechaHoraIngresoAWaitlist(evento,
+                EstadoInscripcion.PENDIENTE, fechaHoraIngresoAWaitlist);
+    }
+
+    /**
+     * Obtiene todas las inscripciones para ese evento, en ese estado, que hayan sido agregadas a la waitlist en una
+     * fecha posterior a la pasada por parámetro, ordenadas por fechaHoraIngresoAWaitlist.
+     *
+     * @param evento
+     * @param estado
+     * @param fechaHoraIngresoAWaitlist
+     *
+     * @return
+     */
+    List<InscripcionEvento> findByEventoAndEstadoAndFechaHoraIngresoAWaitlistGreaterThanEqualOrderByFechaHoraIngresoAWaitlist(
+            Evento evento, EstadoInscripcion estado, LocalDateTime fechaHoraIngresoAWaitlist);
+
+    /**
+     * Obtiene todas las inscripciones para ese evento, en ese estado, ordenadas por fechaHoraIngresoAWaitlist.
+     *
+     * @param evento
+     * @param estado
+     *
+     * @return
+     */
+    List<InscripcionEvento> findByEventoAndEstadoOrderByFechaHoraIngresoAWaitlist(Evento evento,
+            EstadoInscripcion estado);
 
     /**
      * @param evento
      *
      * @return cantidad de inscripciones confirmadas para ese evento
      */
-    int cantidadInscriptos(Evento evento);
+    int countByEvento(Evento evento);
 
     /**
+     * Busca una inscripción que no esté cancelada (puede estar confirmada o pendiente) para ese participante y evento.
+     *
      * @param usuarioInscripto
      * @param evento
      *
-     * @return la única inscripción para ese usuario y evento, si es que existe
+     * @return la inscripción, o un Optional vacío si no existe una que no cumpla con las condiciones
      */
-    Optional<InscripcionEvento> getInscripcionParaUsuarioYEvento(Usuario usuarioInscripto, Evento evento);
+    default Optional<InscripcionEvento> noCanceladaParaParticipanteYEvento(Usuario usuarioInscripto, Evento evento) {
+        return findFirstByParticipanteAndEventoAndEstadoNot(usuarioInscripto, evento, EstadoInscripcion.CANCELADA);
+    }
 
     /**
-     * @param id
-     *            el id de la inscripción que se quiere obtener
+     * @param participante
      *
-     * @return la inscripción con ese id, si existe
+     * @return las inscripciones no canceladas de ese participante
      */
-    Optional<InscripcionEvento> getInscripcionPorId(String id);
+    default List<InscripcionEvento> noCanceladasDeParticipante(Usuario participante) {
+        return findByParticipanteAndEstadoNot(participante, EstadoInscripcion.CANCELADA);
+    }
 
-    List<InscripcionEvento> getInscripcionesPendientes(Evento evento);
+    /**
+     * @param evento
+     * @param estadoInscripcion
+     *
+     * @return cantidad de inscripciones en ese estado para ese evento
+     */
+    int countByEventoAndEstado(Evento evento, EstadoInscripcion estadoInscripcion);
+
+    Optional<InscripcionEvento> findFirstByEventoAndEstado(Evento evento, EstadoInscripcion estado);
+
+    // TODO: este creo que es el único método del repo que tendría sentido probar en un test unitario
+
+    /**
+     * @return todos los eventos que tengan inscripciones creadas (en cualquier estado)
+     */
+    @Aggregation(pipeline = { "{ '$group': { '_id': '$evento' } }", "{ '$replaceRoot': { 'newRoot': '$_id' } }" })
+    Stream<Evento> eventosConInscripciones();
 }

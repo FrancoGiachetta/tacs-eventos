@@ -1,14 +1,20 @@
 package tacs.eventos.model;
 
 import lombok.Getter;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
+@Document(collection = "usuarios")
 @Getter
-public class Usuario {
+
+public class Usuario implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String id;
+    // TODO: crear un indice unico por este campo
     private String email; // almacenadr normalizado (lowercase)
     private String passwordHash; // BCrypt
     private Set<RolUsuario> roles = new HashSet<>();

@@ -1,5 +1,6 @@
 package tacs.eventos.config;
 
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.context.annotation.Bean;
@@ -22,11 +23,15 @@ public class ModelMapperConfig {
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
 
+        // Convertidor para EstadoEvento a boolean
+        Converter<EstadoEvento, Boolean> estadoEventoToBooleanConverter = ctx -> ctx
+                .getSource() == EstadoEvento.ABIERTO;
+
         mapper.addMappings(new PropertyMap<Evento, EventoResponse>() {
             @Override
             protected void configure() {
-                // All other fields will map automatically by default
-                map().setAbierto(source.getEstado() == EstadoEvento.ABIERTO);
+                // Map estado to abierto using the converter
+                using(estadoEventoToBooleanConverter).map(source.getEstado()).setAbierto(false);
             }
         });
 

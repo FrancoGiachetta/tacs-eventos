@@ -37,8 +37,8 @@ public class UsuarioController {
     @GetMapping("/me")
     public UsuarioDto getMe(@AuthenticationPrincipal Usuario usuario) {
         return new UsuarioDto(usuario.getId(), usuario.getEmail(), usuario.getRoles().iterator().next(), // Asumimos un
-                                                                                                         // rol por
-                                                                                                         // usuario
+                // rol por
+                // usuario
                 usuario.getFechaCreacion());
     }
 
@@ -68,12 +68,12 @@ public class UsuarioController {
     public ResponseEntity<List<EventoResponse>> getMisEventos(@AuthenticationPrincipal Usuario usuario) {
         // Si es ADMIN, devolver todos los eventos
         if (usuario.getRoles().contains(RolUsuario.ADMIN)) {
-            return ResponseEntity.ok(eventosRepository.todos().stream()
+            return ResponseEntity.ok(eventosRepository.findAll().stream()
                     .map(e -> this.modelMapper.map(e, EventoResponse.class)).toList());
         }
 
         // Si no es ADMIN, devolver solo los eventos que organiza
-        return ResponseEntity.ok(eventosRepository.getEventosPorOrganizador(usuario.getId()).stream()
+        return ResponseEntity.ok(eventosRepository.findByOrganizador(usuario.getId()).stream()
                 .map(e -> this.modelMapper.map(e, EventoResponse.class)).toList());
     }
 }

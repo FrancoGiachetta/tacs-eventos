@@ -20,6 +20,9 @@ import tacs.eventos.model.RolUsuario;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
 class EstadisticasControllerTest {
 
     @Mock
@@ -64,9 +67,9 @@ class EstadisticasControllerTest {
 
     @Test
     void testCantidadInscripciones() {
-        when(estadisticaService.cantidadInscripciones()).thenReturn(20);
+        when(estadisticaService.cantidadInscripciones()).thenReturn(20l);
 
-        ResponseEntity<Integer> response = controller.cantidadInscripciones(VALID_AUTH_HEADER);
+        ResponseEntity<Long> response = controller.cantidadInscripciones(VALID_AUTH_HEADER);
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(20, response.getBody());
