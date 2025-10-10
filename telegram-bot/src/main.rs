@@ -11,7 +11,8 @@ mod schemas;
 
 #[tokio::main]
 async fn main() -> BotResult<()> {
-    // Load .env vars
+    // Load .env vars only in debug mode.
+    #[cfg(debug_assertions)]
     dotenv::dotenv()?;
 
     // Configure logging.

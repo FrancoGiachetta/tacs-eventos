@@ -12,9 +12,9 @@ use crate::schemas::{
 };
 
 lazy_static! {
-    static ref URL_BASE: String = String::from("http://localhost:8080/api/v1");
-    static ref CLIENT_TIMEOUT_SECS: u64 = 90;
-    static ref DEFAULT_MAX_RETRIES: u8 = 10;
+    static ref URL_BASE: String = env::var("URL_BASE").unwrap();
+    static ref CLIENT_TIMEOUT_SECS: u64 = env::var("CLIENT_TIMEOUT_SECS").unwrap().parse().unwrap();
+    static ref DEFAULT_MAX_RETRIES: u8 = env::var("DEFAULT_MAX_RETRIES").unwrap().parse().unwrap();
 }
 
 pub struct RequestClient {
@@ -53,7 +53,6 @@ impl RequestClient {
         &self,
         filters: EventFilter,
     ) -> Result<Vec<Event>, RequestClientError> {
-        let url = format!("{}/evento", *URL_BASE);
         let mut filter_query = Vec::new();
 
         if let Some(max_price) = filters.max_price {
@@ -74,7 +73,7 @@ impl RequestClient {
         // TODO: add palabrasClave query.
 
         let response = self
-            .send_request_with_retry(url, RequestMethod::Get(filter_query))
+            .send_request_with_retry("evento", RequestMethod::Get(filter_query))
             .await?;
 
         Ok(serde_json::from_value(response)?)
@@ -84,10 +83,11 @@ impl RequestClient {
         &self,
         user_data: UserOut,
     ) -> Result<Token, RequestClientError> {
-        let url = format!("{}/register", *URL_BASE);
-
-        self.send_request_with_retry(url, RequestMethod::Post(serde_json::to_value(&user_data)?))
-            .await?;
+        self.send_request_with_retry(
+            "auth/register",
+            RequestMethod::Post(serde_json::to_value(&user_data)?),
+        )
+        .await?;
 
         let token = self.send_user_login_request(user_data).await?;
 
@@ -98,10 +98,11 @@ impl RequestClient {
         &self,
         user_data: UserOut,
     ) -> Result<Token, RequestClientError> {
-        let url = format!("{}/login", *URL_BASE);
-
         let response = self
-            .send_request_with_retry(url, RequestMethod::Post(serde_json::to_value(user_data)?))
+            .send_request_with_retry(
+                "login",
+                RequestMethod::Post(serde_json::to_value(user_data)?),
+            )
             .await?;
 
         Ok(serde_json::from_value(response)?)
@@ -109,9 +110,10 @@ impl RequestClient {
 
     pub async fn send_request_with_retry<'req>(
         &self,
-        url: String,
+        url: &str,
         method: RequestMethod<'req>,
     ) -> Result<Value, RequestClientError> {
+        let url = format!("{}/{}", *URL_BASE, url);
         let response = Self::retry(|| self.send_request(&url, &method)).await?;
 
         response
