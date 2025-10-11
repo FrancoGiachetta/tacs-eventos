@@ -31,6 +31,7 @@ pub enum RequestClientError {
     JsonParse(#[from] serde_json::Error),
 }
 
+#[derive(Debug)]
 pub enum RequestMethod<'req> {
     Get(Vec<(&'req str, String)>),
     Post(Value),
@@ -83,15 +84,14 @@ impl RequestClient {
         &self,
         user_data: UserOut,
     ) -> Result<Token, RequestClientError> {
-        self.send_request_with_retry(
-            "auth/register",
-            RequestMethod::Post(serde_json::to_value(&user_data)?),
-        )
-        .await?;
+        let response = self
+            .send_request_with_retry(
+                "auth/register",
+                RequestMethod::Post(serde_json::to_value(&user_data)?),
+            )
+            .await?;
 
-        let token = self.send_user_login_request(user_data).await?;
-
-        Ok(token)
+        Ok(serde_json::from_value(response)?)
     }
 
     pub async fn send_user_login_request(
@@ -100,7 +100,7 @@ impl RequestClient {
     ) -> Result<Token, RequestClientError> {
         let response = self
             .send_request_with_retry(
-                "login",
+                "auth/login",
                 RequestMethod::Post(serde_json::to_value(user_data)?),
             )
             .await?;

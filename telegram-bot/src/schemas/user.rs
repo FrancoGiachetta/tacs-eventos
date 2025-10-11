@@ -12,6 +12,6 @@ pub struct Token {
 pub struct UserOut {
     pub email: String,
     pub password: String,
-    #[serde(rename(deserialize = "TipoUsuario"))]
-    pub r#type: String,
+    #[serde(rename = "tipoUsuario")]
+    pub user_type: String,
 }

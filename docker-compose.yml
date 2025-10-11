@@ -9,6 +9,8 @@ services:
       dockerfile: Dockerfile
     container_name: eventos-telegram-bot
     env_file: ./telegram-bot/.env
+    environment:
+      - URL_BASE=http://eventos-backend:8080/api/v1
     networks:
       - eventos-network
     ports:

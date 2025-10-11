@@ -83,7 +83,7 @@ pub async fn handle_confirm_password(
                 .send_user_registration_request(UserOut {
                     email,
                     password,
-                    r#type: "USUARIO".to_string(),
+                    user_type: "USUARIO".to_string(),
                 })
                 .await?;
 
