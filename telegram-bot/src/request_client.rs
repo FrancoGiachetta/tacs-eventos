@@ -3,12 +3,14 @@ use std::{env, time::Duration};
 use lazy_static::lazy_static;
 use reqwest::{Client, Response};
 use serde_json::Value;
-use thiserror::Error;
 use tracing::info;
 
-use crate::schemas::{
-    event::{Event, EventFilter},
-    user::{Token, UserOut},
+use crate::{
+    error::request_client_error::RequestClientError,
+    schemas::{
+        event::{Event, EventFilter},
+        user::{Token, UserOut},
+    },
 };
 
 lazy_static! {
@@ -19,16 +21,6 @@ lazy_static! {
 
 pub struct RequestClient {
     client: Client,
-}
-
-#[derive(Debug, Error)]
-pub enum RequestClientError {
-    #[error(transparent)]
-    Reqwest(#[from] reqwest::Error),
-    #[error("request has failed with due to timeout")]
-    TimeOut,
-    #[error(transparent)]
-    JsonParse(#[from] serde_json::Error),
 }
 
 #[derive(Debug)]

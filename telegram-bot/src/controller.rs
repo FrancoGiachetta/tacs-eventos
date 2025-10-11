@@ -8,7 +8,8 @@ use teloxide::{
 
 use crate::{
     bot::BotResult,
-    dialogue::{MyDialogue, State, error::DialogueError},
+    dialogue::{MyDialogue, State},
+    error::dialogue_error::DialogueError,
     request_client::RequestClient,
 };
 

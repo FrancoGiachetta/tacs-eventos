@@ -14,7 +14,6 @@ use crate::{
     dialogue::user::check_user_auth_selection, error::BotError,
 };
 
-pub mod error;
 mod user;
 
 pub type MyDialogue = Dialogue<State, InMemStorage<State>>;

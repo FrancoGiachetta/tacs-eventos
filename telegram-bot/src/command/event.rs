@@ -8,7 +8,7 @@ use teloxide::utils::command::ParseError;
 use tracing::{error, info};
 
 use crate::{
-    bot::BotResult, controller::Controller, request_client::RequestClientError,
+    bot::BotResult, controller::Controller, error::request_client_error::RequestClientError,
     schemas::event::EventFilter,
 };
 

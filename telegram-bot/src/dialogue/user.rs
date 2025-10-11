@@ -3,9 +3,7 @@ use lazy_static::lazy_static;
 use tracing::{error, info};
 
 use crate::{
-    bot::BotResult,
-    controller::Controller,
-    dialogue::{State, error::DialogueError},
+    bot::BotResult, controller::Controller, dialogue::State, error::dialogue_error::DialogueError,
     schemas::user::UserOut,
 };
 

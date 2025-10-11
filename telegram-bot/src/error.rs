@@ -1,6 +1,10 @@
-use crate::{dialogue::error::DialogueError, request_client::RequestClientError};
 use thiserror::Error;
 use tracing::subscriber::SetGlobalDefaultError;
+
+use crate::error::{dialogue_error::DialogueError, request_client_error::RequestClientError};
+
+pub mod dialogue_error;
+pub mod request_client_error;
 
 #[derive(Debug, Error)]
 pub enum BotError {
