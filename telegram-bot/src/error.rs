@@ -1,6 +1,4 @@
-use crate::request_client::RequestClientError;
-use fancy_regex;
-use teloxide::dispatching::dialogue::InMemStorageError;
+use crate::{dialogue::error::DialogueError, request_client::RequestClientError};
 use thiserror::Error;
 use tracing::subscriber::SetGlobalDefaultError;
 
@@ -17,9 +15,7 @@ pub enum BotError {
     #[error(transparent)]
     RequestError(#[from] RequestClientError),
     #[error(transparent)]
-    DialogueError(#[from] InMemStorageError),
-    #[error(transparent)]
-    RegexError(#[from] fancy_regex::Error),
+    DialogueError(#[from] DialogueError),
     #[error("{}", .0)]
     CustomError(String),
 }

@@ -12,6 +12,7 @@ pub struct Token {
 pub struct UserOut {
     pub email: String,
     pub password: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tipoUsuario")]
-    pub user_type: String,
+    pub user_type: Option<String>,
 }

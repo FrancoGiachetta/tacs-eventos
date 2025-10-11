@@ -14,12 +14,13 @@ use crate::{
     dialogue::user::check_user_auth_selection, error::BotError,
 };
 
+pub mod error;
 mod user;
 
 pub type MyDialogue = Dialogue<State, InMemStorage<State>>;
 pub type DialogueStorage = InMemStorage<State>;
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 pub enum State {
     #[default]
     Start,
@@ -32,6 +33,10 @@ pub enum State {
         email: String,
         password: String,
     },
+    LoginEmail,
+    LoginPassword {
+        email: String,
+    },
     Authenticated,
 }
 
@@ -41,7 +46,9 @@ pub enum State {
 pub fn create_dialogue_handler() -> UpdateHandler<BotError> {
     dialogue::enter::<Update, DialogueStorage, State, _>()
         .branch(dptree::case![State::Start].endpoint(greetings))
+        // Check user auth method.
         .branch(dptree::case![State::CheckUser].endpoint(check_user_auth_selection))
+        // Register user.
         .branch(dptree::case![State::RegisterEmail].endpoint(user::handle_register_email))
         .branch(
             dptree::case![State::RegisterPassword { email }]
@@ -50,6 +57,11 @@ pub fn create_dialogue_handler() -> UpdateHandler<BotError> {
         .branch(
             dptree::case![State::ConfirmPassword { email, password }]
                 .endpoint(user::handle_confirm_password),
+        )
+        // Login user.
+        .branch(dptree::case![State::LoginEmail].endpoint(user::handle_register_email))
+        .branch(
+            dptree::case![State::LoginPassword { email }].endpoint(user::handle_register_password),
         )
 }
 

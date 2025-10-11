@@ -1,8 +1,13 @@
 use fancy_regex::Regex;
 use lazy_static::lazy_static;
-use tracing::info;
+use tracing::{error, info};
 
-use crate::{bot::BotResult, controller::Controller, dialogue::State, schemas::user::UserOut};
+use crate::{
+    bot::BotResult,
+    controller::Controller,
+    dialogue::{State, error::DialogueError},
+    schemas::user::UserOut,
+};
 
 // User first choice, either registering a new account logging with an existing
 // one.
@@ -36,9 +41,36 @@ lazy_static! {
 
 pub async fn handle_register_email(ctl: Controller) -> BotResult<()> {
     match ctl.message().text() {
-        Some(email) if EMAIL_REGEX.is_match(email)? => {
+        Some(email) if EMAIL_REGEX.is_match(email).map_err(DialogueError::from)? => {
             ctl.send_message("Ahora necesito una contrasena").await?;
 
+            match ctl.get_dialogue_state().await? {
+                Some(s) => match s {
+                    State::RegisterEmail => {
+                        ctl.update_dialogue_state(State::RegisterPassword {
+                            email: email.to_string(),
+                        })
+                        .await?
+                    }
+                    State::LoginEmail => {
+                        ctl.update_dialogue_state(State::LoginPassword {
+                            email: email.to_string(),
+                        })
+                        .await?
+                    }
+                    _ => {
+                        error!(
+                            "Impossible state! {:?}. Should be RegisterEmail or LoginEmail",
+                            s
+                        );
+                        ctl.reset_dialogue().await?;
+                    }
+                },
+                None => {
+                    error!("Got no state! There should be one when registering or logging");
+                    ctl.reset_dialogue().await?;
+                }
+            }
             ctl.update_dialogue_state(State::RegisterPassword {
                 email: email.to_string(),
             })
@@ -54,15 +86,57 @@ pub async fn handle_register_email(ctl: Controller) -> BotResult<()> {
 
 pub async fn handle_register_password(ctl: Controller, email: String) -> BotResult<()> {
     match ctl.message().text() {
-        Some(password) if PASSWORD_REGEX.is_match(password)? => {
-            ctl.send_message("Ahora necesito que confirmes las contrasena")
-                .await?;
+        Some(password)
+            if PASSWORD_REGEX
+                .is_match(password)
+                .map_err(DialogueError::from)? =>
+        {
+            match ctl.get_dialogue_state().await? {
+                Some(s) => match s {
+                    State::RegisterPassword { .. } => {
+                        ctl.send_message("Ahora necesito que confirmes las contrasena")
+                            .await?;
 
-            ctl.update_dialogue_state(State::ConfirmPassword {
-                email,
-                password: password.to_string(),
-            })
-            .await?;
+                        ctl.update_dialogue_state(State::ConfirmPassword {
+                            email,
+                            password: password.to_string(),
+                        })
+                        .await?;
+                    }
+                    State::LoginPassword { .. } => {
+                        let token = ctl
+                            .request_client()
+                            .send_user_login_request(UserOut {
+                                email,
+                                password: password.to_string(),
+                                user_type: None,
+                            })
+                            .await?;
+
+                        info!("TOKEN: {:?}", &token);
+
+                        ctl.send_message("Ya creaste tu cuenta!").await?;
+                    }
+                    _ => {
+                        let error_msg = "❌ Oops, algo salió mal. No pudimos completar tu autenticación.\n\
+\n\
+No te preocupes, simplemente elige qué deseas hacer:\n\
+\n\
+A) Crear una cuenta nueva 🆕\n\
+B) Iniciar sesión con tu cuenta existente 🔐";
+                        error!(
+                            "Impossible state! {:?}. Should be RegisterEmail or LoginEmail",
+                            s
+                        );
+                        ctl.send_error_message(error_msg).await?;
+                        ctl.update_dialogue_state(State::CheckUser).await?;
+                    }
+                },
+                None => {
+                    error!("Got no state! There should be one when registering or logging");
+                    ctl.reset_dialogue().await?;
+                }
+            }
         }
         _ => {
             ctl.send_message("Esa contrasena es invalida!").await?;
@@ -83,7 +157,7 @@ pub async fn handle_confirm_password(
                 .send_user_registration_request(UserOut {
                     email,
                     password,
-                    user_type: "USUARIO".to_string(),
+                    user_type: Some("USUARIO".to_string()),
                 })
                 .await?;
 

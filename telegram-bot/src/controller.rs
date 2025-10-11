@@ -8,7 +8,7 @@ use teloxide::{
 
 use crate::{
     bot::BotResult,
-    dialogue::{MyDialogue, State},
+    dialogue::{MyDialogue, State, error::DialogueError},
     request_client::RequestClient,
 };
 
@@ -53,7 +53,7 @@ impl Controller {
         Ok(())
     }
 
-    pub async fn send_error_message(&self, msg: &str) -> BotResult<()> {
+    pub async fn send_error_message(&self, msg: &str) -> Result<(), teloxide::RequestError> {
         self.bot
             .send_message(self.chat_id, format!("❌ {}", msg))
             .await?;
@@ -61,9 +61,17 @@ impl Controller {
         Ok(())
     }
 
-    pub async fn update_dialogue_state(&self, state: State) -> BotResult<()> {
+    pub async fn get_dialogue_state(&self) -> Result<Option<State>, DialogueError> {
+        Ok(self.dialogue.get().await?)
+    }
+
+    pub async fn update_dialogue_state(&self, state: State) -> Result<(), DialogueError> {
         self.dialogue.update(state).await?;
 
         Ok(())
+    }
+
+    pub async fn reset_dialogue(&self) -> Result<(), DialogueError> {
+        Ok(self.dialogue.reset().await?)
     }
 }
