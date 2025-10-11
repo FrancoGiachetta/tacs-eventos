@@ -14,7 +14,7 @@ concurrency:
 jobs:
     check-bot-clippy:
       name: clippy
-      runs-on: ubuntu-lastest
+      runs-on: ubuntu-latest
 
       steps:
         - uses: actions/checkout@v4
@@ -24,12 +24,12 @@ jobs:
         - uses: Swatinem/rust-cache@v2
         - name: Check Clippy
           run:  |
-            cd telegra-bot
+            cd telegram-bot
             cargo clippy --all-targets --all-features -- -D warnings
 
     check-bot-fmt:
       name: rustfmt
-      runs-on: ubuntu-lastest
+      runs-on: ubuntu-latest
 
       steps:
         - uses: actions/checkout@v4
@@ -39,5 +39,5 @@ jobs:
         - uses: Swatinem/rust-cache@v2
         - name: Check Clippy
           run: |
-            cd telegra-bot
+            cd telegram-bot
             cargo fmt --all -- --check
