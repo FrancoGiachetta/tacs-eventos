@@ -10,11 +10,16 @@ use teloxide::{
 };
 
 use crate::{
-    bot::BotResult, command::Command, controller::Controller,
-    dialogue::user::check_user_auth_selection, error::BotError,
+    bot::BotResult,
+    command::Command,
+    controller::Controller,
+    dialogue::user::check_user_auth_selection,
+    error::{BotError, dialogue_error::DialogueError},
 };
 
 mod user;
+
+pub type DialogueResult<T> = Result<T, Box<DialogueError>>;
 
 pub type MyDialogue = Dialogue<State, InMemStorage<State>>;
 pub type DialogueStorage = InMemStorage<State>;

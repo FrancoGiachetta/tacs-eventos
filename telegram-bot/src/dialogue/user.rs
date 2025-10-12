@@ -39,7 +39,11 @@ lazy_static! {
 
 pub async fn handle_register_email(ctl: Controller) -> BotResult<()> {
     match ctl.message().text() {
-        Some(email) if EMAIL_REGEX.is_match(email).map_err(DialogueError::from)? => {
+        Some(email)
+            if EMAIL_REGEX
+                .is_match(email)
+                .map_err(|e| Box::new(DialogueError::from(e)))? =>
+        {
             ctl.send_message("Ahora necesito una contrasena").await?;
 
             match ctl.get_dialogue_state().await? {
@@ -87,7 +91,7 @@ pub async fn handle_register_password(ctl: Controller, email: String) -> BotResu
         Some(password)
             if PASSWORD_REGEX
                 .is_match(password)
-                .map_err(DialogueError::from)? =>
+                .map_err(|e| Box::new(DialogueError::from(e)))? =>
         {
             match ctl.get_dialogue_state().await? {
                 Some(s) => match s {

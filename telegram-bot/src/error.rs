@@ -19,7 +19,7 @@ pub enum BotError {
     #[error(transparent)]
     RequestError(#[from] RequestClientError),
     #[error(transparent)]
-    DialogueError(#[from] DialogueError),
+    DialogueError(#[from] Box<DialogueError>),
     #[error("{}", .0)]
     CustomError(String),
 }
