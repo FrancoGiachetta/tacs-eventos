@@ -1,11 +1,11 @@
-use chrono::NaiveDate;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Debug)]
 pub struct Token {
     pub token: String,
-    #[serde(rename(deserialize = "expiresAt"))]
-    pub expires_at: NaiveDate,
+    #[serde(rename = "expiresAt")]
+    pub expires_at: DateTime<Utc>,
 }
 
 #[derive(Serialize)]

@@ -22,7 +22,7 @@ pub async fn check_user_auth_selection(ctl: Controller) -> BotResult<()> {
             let message = "Okay! Parece que ya tenes una cuenta registrada. Para eso voy a necesitar que me envies tu mail";
 
             ctl.send_message(message).await?;
-            // TODO: Add a State for registering already created mail.
+            ctl.update_dialogue_state(State::LoginEmail).await?
         }
         _ => {}
     }
@@ -73,10 +73,6 @@ pub async fn handle_register_email(ctl: Controller) -> BotResult<()> {
                     ctl.reset_dialogue().await?;
                 }
             }
-            ctl.update_dialogue_state(State::RegisterPassword {
-                email: email.to_string(),
-            })
-            .await?;
         }
         _ => {
             ctl.send_message("Ese email no es valido!").await?;
@@ -115,9 +111,7 @@ pub async fn handle_register_password(ctl: Controller, email: String) -> BotResu
                             })
                             .await?;
 
-                        info!("TOKEN: {:?}", &token);
-
-                        ctl.send_message("Ya creaste tu cuenta!").await?;
+                        ctl.send_message("Ya te loggeaste!").await?;
                     }
                     _ => {
                         let error_msg = "❌ Oops, algo salió mal. No pudimos completar tu autenticación.\n\
@@ -162,8 +156,6 @@ pub async fn handle_confirm_password(
                     user_type: Some("USUARIO".to_string()),
                 })
                 .await?;
-
-            info!("TOKEN: {:?}", &token);
 
             ctl.send_message("Ya creaste tu cuenta!").await?;
 
