@@ -63,27 +63,23 @@ impl Controller {
     }
 
     pub async fn get_dialogue_state(&self) -> DialogueResult<Option<State>> {
-        Ok(self
-            .dialogue
+        self.dialogue
             .get()
             .await
-            .map_err(|e| Box::new(DialogueError::from(e)))?)
+            .map_err(|e| Box::new(DialogueError::from(e)))
     }
 
     pub async fn update_dialogue_state(&self, state: State) -> DialogueResult<()> {
         self.dialogue
             .update(state)
             .await
-            .map_err(|e| Box::new(DialogueError::from(e)))?;
-
-        Ok(())
+            .map_err(|e| Box::new(DialogueError::from(e)))
     }
 
     pub async fn reset_dialogue(&self) -> DialogueResult<()> {
-        Ok(self
-            .dialogue
+        self.dialogue
             .reset()
             .await
-            .map_err(|e| Box::new(DialogueError::from(e)))?)
+            .map_err(|e| Box::new(DialogueError::from(e)))
     }
 }
