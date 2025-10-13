@@ -9,7 +9,7 @@ use crate::{
     error::request_client_error::RequestClientError,
     schemas::{
         event::{Event, EventFilter},
-        user::{Token, UserOut},
+        user::{Token, UserIn, UserOut},
     },
 };
 
@@ -25,7 +25,7 @@ pub struct RequestClient {
 
 #[derive(Debug)]
 pub enum RequestMethod<'req> {
-    Get(Vec<(&'req str, String)>),
+    Get(&'req [(&'req str, String)]),
     Post(Value),
     Put(Value),
     Patch(Value),
@@ -40,6 +40,14 @@ impl RequestClient {
             .build()?;
 
         Ok(Self { client })
+    }
+
+    pub async fn send_get_me(&self, token: &str) -> Result<UserIn, RequestClientError> {
+        let response = self
+            .send_request_with_retry("usuario/me", RequestMethod::Get(&[]), Some(token))
+            .await?;
+
+        Ok(serde_json::from_value(response)?)
     }
 
     pub async fn send_get_events_list_request(
@@ -66,7 +74,7 @@ impl RequestClient {
         // TODO: add palabrasClave query.
 
         let response = self
-            .send_request_with_retry("evento", RequestMethod::Get(filter_query))
+            .send_request_with_retry("evento", RequestMethod::Get(&filter_query), None)
             .await?;
 
         Ok(serde_json::from_value(response)?)
@@ -80,6 +88,7 @@ impl RequestClient {
             .send_request_with_retry(
                 "auth/register",
                 RequestMethod::Post(serde_json::to_value(&user_data)?),
+                None,
             )
             .await?;
 
@@ -94,19 +103,21 @@ impl RequestClient {
             .send_request_with_retry(
                 "auth/login",
                 RequestMethod::Post(serde_json::to_value(user_data)?),
+                None,
             )
             .await?;
 
         Ok(serde_json::from_value(response)?)
     }
 
-    pub async fn send_request_with_retry<'req>(
+    async fn send_request_with_retry<'req>(
         &self,
         url: &str,
         method: RequestMethod<'req>,
+        token: Option<&str>,
     ) -> Result<Value, RequestClientError> {
         let url = format!("{}/{}", *URL_BASE, url);
-        let response = Self::retry(|| self.send_request(&url, &method)).await?;
+        let response = Self::retry(|| self.send_request(&url, &method, token)).await?;
 
         response
             .json::<Value>()
@@ -118,6 +129,7 @@ impl RequestClient {
         &self,
         url: &str,
         method: &RequestMethod<'req>,
+        token: Option<&str>,
     ) -> Result<Response, reqwest::Error> {
         let request = match method {
             RequestMethod::Get(params) => {
@@ -142,7 +154,11 @@ impl RequestClient {
             }
         };
 
-        request.send().await
+        if let Some(token) = token {
+            request.bearer_auth(token).send().await
+        } else {
+            request.send().await
+        }
     }
 
     /// Retries sending a request.

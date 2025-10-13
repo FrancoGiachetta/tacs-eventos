@@ -7,6 +7,7 @@ use teloxide::{
 };
 
 use crate::{
+    auth::in_memory_auth::InMemoryAuth,
     bot::BotResult,
     dialogue::{DialogueResult, MyDialogue, State},
     error::dialogue_error::DialogueError,
@@ -21,6 +22,7 @@ pub struct Controller {
     req_client: Arc<RequestClient>,
     msg: Message,
     dialogue: MyDialogue,
+    auth: Arc<InMemoryAuth>,
 }
 
 impl Controller {
@@ -28,7 +30,7 @@ impl Controller {
         msg: Message,
         bot: Arc<Bot>,
         req_client: Arc<RequestClient>,
-
+        auth: Arc<InMemoryAuth>,
         dialogue: MyDialogue,
     ) -> Option<Self> {
         Some(Self {
@@ -36,8 +38,13 @@ impl Controller {
             msg,
             bot,
             req_client,
+            auth,
             dialogue,
         })
+    }
+
+    pub fn chat_id(&self) -> ChatId {
+        self.chat_id
     }
 
     pub fn message(&self) -> Message {
@@ -46,6 +53,10 @@ impl Controller {
 
     pub fn request_client(&self) -> Arc<RequestClient> {
         self.req_client.clone()
+    }
+
+    pub fn auth(&self) -> Arc<InMemoryAuth> {
+        self.auth.clone()
     }
 
     pub async fn send_message(&self, msg: &str) -> BotResult<()> {

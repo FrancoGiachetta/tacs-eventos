@@ -1,10 +1,10 @@
 use fancy_regex::Regex;
 use lazy_static::lazy_static;
-use tracing::{error, info};
+use tracing::error;
 
 use crate::{
-    bot::BotResult, controller::Controller, dialogue::State, error::dialogue_error::DialogueError,
-    schemas::user::UserOut,
+    auth::Authenticator, bot::BotResult, controller::Controller, dialogue::State,
+    error::dialogue_error::DialogueError, schemas::user::UserOut,
 };
 
 // User first choice, either registering a new account logging with an existing
@@ -105,10 +105,14 @@ pub async fn handle_register_password(ctl: Controller, email: String) -> BotResu
                         let token = ctl
                             .request_client()
                             .send_user_login_request(UserOut {
-                                email,
+                                email: email.clone(),
                                 password: password.to_string(),
                                 user_type: None,
                             })
+                            .await?;
+
+                        ctl.auth()
+                            .new_session(ctl.chat_id(), password.to_string(), token)
                             .await?;
 
                         ctl.send_message("Ya te loggeaste!").await?;
@@ -151,10 +155,14 @@ pub async fn handle_confirm_password(
             let token = ctl
                 .request_client()
                 .send_user_registration_request(UserOut {
-                    email,
-                    password,
+                    email: email.clone(),
+                    password: password.clone(),
                     user_type: Some("USUARIO".to_string()),
                 })
+                .await?;
+
+            ctl.auth()
+                .new_session(ctl.chat_id(), password, token)
                 .await?;
 
             ctl.send_message("Ya creaste tu cuenta!").await?;

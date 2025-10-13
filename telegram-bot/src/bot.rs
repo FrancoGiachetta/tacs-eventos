@@ -11,6 +11,7 @@ use teloxide::{
 use tracing::{info, warn};
 
 use crate::{
+    auth::in_memory_auth::InMemoryAuth,
     command::{self, Command},
     controller::Controller,
     dialogue::{self, DialogueStorage, State},
@@ -33,10 +34,15 @@ pub async fn run() -> BotResult<()> {
                 .branch(dialogue::create_dialogue_handler()),
         );
 
-        let req_client = RequestClient::new()?;
+        let req_client = Arc::new(RequestClient::new()?);
+        let authenticator = Arc::new(InMemoryAuth::new(req_client.clone()));
 
         Dispatcher::builder(bot.clone(), handler)
-            .dependencies(dptree::deps![Arc::new(req_client), DialogueStorage::new()])
+            .dependencies(dptree::deps![
+                req_client,
+                DialogueStorage::new(),
+                authenticator
+            ])
             .default_handler(|upd| async move {
                 warn!("Unhandled update: {upd:?}");
             })
