@@ -21,7 +21,7 @@ pub async fn handle_list_events(ctl: Controller, filters: EventFilter) -> BotRes
 
     match ctl
         .request_client()
-        .send_get_events_list_request(filters)
+        .send_get_events_list_request(filters, &ctl.auth().get_session_token(&ctl.chat_id())?)
         .await
     {
         Ok(events_list) => {

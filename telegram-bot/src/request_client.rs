@@ -53,6 +53,7 @@ impl RequestClient {
     pub async fn send_get_events_list_request(
         &self,
         filters: EventFilter,
+        token: &str,
     ) -> Result<Vec<Event>, RequestClientError> {
         let mut filter_query = Vec::new();
 
@@ -74,7 +75,7 @@ impl RequestClient {
         // TODO: add palabrasClave query.
 
         let response = self
-            .send_request_with_retry("evento", RequestMethod::Get(&filter_query), None)
+            .send_request_with_retry("evento", RequestMethod::Get(&filter_query), Some(token))
             .await?;
 
         Ok(serde_json::from_value(response)?)

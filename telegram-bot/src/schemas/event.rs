@@ -1,7 +1,7 @@
 use std::{fmt::Display, str::FromStr};
 
 use chrono::{NaiveDate, NaiveDateTime};
-use serde::Deserialize;
+use serde::{Deserialize, de};
 use serde_json::Value;
 
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -30,16 +30,22 @@ pub struct Event {
 // Defines how to format an Event struct.
 impl Display for Event {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Event: {}", self.title)?;
-        write!(f, "Organized by {}", self.organizer)?;
-        write!(f, "    Description: {}", self.description)?;
-        write!(f, "    Starting date: {}", self.start_date_time)?;
-        write!(f, "    Location: {}", self.location)?;
-        write!(f, "    Maximum Capacity: {}", self.max_capacity)?;
-        write!(f, "    Duration (minutes): {}", self.duration_minutes)?;
-        write!(f, "    Price: {}", self.price)?;
-        write!(f, "    Category: {}", self.category)?;
-
+        writeln!(f, "🎉 *{}*", self.title)?;
+        writeln!(f, "👤 Organizado por: _{}_", self.organizer)?;
+        writeln!(f)?;
+        writeln!(f, "📝 *Descripción*")?;
+        writeln!(f, "{}", self.description)?;
+        writeln!(f)?;
+        writeln!(f, "📅 *Fecha y Hora*")?;
+        writeln!(f, "{}", self.start_date_time)?;
+        writeln!(f, "⏱ Duración: {} minutos", self.duration_minutes)?;
+        writeln!(f)?;
+        writeln!(f, "📍 *Ubicación*")?;
+        writeln!(f, "{}", self.location)?;
+        writeln!(f)?;
+        writeln!(f, "👥 Capacidad: {}", self.max_capacity)?;
+        writeln!(f, "💰 Precio: {}", self.price)?;
+        writeln!(f, "🏷 Categoría: {}", self.category)?;
         Ok(())
     }
 }
@@ -61,9 +67,11 @@ fn derialize_event(json_value: Value) -> serde_json::Result<Event> {
     let title = json_value["titulo"].to_string();
     let description = json_value["descripcion"].to_string();
     let start_date_time = {
-        let date_str = json_value["fechaHoraInicio"].to_string();
+        let date_str = json_value["fechaHoraInicio"]
+            .as_str()
+            .ok_or(de::Error::custom("fechaHoraInicio is not a string"))?;
 
-        NaiveDateTime::from_str(&date_str)
+        NaiveDateTime::from_str(date_str)
             .map_err(|_| serde::de::Error::custom("Couldn't parse date"))?
     };
     let duration_minutes = json_value["duracionMinutos"]

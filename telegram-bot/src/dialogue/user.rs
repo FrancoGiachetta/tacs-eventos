@@ -111,11 +111,15 @@ pub async fn handle_register_password(ctl: Controller, email: String) -> BotResu
                             })
                             .await?;
 
+                        // Create the new session.
                         ctl.auth()
                             .new_session(ctl.chat_id(), password.to_string(), token)
                             .await?;
 
                         ctl.send_message("Ya te loggeaste!").await?;
+
+                        // Change to State::Authenticated so that the user can perform commands.
+                        ctl.update_dialogue_state(State::Authenticated).await?;
                     }
                     _ => {
                         let error_msg = "❌ Oops, algo salió mal. No pudimos completar tu autenticación.\n\
@@ -161,6 +165,7 @@ pub async fn handle_confirm_password(
                 })
                 .await?;
 
+            // Create the new session.
             ctl.auth()
                 .new_session(ctl.chat_id(), password, token)
                 .await?;

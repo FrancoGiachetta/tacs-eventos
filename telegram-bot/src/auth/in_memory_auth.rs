@@ -26,6 +26,21 @@ impl InMemoryAuth {
             sessions: RwLock::new(HashMap::new()),
         }
     }
+
+    /// Gets the session token associated to a chat.
+    pub fn get_session_token(&self, chat_id: &ChatId) -> Result<String, AuthError> {
+        let session = self
+            .sessions
+            .read()
+            .map_err(|e| AuthError::SessionLockError(e.to_string()))?;
+
+        Ok(session
+            .get(chat_id)
+            .ok_or(AuthError::SessionNotFound(chat_id.to_string()))?
+            .token
+            .token
+            .clone())
+    }
 }
 
 #[async_trait]
@@ -55,7 +70,7 @@ impl Authenticator for InMemoryAuth {
     }
 
     async fn reset_token(&self, chat_id: &ChatId) -> Result<(), AuthError> {
-        let (email, password, ..) = {
+        let (email, password) = {
             let sessions = self
                 .sessions
                 .read()
