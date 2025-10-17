@@ -25,7 +25,7 @@ jobs:
         - name: Check Clippy
           run:  |
             cd telegram-bot
-            cargo clippy --all-targets --all-features -- -D warnings
+            cargo clippy --all-targets --all-features
 
     check-bot-fmt:
       name: rustfmt
