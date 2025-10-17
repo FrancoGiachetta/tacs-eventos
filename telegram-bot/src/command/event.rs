@@ -25,13 +25,12 @@ pub async fn handle_list_events(ctl: Controller, filters: EventFilter) -> BotRes
         .await
     {
         Ok(events_list) => {
-            let events_msg = events_list
-                .into_iter()
-                .map(|e| format!("{e}"))
-                .collect::<Vec<String>>()
-                .join("\n");
+            ctl.send_message(&format!("<b>📅 Estos son los eventos disponibles</b>\n\n<i>Según los criterios de búsqueda que ingresaste:</i>\n\n")).await?;
 
-            ctl.send_message(&events_msg).await?;
+            for event in events_list {
+                ctl.send_message(&format!("📅 <b>Evento</b>\n\n{}", event))
+                    .await?;
+            }
         }
         Err(err) => {
             error!("Got an error while performing the request: {}", err);
@@ -43,12 +42,17 @@ pub async fn handle_list_events(ctl: Controller, filters: EventFilter) -> BotRes
                         .status()
                         .is_some_and(|e| matches!(e, StatusCode::FORBIDDEN)) =>
                 {
-                    "Ese comando requiere que estes logeado!"
+                    "🔒 <b>Necesitás estar logueado</b>\n\n\
+Para usar este comando, primero iniciá sesión"
                 }
-                _ => "Hubo un error al ejecutar el comando!",
+                _ => {
+                    "⚠️ <b>Error al ejecutar el comando</b>\n\n\
+Ocurrió un problema inesperado.\n\
+Intentá nuevamente en unos momentos ⏱️"
+                }
             };
 
-            ctl.send_error_message(error_msg).await?;
+            ctl.send_message(error_msg).await?;
         }
     }
 
