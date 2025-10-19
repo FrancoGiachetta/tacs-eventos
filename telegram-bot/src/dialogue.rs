@@ -66,14 +66,6 @@ Soy tu asistente para descubrir y participar en eventos de forma rápida y senci
 Los comandos disponibles son:
 
 {}
-
-Para comenzar, necesitas tener una cuenta activa. 🔐
-Por favor, elige una opción para continuar:
-
-A) Registrarme ✍️
-B) Iniciar sesión 🔑
-
-¿Qué te gustaría hacer? 💬
 ", username, &Command::descriptions());
 
     ctl.send_message(&greetings_message).await?;

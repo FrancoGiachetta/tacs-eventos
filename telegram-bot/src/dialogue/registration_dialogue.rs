@@ -36,6 +36,16 @@ pub async fn handle_user_registration(ctl: Controller, state: RegisterState) -> 
 // one.
 
 pub async fn check_user_auth_selection(ctl: Controller) -> BotResult<()> {
+    let msg = "Para comenzar, necesitas tener una cuenta activa. 🔐
+Por favor, elige una opción para continuar:
+
+A) Registrarme ✍️
+B) Iniciar sesión 🔑
+
+¿Qué te gustaría hacer? 💬";
+
+    ctl.send_message(msg).await?;
+
     match &ctl.message().text().map(|m| m.to_lowercase()) {
         Some(m) if m == "a" => {
             let message = "Okay! Elegiste crearte una cuenta nueva. Para eso voy a necesitar que me envies un mail";
