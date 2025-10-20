@@ -55,6 +55,9 @@ class EventosRepoTest {
 
     @BeforeEach
     void setUp() {
+        // Limpiar la colección antes de cada test
+        mongoTemplate.getCollection("eventos").deleteMany(new org.bson.Document());
+        
         this.e1 = new Evento("Evento 1", "", null, 1, "", 0, 0, "Deporte");
         this.e2 = new Evento("Evento 2", "", null, 1, "", 0, 0, "Moda");
         this.e3 = new Evento("Evento 3", "", null, 1, "", 0, 0, "Deporte");
@@ -64,10 +67,9 @@ class EventosRepoTest {
     }
 
     @AfterEach
-    void setUp2() {
-        this.repo.delete(e1);
-        this.repo.delete(e2);
-        this.repo.delete(e3);
+    void tearDown() {
+        // Limpiar la colección después de cada test
+        mongoTemplate.getCollection("eventos").deleteMany(new org.bson.Document());
     }
 
     @Test
