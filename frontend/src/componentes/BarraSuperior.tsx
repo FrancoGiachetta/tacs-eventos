@@ -100,16 +100,22 @@ export default function BarraSuperior() {
                             </button>
 
                             {open && (
-                                <div className="absolute right-0 mt-2 w-48 rounded-md bg-white text-slate-900 shadow-lg">
-                                    <div className="flex flex-col p-2 gap-2">
-                                        <div className="px-3 py-1 text-sm text-gray-600 border-b">
-                                            {usuario.email}
+                                <div className="absolute right-0 mt-2 w-56 rounded-md bg-white text-slate-900 shadow-lg border">
+                                    <div className="flex flex-col p-3">
+                                        <div className="border-b pb-3 mb-3">
+                                            <div className="font-medium text-gray-900">{usuario.email}</div>
+                                            <div className="text-sm text-gray-500">
+                                                ID: {usuario.id}
+                                            </div>
+                                            <div className="text-xs text-gray-400 mt-1">
+                                                Rol: {getRolPrincipal(usuario)}
+                                            </div>
                                         </div>
                                         <button
                                             onClick={handleLogout}
-                                            className="rounded border px-3 py-1 text-left hover:bg-gray-100"
+                                            className="rounded px-3 py-2 text-left text-red-600 hover:bg-red-50 transition-colors"
                                         >
-                                            Cerrar sesión
+                                            🚪 Cerrar sesión
                                         </button>
                                     </div>
                                 </div>

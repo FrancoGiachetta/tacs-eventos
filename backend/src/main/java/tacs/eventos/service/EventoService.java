@@ -9,6 +9,7 @@ import tacs.eventos.repository.evento.EventosRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -58,6 +59,18 @@ public class EventoService {
     public void abrirEvento(Usuario organizador, Evento evento) {
         evento.abrirEvento();
         this.eventosRepository.save(evento);
+    }
+
+    public Evento actualizarEvento(Evento evento) {
+        this.eventosRepository.save(evento);
+        return evento;
+    }
+
+    public void eliminarEvento(String eventoId) {
+        Optional<Evento> evento = this.eventosRepository.findById(eventoId);
+        if (evento.isPresent()) {
+            this.eventosRepository.delete(evento.get());
+        }
     }
 
 }
