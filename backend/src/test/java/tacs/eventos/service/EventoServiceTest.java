@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -38,29 +39,30 @@ public class EventoServiceTest {
     @Autowired
     private EventosRepository repo;
 
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
     private Evento e1;
     private Evento e2;
     private Evento e3;
 
     @BeforeEach
     void setUp() {
+        // Limpiar la colección antes de cada test
+        mongoTemplate.getCollection("eventos").deleteMany(new org.bson.Document());
+        
         this.e1 = new Evento("Evento Tennis", "Evento de comida, deporte y pasion",
                 LocalDateTime.of(2025, 10, 10, 0, 0, 0), 1, "", 0, 1000, "Deporte");
         this.e2 = new Evento("Evento Ropa", "Evento de moda, desfile", LocalDateTime.of(2025, 11, 23, 0, 0, 0), 1, "",
                 0, 100, "Moda");
         this.e3 = new Evento("Evento Computacion", "Evento de educacion, tecnica y aprensizaje",
                 LocalDateTime.of(2025, 10, 23, 0, 0, 0), 1, "", 0, 10, "Educacion");
-
-        eventoService.crearEvento(this.e1);
-        eventoService.crearEvento(this.e2);
-        eventoService.crearEvento(this.e3);
     }
 
     @AfterEach
-    void setUp2() {
-        this.repo.delete(e1);
-        this.repo.delete(e2);
-        this.repo.delete(e3);
+    void tearDown() {
+        // Limpiar la colección después de cada test
+        mongoTemplate.getCollection("eventos").deleteMany(new org.bson.Document());
     }
 
     @Test

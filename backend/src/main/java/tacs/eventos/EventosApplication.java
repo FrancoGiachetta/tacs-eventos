@@ -4,6 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,8 +32,9 @@ public class EventosApplication {
         return new BCryptPasswordEncoder(12);
     }
 
-    // seeder: crea usuarios y eventos de ejemplo
+    // seeder: crea usuarios y eventos de ejemplo (solo en desarrollo, no en tests)
     @Bean
+    @Profile("!test")
     CommandLineRunner seedData(UsuarioRepository users, EventosRepository eventos, PasswordEncoder pe) {
         return args -> {
             // Crear admin principal si no existe
