@@ -39,7 +39,7 @@ services:
       eventos-backend:
         condition: service_healthy
     environment:
-      - VITE_API_URL=http://localhost:8080
+      - VITE_API_URL=${VITE_API_BASE_URL}
 
   mongodb:
     image: mongodb/mongodb-community-server
