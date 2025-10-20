@@ -103,7 +103,9 @@ export default function BarraSuperior() {
                                 <div className="absolute right-0 mt-2 w-56 rounded-md bg-white text-slate-900 shadow-lg border">
                                     <div className="flex flex-col p-3">
                                         <div className="border-b pb-3 mb-3">
-                                            <div className="font-medium text-gray-900">{usuario.email}</div>
+                                            <div className="font-medium text-gray-900">
+                                                {usuario.email}
+                                            </div>
                                             <div className="text-sm text-gray-500">
                                                 ID: {usuario.id}
                                             </div>

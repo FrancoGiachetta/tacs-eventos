@@ -296,7 +296,6 @@ function InscriptosTable({
     inscriptos: Inscripcion[]
     onQuitar: (inscripcionId: string) => void
 }) {
-    
     return (
         <div className="overflow-x-auto p-4">
             <table className="min-w-full text-sm">
@@ -314,7 +313,9 @@ function InscriptosTable({
                         <tr key={i.id} className="odd:bg-white even:bg-gray-50">
                             <td className="px-3 py-2">
                                 <div>
-                                    <div className="font-medium">{i.email ?? '—'}</div>
+                                    <div className="font-medium">
+                                        {i.email ?? '—'}
+                                    </div>
                                     {i.id && (
                                         <div className="text-xs text-gray-500">
                                             Inscripción ID: {i.id}
@@ -357,7 +358,6 @@ function InscriptosTable({
 }
 
 function WaitlistTable({ waitlist }: { waitlist: ItemWaitlist[] }) {
-    
     return (
         <div className="overflow-x-auto p-4">
             <table className="min-w-full text-sm">
@@ -365,7 +365,9 @@ function WaitlistTable({ waitlist }: { waitlist: ItemWaitlist[] }) {
                     <tr className="bg-gray-100 text-gray-700">
                         <th className="text-left px-3 py-2">Posición</th>
                         <th className="text-left px-3 py-2">Usuario</th>
-                        <th className="text-left px-3 py-2">Fecha de ingreso</th>
+                        <th className="text-left px-3 py-2">
+                            Fecha de ingreso
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -377,7 +379,9 @@ function WaitlistTable({ waitlist }: { waitlist: ItemWaitlist[] }) {
                             <td className="px-3 py-2">{idx + 1}</td>
                             <td className="px-3 py-2">
                                 <div>
-                                    <div className="font-medium">{w.usuario.email}</div>
+                                    <div className="font-medium">
+                                        {w.usuario.email}
+                                    </div>
                                     {w.usuario.id && (
                                         <div className="text-xs text-gray-500">
                                             ID: {w.usuario.id}

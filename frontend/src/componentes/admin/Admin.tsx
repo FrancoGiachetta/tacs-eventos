@@ -217,8 +217,10 @@ const EstadisticasPanel: React.FC<EstadisticasPanelProps> = ({
 }) => {
     return (
         <div className="space-y-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">📊 Panel de Estadísticas</h2>
-            
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                📊 Panel de Estadísticas
+            </h2>
+
             {/* Cards de estadísticas principales */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {/* Card Inscripciones */}
@@ -228,17 +230,23 @@ const EstadisticasPanel: React.FC<EstadisticasPanelProps> = ({
                             <div className="p-2 bg-blue-500 rounded-lg mr-3">
                                 <span className="text-white text-xl">👥</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-blue-900">Total de Inscripciones</h3>
+                            <h3 className="text-lg font-semibold text-blue-900">
+                                Total de Inscripciones
+                            </h3>
                         </div>
                     </div>
-                    
+
                     {totalInscripciones !== null && (
                         <div className="mb-4">
-                            <p className="text-3xl font-bold text-blue-600">{totalInscripciones.toLocaleString()}</p>
-                            <p className="text-sm text-blue-500">inscripciones en el sistema</p>
+                            <p className="text-3xl font-bold text-blue-600">
+                                {totalInscripciones.toLocaleString()}
+                            </p>
+                            <p className="text-sm text-blue-500">
+                                inscripciones en el sistema
+                            </p>
                         </div>
                     )}
-                    
+
                     <button
                         onClick={fetchInscripciones}
                         disabled={loadingInscripciones}
@@ -257,10 +265,12 @@ const EstadisticasPanel: React.FC<EstadisticasPanelProps> = ({
                             '🔄 Actualizar Inscripciones'
                         )}
                     </button>
-                    
+
                     {errorInscripciones && (
                         <div className="mt-3 p-3 bg-red-100 border border-red-300 rounded-lg">
-                            <p className="text-red-700 text-sm">❌ {errorInscripciones}</p>
+                            <p className="text-red-700 text-sm">
+                                ❌ {errorInscripciones}
+                            </p>
                         </div>
                     )}
                 </div>
@@ -272,17 +282,23 @@ const EstadisticasPanel: React.FC<EstadisticasPanelProps> = ({
                             <div className="p-2 bg-green-500 rounded-lg mr-3">
                                 <span className="text-white text-xl">📅</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-green-900">Total de Eventos</h3>
+                            <h3 className="text-lg font-semibold text-green-900">
+                                Total de Eventos
+                            </h3>
                         </div>
                     </div>
-                    
+
                     {totalEventos !== null && (
                         <div className="mb-4">
-                            <p className="text-3xl font-bold text-green-600">{totalEventos.toLocaleString()}</p>
-                            <p className="text-sm text-green-500">eventos creados</p>
+                            <p className="text-3xl font-bold text-green-600">
+                                {totalEventos.toLocaleString()}
+                            </p>
+                            <p className="text-sm text-green-500">
+                                eventos creados
+                            </p>
                         </div>
                     )}
-                    
+
                     <button
                         onClick={fetchEventos}
                         disabled={loadingEventos}
@@ -301,10 +317,12 @@ const EstadisticasPanel: React.FC<EstadisticasPanelProps> = ({
                             '🔄 Actualizar Eventos'
                         )}
                     </button>
-                    
+
                     {errorEventos && (
                         <div className="mt-3 p-3 bg-red-100 border border-red-300 rounded-lg">
-                            <p className="text-red-700 text-sm">❌ {errorEventos}</p>
+                            <p className="text-red-700 text-sm">
+                                ❌ {errorEventos}
+                            </p>
                         </div>
                     )}
                 </div>
@@ -316,9 +334,11 @@ const EstadisticasPanel: React.FC<EstadisticasPanelProps> = ({
                     <div className="p-2 bg-purple-500 rounded-lg mr-3">
                         <span className="text-white text-xl">📈</span>
                     </div>
-                    <h3 className="text-lg font-semibold text-purple-900">Tasa de Conversión Waitlist</h3>
+                    <h3 className="text-lg font-semibold text-purple-900">
+                        Tasa de Conversión Waitlist
+                    </h3>
                 </div>
-                
+
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-purple-700 mb-2">
                         ID del Evento
@@ -331,14 +351,18 @@ const EstadisticasPanel: React.FC<EstadisticasPanelProps> = ({
                         className="w-full px-4 py-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                 </div>
-                
+
                 {tasaConversionWL !== null && (
                     <div className="mb-4">
-                        <p className="text-3xl font-bold text-purple-600">{tasaConversionWL}%</p>
-                        <p className="text-sm text-purple-500">de conversión desde waitlist</p>
+                        <p className="text-3xl font-bold text-purple-600">
+                            {tasaConversionWL}%
+                        </p>
+                        <p className="text-sm text-purple-500">
+                            de conversión desde waitlist
+                        </p>
                     </div>
                 )}
-                
+
                 <button
                     onClick={fetchTasaConversionWL}
                     disabled={loadingTasa || !idEvento.trim()}
@@ -357,17 +381,19 @@ const EstadisticasPanel: React.FC<EstadisticasPanelProps> = ({
                         '📊 Calcular Tasa de Conversión'
                     )}
                 </button>
-                
+
                 {errorTasa && (
                     <div className="mt-3 p-3 bg-red-100 border border-red-300 rounded-lg">
                         <p className="text-red-700 text-sm">❌ {errorTasa}</p>
                     </div>
                 )}
-                
+
                 <div className="mt-4 p-3 bg-purple-50 rounded-lg">
                     <p className="text-xs text-purple-600">
-                        💡 <strong>¿Qué es la tasa de conversión?</strong><br/>
-                        Porcentaje de personas que pasan de la waitlist a estar confirmadas en el evento.
+                        💡 <strong>¿Qué es la tasa de conversión?</strong>
+                        <br />
+                        Porcentaje de personas que pasan de la waitlist a estar
+                        confirmadas en el evento.
                     </p>
                 </div>
             </div>
@@ -375,28 +401,42 @@ const EstadisticasPanel: React.FC<EstadisticasPanelProps> = ({
             {/* Resumen visual cuando hay datos */}
             {(totalInscripciones !== null || totalEventos !== null) && (
                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4">📋 Resumen del Sistema</h4>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                        📋 Resumen del Sistema
+                    </h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {totalInscripciones !== null && (
                             <div className="text-center">
-                                <p className="text-2xl font-bold text-blue-600">{totalInscripciones}</p>
-                                <p className="text-sm text-gray-600">Inscripciones</p>
+                                <p className="text-2xl font-bold text-blue-600">
+                                    {totalInscripciones}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                    Inscripciones
+                                </p>
                             </div>
                         )}
                         {totalEventos !== null && (
                             <div className="text-center">
-                                <p className="text-2xl font-bold text-green-600">{totalEventos}</p>
+                                <p className="text-2xl font-bold text-green-600">
+                                    {totalEventos}
+                                </p>
                                 <p className="text-sm text-gray-600">Eventos</p>
                             </div>
                         )}
-                        {totalInscripciones !== null && totalEventos !== null && totalEventos > 0 && (
-                            <div className="text-center">
-                                <p className="text-2xl font-bold text-orange-600">
-                                    {(totalInscripciones / totalEventos).toFixed(1)}
-                                </p>
-                                <p className="text-sm text-gray-600">Inscripciones promedio por evento</p>
-                            </div>
-                        )}
+                        {totalInscripciones !== null &&
+                            totalEventos !== null &&
+                            totalEventos > 0 && (
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-orange-600">
+                                        {(
+                                            totalInscripciones / totalEventos
+                                        ).toFixed(1)}
+                                    </p>
+                                    <p className="text-sm text-gray-600">
+                                        Inscripciones promedio por evento
+                                    </p>
+                                </div>
+                            )}
                     </div>
                 </div>
             )}

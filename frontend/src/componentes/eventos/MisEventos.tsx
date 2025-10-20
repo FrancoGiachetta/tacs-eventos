@@ -38,7 +38,11 @@ export default function MisEventos() {
     }
 
     const handleEliminarEvento = async (evento: Evento) => {
-        if (window.confirm(`¿Está seguro que desea eliminar el evento "${evento.titulo}"?`)) {
+        if (
+            window.confirm(
+                `¿Está seguro que desea eliminar el evento "${evento.titulo}"?`
+            )
+        ) {
             try {
                 const token = localStorage.getItem('authToken')
                 await api.delete(`/api/v1/evento/${evento.id}`, {
@@ -58,13 +62,17 @@ export default function MisEventos() {
     const handleGuardarEvento = async (eventoData: any) => {
         try {
             const token = localStorage.getItem('authToken')
-            
+
             if (eventoEditando) {
-                await api.put(`/api/v1/evento/${eventoEditando.id}`, eventoData, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
+                await api.put(
+                    `/api/v1/evento/${eventoEditando.id}`,
+                    eventoData,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                )
                 toast.success('Evento actualizado exitosamente')
             } else {
                 await api.post('/api/v1/evento', eventoData, {
@@ -74,7 +82,7 @@ export default function MisEventos() {
                 })
                 toast.success('Evento creado exitosamente')
             }
-            
+
             setMostrarModal(false)
             setEventoEditando(null)
             cargarEventos()
@@ -113,8 +121,12 @@ export default function MisEventos() {
                 {eventos.length === 0 ? (
                     <div className="text-center py-12">
                         <div className="text-gray-400 text-6xl mb-4">📅</div>
-                        <h3 className="text-xl font-medium text-gray-900 mb-2">No hay eventos</h3>
-                        <p className="text-gray-500">Comienza creando tu primer evento</p>
+                        <h3 className="text-xl font-medium text-gray-900 mb-2">
+                            No hay eventos
+                        </h3>
+                        <p className="text-gray-500">
+                            Comienza creando tu primer evento
+                        </p>
                     </div>
                 ) : (
                     <div className="bg-white shadow-sm rounded-lg overflow-hidden">
@@ -132,8 +144,8 @@ export default function MisEventos() {
                             </thead>
                             <tbody>
                                 {eventos.map((evento: Evento) => (
-                                    <EventoRow 
-                                        key={evento.id} 
+                                    <EventoRow
+                                        key={evento.id}
                                         evento={evento}
                                         onEditar={handleEditarEvento}
                                         onEliminar={handleEliminarEvento}
@@ -192,8 +204,12 @@ function EventoRow({ evento, onEditar, onEliminar }: EventoRowProps) {
         <tr className="table-row even:bg-gray-50 odd:bg-white hover:bg-gray-100">
             <td className="px-4 py-3">
                 <div>
-                    <div className="font-medium text-gray-900">{evento.titulo}</div>
-                    <div className="text-sm text-gray-500">{evento.categoria}</div>
+                    <div className="font-medium text-gray-900">
+                        {evento.titulo}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                        {evento.categoria}
+                    </div>
                     <div className="text-xs text-gray-400">ID: {evento.id}</div>
                 </div>
             </td>
@@ -202,11 +218,13 @@ function EventoRow({ evento, onEditar, onEliminar }: EventoRowProps) {
             </td>
             <td className="px-4 py-3">{evento.ubicacion}</td>
             <td className="px-4 py-3">
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    evento.abierto 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                }`}>
+                <span
+                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        evento.abierto
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                    }`}
+                >
                     {evento.abierto ? 'Abierto' : 'Cerrado'}
                 </span>
             </td>
@@ -258,40 +276,57 @@ interface ModalEventoProps {
     onCerrar: () => void
 }
 
-const ModalEvento: React.FC<ModalEventoProps> = ({ evento, onGuardar, onCerrar }) => {
+const ModalEvento: React.FC<ModalEventoProps> = ({
+    evento,
+    onGuardar,
+    onCerrar,
+}) => {
     const [formData, setFormData] = useState({
         titulo: evento?.titulo || '',
         descripcion: evento?.descripcion || '',
-        fechaHoraInicio: evento?.fechaHoraInicio ? 
-            new Date(evento.fechaHoraInicio).toISOString().slice(0, 16) : '',
+        fechaHoraInicio: evento?.fechaHoraInicio
+            ? new Date(evento.fechaHoraInicio).toISOString().slice(0, 16)
+            : '',
         duracionMinutos: evento?.duracionMinutos || 60,
         ubicacion: evento?.ubicacion || '',
         cupoMaximo: evento?.cupoMaximo || 50,
         precio: evento?.precio || 0,
-        categoria: evento?.categoria || 'General'
+        categoria: evento?.categoria || 'General',
     })
 
     const categorias = [
-        'Tecnología', 'Desarrollo', 'Seguridad', 'DevOps', 'IA', 
-        'Diseño', 'Marketing', 'Negocios', 'Educación', 'General'
+        'Tecnología',
+        'Desarrollo',
+        'Seguridad',
+        'DevOps',
+        'IA',
+        'Diseño',
+        'Marketing',
+        'Negocios',
+        'Educación',
+        'General',
     ]
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        
+
         const eventoData = {
             ...formData,
-            fechaHoraInicio: new Date(formData.fechaHoraInicio).toISOString()
+            fechaHoraInicio: new Date(formData.fechaHoraInicio).toISOString(),
         }
-        
+
         onGuardar(eventoData)
     }
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const handleChange = (
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
+    ) => {
         const { name, value, type } = e.target
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
-            [name]: type === 'number' ? parseFloat(value) || 0 : value
+            [name]: type === 'number' ? parseFloat(value) || 0 : value,
         }))
     }
 
@@ -426,8 +461,10 @@ const ModalEvento: React.FC<ModalEventoProps> = ({ evento, onGuardar, onCerrar }
                                 required
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                {categorias.map(cat => (
-                                    <option key={cat} value={cat}>{cat}</option>
+                                {categorias.map((cat) => (
+                                    <option key={cat} value={cat}>
+                                        {cat}
+                                    </option>
                                 ))}
                             </select>
                         </div>
