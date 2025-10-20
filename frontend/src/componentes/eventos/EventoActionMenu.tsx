@@ -33,28 +33,28 @@ export default function EventoActionMenu(props: {
             const viewportWidth = window.innerWidth
             const menuWidth = 192 // w-48 = 12rem = 192px
             const menuHeight = 90 // Altura real del menú (80px minHeight + padding)
-            
+
             // Calcular posición vertical
             const spaceBelow = viewportHeight - rect.bottom
             const shouldPositionAbove = spaceBelow < menuHeight + 10
-            
-            let top = shouldPositionAbove 
-                ? rect.top + window.scrollY - menuHeight - 5  // Posicionar arriba
-                : rect.bottom + window.scrollY + 5           // Posicionar abajo
-            
+
+            let top = shouldPositionAbove
+                ? rect.top + window.scrollY - menuHeight - 5 // Posicionar arriba
+                : rect.bottom + window.scrollY + 5 // Posicionar abajo
+
             // Calcular posición horizontal (alineado a la derecha del botón)
             let left = rect.right + window.scrollX - menuWidth
-            
+
             // Ajustar si se sale por la derecha
             if (left + menuWidth > window.scrollX + viewportWidth - 10) {
                 left = window.scrollX + viewportWidth - menuWidth - 10
             }
-            
+
             // Ajustar si se sale por la izquierda
             if (left < window.scrollX + 10) {
                 left = window.scrollX + 10
             }
-            
+
             setPosition({ top, left })
         }
         setOpen(!open)
@@ -80,7 +80,7 @@ export default function EventoActionMenu(props: {
                     style={{
                         top: `${position.top}px`,
                         left: `${position.left}px`,
-                        minHeight: '80px'
+                        minHeight: '80px',
                     }}
                 >
                     <ul className="text-gray-700 py-1">
