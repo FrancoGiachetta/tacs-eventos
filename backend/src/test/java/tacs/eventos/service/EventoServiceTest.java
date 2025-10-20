@@ -50,7 +50,7 @@ public class EventoServiceTest {
     void setUp() {
         // Limpiar la colección antes de cada test
         mongoTemplate.getCollection("eventos").deleteMany(new org.bson.Document());
-        
+
         this.e1 = new Evento("Evento Tennis", "Evento de comida, deporte y pasion",
                 LocalDateTime.of(2025, 10, 10, 0, 0, 0), 1, "", 0, 1000, "Deporte");
         this.e2 = new Evento("Evento Ropa", "Evento de moda, desfile", LocalDateTime.of(2025, 11, 23, 0, 0, 0), 1, "",
