@@ -356,6 +356,84 @@ public class EventoController {
                 }).toList());
     }
 
+    /**
+     * Actualiza un evento existente. Solo el organizador del evento o un admin pueden editar.
+     *
+     * @param usuario
+     *            usuario logueado
+     * @param eventoId
+     *            id del evento a actualizar
+     * @param dto
+     *            datos actualizados del evento
+     *
+     * @return ResponseEntity con el evento actualizado
+     */
+    @PutMapping("/{eventoId}")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Evento actualizado correctamente"),
+        @ApiResponse(responseCode = "403", description = "Acceso denegado"),
+        @ApiResponse(responseCode = "404", description = "Evento no encontrado")
+    })
+    public ResponseEntity<EventoResponse> actualizarEvento(@AuthenticationPrincipal Usuario usuario,
+            @PathVariable String eventoId, @Valid @RequestBody CreacionEventoRequest dto) {
+        
+        Evento evento = this.buscarEvento(eventoId);
+        
+        Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
+        
+        // Si el usuario no es el organizador ni admin, devolver 403
+        if (!validador.validar()) {
+            throw new AccesoDenegadoHandler("No tiene permisos para editar este evento");
+        }
+        
+        // Actualizar los campos del evento
+        evento.setTitulo(dto.getTitulo());
+        evento.setDescripcion(dto.getDescripcion());
+        evento.setFechaHoraInicio(dto.getFechaHoraInicio());
+        evento.setDuracionMinutos(dto.getDuracionMinutos());
+        evento.setUbicacion(dto.getUbicacion());
+        evento.setCupoMaximo(dto.getCupoMaximo());
+        evento.setPrecio(dto.getPrecio());
+        evento.setCategoria(dto.getCategoria());
+        
+        Evento eventoActualizado = eventoService.actualizarEvento(evento);
+        
+        return ResponseEntity.ok(modelMapper.map(eventoActualizado, EventoResponse.class));
+    }
+
+    /**
+     * Elimina un evento. Solo el organizador del evento o un admin pueden eliminarlo.
+     *
+     * @param usuario
+     *            usuario logueado
+     * @param eventoId
+     *            id del evento a eliminar
+     *
+     * @return ResponseEntity sin contenido
+     */
+    @DeleteMapping("/{eventoId}")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Evento eliminado correctamente"),
+        @ApiResponse(responseCode = "403", description = "Acceso denegado"),
+        @ApiResponse(responseCode = "404", description = "Evento no encontrado")
+    })
+    public ResponseEntity<Void> eliminarEvento(@AuthenticationPrincipal Usuario usuario,
+            @PathVariable String eventoId) {
+        
+        Evento evento = this.buscarEvento(eventoId);
+        
+        Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
+        
+        // Si el usuario no es el organizador ni admin, devolver 403
+        if (!validador.validar()) {
+            throw new AccesoDenegadoHandler("No tiene permisos para eliminar este evento");
+        }
+        
+        eventoService.eliminarEvento(eventoId);
+        
+        return ResponseEntity.noContent().build();
+    }
+
     private Evento buscarEvento(String id) {
         return this.eventoService.buscarEventoPorId(id)
                 .orElseThrow(() -> new RecursoNoEncontradoHandler("Evento no encontrado"));

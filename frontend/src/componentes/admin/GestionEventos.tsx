@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import api from '../../lib/api'
-import type { Evento } from '../../types/evento'
-import type { Inscripcion, ItemWaitlist } from '../../types/inscripciones'
-import { formatDate } from '../../lib/utils'
-
+import { Evento } from '../../types/evento'
 import { toast } from '../../lib/simpleToast'
+import { formatDate } from '../../lib/utils'
 import { useAuth } from '../../contexts/AuthContext'
 import { esAdmin } from '../../types/usuario'
 
-export default function MisEventos() {
+const GestionEventos: React.FC = () => {
     const [eventos, setEventos] = useState<Evento[]>([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState('')
     const [eventoEditando, setEventoEditando] = useState<Evento | null>(null)
     const [mostrarModal, setMostrarModal] = useState(false)
+    const [eventoAEliminar, setEventoAEliminar] = useState<Evento | null>(null)
     const { usuario } = useAuth()
 
     useEffect(() => {
@@ -22,11 +22,23 @@ export default function MisEventos() {
     const cargarEventos = async () => {
         try {
             setLoading(true)
-            const response = await api.get('/api/v1/usuario/mis-eventos')
+            const token = localStorage.getItem('authToken')
+            
+            // Si es admin, obtener todos los eventos, sino solo mis eventos
+            const endpoint = esAdmin(usuario) 
+                ? '/api/v1/evento' 
+                : '/api/v1/usuario/mis-eventos'
+                
+            const response = await api.get(endpoint, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
             setEventos(response.data)
-        } catch (error) {
-            console.error('Error al cargar eventos:', error)
-            toast.error('Error al cargar eventos')
+            setError('')
+        } catch (err) {
+            setError('Error al cargar eventos')
+            console.error('Error:', err)
         } finally {
             setLoading(false)
         }
@@ -60,6 +72,7 @@ export default function MisEventos() {
             const token = localStorage.getItem('authToken')
             
             if (eventoEditando) {
+                // Actualizar evento existente
                 await api.put(`/api/v1/evento/${eventoEditando.id}`, eventoData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -67,6 +80,7 @@ export default function MisEventos() {
                 })
                 toast.success('Evento actualizado exitosamente')
             } else {
+                // Crear nuevo evento
                 await api.post('/api/v1/evento', eventoData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -84,6 +98,16 @@ export default function MisEventos() {
         }
     }
 
+    const getEstadoColor = (abierto: boolean) => {
+        return abierto
+            ? 'bg-green-100 text-green-800'
+            : 'bg-red-100 text-red-800'
+    }
+
+    const getEstadoTexto = (abierto: boolean) => {
+        return abierto ? 'Abierto' : 'Cerrado'
+    }
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-64">
@@ -92,58 +116,141 @@ export default function MisEventos() {
         )
     }
 
-    return (
-        <>
-            <div className="mt-5">
-                <div className="flex justify-between items-center mb-7">
-                    <h1 className="text-3xl">
-                        {esAdmin(usuario) ? 'Todos los eventos' : 'Mis eventos'}
-                    </h1>
-                    <button
-                        onClick={() => {
-                            setEventoEditando(null)
-                            setMostrarModal(true)
-                        }}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                        + Crear Evento
-                    </button>
-                </div>
+    if (error) {
+        return (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-800">{error}</p>
+                <button
+                    onClick={cargarEventos}
+                    className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                    Reintentar
+                </button>
+            </div>
+        )
+    }
 
-                {eventos.length === 0 ? (
-                    <div className="text-center py-12">
-                        <div className="text-gray-400 text-6xl mb-4">📅</div>
-                        <h3 className="text-xl font-medium text-gray-900 mb-2">No hay eventos</h3>
-                        <p className="text-gray-500">Comienza creando tu primer evento</p>
-                    </div>
-                ) : (
-                    <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-                        <table className="table-auto border-collapse min-w-full text-sm text-left">
-                            <thead>
-                                <tr className="table-row font-bold bg-gray-50 text-gray-600">
-                                    <th className="px-4 py-3">Nombre</th>
-                                    <th className="px-4 py-3">Fecha</th>
-                                    <th className="px-4 py-3">Ubicación</th>
-                                    <th className="px-4 py-3">Estado</th>
-                                    <th className="px-4 py-3">Inscriptos</th>
-                                    <th className="px-4 py-3">En Waitlist</th>
-                                    <th className="px-4 py-3">Acciones</th>
+    return (
+        <div className="space-y-6">
+            <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-900">
+                    {esAdmin(usuario) ? 'Gestión de Todos los Eventos' : 'Mis Eventos'}
+                </h2>
+                <button
+                    onClick={() => {
+                        setEventoEditando(null)
+                        setMostrarModal(true)
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                    + Crear Evento
+                </button>
+            </div>
+
+            {eventos.length === 0 ? (
+                <div className="text-center py-12">
+                    <div className="text-gray-400 text-6xl mb-4">📅</div>
+                    <h3 className="text-xl font-medium text-gray-900 mb-2">No hay eventos</h3>
+                    <p className="text-gray-500">Comienza creando tu primer evento</p>
+                </div>
+            ) : (
+                <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Evento
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Fecha/Hora
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Ubicación
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Cupo
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Precio
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Estado
+                                    </th>
+                                    {esAdmin(usuario) && (
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Organizador
+                                        </th>
+                                    )}
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Acciones
+                                    </th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {eventos.map((evento: Evento) => (
-                                    <EventoRow 
-                                        key={evento.id} 
-                                        evento={evento}
-                                        onEditar={handleEditarEvento}
-                                        onEliminar={handleEliminarEvento}
-                                    />
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {eventos.map((evento) => (
+                                    <tr key={evento.id} className="hover:bg-gray-50">
+                                        <td className="px-6 py-4">
+                                            <div>
+                                                <div className="text-sm font-medium text-gray-900">
+                                                    {evento.titulo}
+                                                </div>
+                                                <div className="text-sm text-gray-500">
+                                                    {evento.categoria}
+                                                </div>
+                                                <div className="text-xs text-gray-400">
+                                                    ID: {evento.id}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-900">
+                                            {formatDate(evento.fechaHoraInicio, { withTime: true })}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-900">
+                                            {evento.ubicacion}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-900">
+                                            {evento.cupoMaximo}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-900">
+                                            ${evento.precio.toLocaleString()}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getEstadoColor(evento.abierto)}`}>
+                                                {getEstadoTexto(evento.abierto)}
+                                            </span>
+                                        </td>
+                                        {esAdmin(usuario) && (
+                                            <td className="px-6 py-4 text-sm text-gray-900">
+                                                <div>
+                                                    <div>{evento.organizador.email}</div>
+                                                    <div className="text-xs text-gray-400">
+                                                        ID: {evento.organizador.id}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        )}
+                                        <td className="px-6 py-4 text-sm font-medium space-x-2">
+                                            <button
+                                                onClick={() => handleEditarEvento(evento)}
+                                                className="text-blue-600 hover:text-blue-900 transition-colors"
+                                            >
+                                                ✏️ Editar
+                                            </button>
+                                            <button
+                                                onClick={() => handleEliminarEvento(evento)}
+                                                className="text-red-600 hover:text-red-900 transition-colors"
+                                            >
+                                                🗑️ Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
 
             {/* Modal para crear/editar evento */}
             {mostrarModal && (
@@ -156,98 +263,7 @@ export default function MisEventos() {
                     }}
                 />
             )}
-        </>
-    )
-}
-
-interface EventoRowProps {
-    evento: Evento
-    onEditar: (evento: Evento) => void
-    onEliminar: (evento: Evento) => void
-}
-
-function EventoRow({ evento, onEditar, onEliminar }: EventoRowProps) {
-    const [inscripciones, setInscripciones] = useState<Inscripcion[]>([])
-    const [waitlist, setWaitlist] = useState<ItemWaitlist[]>([])
-    const { usuario } = useAuth()
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [inscripcionesRes, waitlistRes] = await Promise.all([
-                    api.get(`/api/v1/evento/${evento.id}/inscripcion`),
-                    api.get(`/api/v1/evento/${evento.id}/waitlist`),
-                ])
-                setInscripciones(inscripcionesRes.data)
-                setWaitlist(waitlistRes.data)
-            } catch (error) {
-                console.error('Error fetching event data:', error)
-            }
-        }
-
-        fetchData()
-    }, [evento.id])
-
-    return (
-        <tr className="table-row even:bg-gray-50 odd:bg-white hover:bg-gray-100">
-            <td className="px-4 py-3">
-                <div>
-                    <div className="font-medium text-gray-900">{evento.titulo}</div>
-                    <div className="text-sm text-gray-500">{evento.categoria}</div>
-                    <div className="text-xs text-gray-400">ID: {evento.id}</div>
-                </div>
-            </td>
-            <td className="px-4 py-3">
-                {formatDate(evento.fechaHoraInicio, { withTime: true })}
-            </td>
-            <td className="px-4 py-3">{evento.ubicacion}</td>
-            <td className="px-4 py-3">
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    evento.abierto 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                }`}>
-                    {evento.abierto ? 'Abierto' : 'Cerrado'}
-                </span>
-            </td>
-            <td className="px-4 py-3">
-                <span className="font-medium">{inscripciones.length}</span>
-                <span className="text-gray-500">/{evento.cupoMaximo}</span>
-            </td>
-            <td className="px-4 py-3">{waitlist.length}</td>
-            <td className="px-4 py-3">
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => onEditar(evento)}
-                        className="px-2 py-1 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
-                        title="Editar evento"
-                    >
-                        ✏️ Editar
-                    </button>
-                    <button
-                        onClick={() => onEliminar(evento)}
-                        className="px-2 py-1 text-red-600 hover:text-red-800 text-sm font-medium transition-colors"
-                        title="Eliminar evento"
-                    >
-                        🗑️ Eliminar
-                    </button>
-                    <a
-                        href={`/organizador/eventos/${evento.id}`}
-                        className="px-3 py-1 text-green-600 hover:text-green-800 text-sm font-medium transition-colors border border-green-600 hover:border-green-800 rounded"
-                        title="Gestionar inscripciones"
-                    >
-                        Gestionar
-                    </a>
-                    <a
-                        href={`/eventos/${evento.id}`}
-                        className="px-3 py-1 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors border border-blue-600 hover:border-blue-800 rounded"
-                        title="Ver detalle del evento"
-                    >
-                        Ver detalle
-                    </a>
-                </div>
-            </td>
-        </tr>
+        </div>
     )
 }
 
@@ -279,6 +295,7 @@ const ModalEvento: React.FC<ModalEventoProps> = ({ evento, onGuardar, onCerrar }
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         
+        // Convertir la fecha de string a formato ISO para el backend
         const eventoData = {
             ...formData,
             fechaHoraInicio: new Date(formData.fechaHoraInicio).toISOString()
@@ -453,3 +470,5 @@ const ModalEvento: React.FC<ModalEventoProps> = ({ evento, onGuardar, onCerrar }
         </div>
     )
 }
+
+export default GestionEventos
