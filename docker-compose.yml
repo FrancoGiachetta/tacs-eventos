@@ -4,7 +4,7 @@ networks:
 
 services:
   eventos-backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: eventos-backend
@@ -12,6 +12,8 @@ services:
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - SPRING_PROFILES_ACTIVE=docker
+      - FRONTEND_ORIGIN=${FRONTEND_ORIGIN}
+
     ports:
       - "8080:8080"
     networks:
@@ -27,9 +29,11 @@ services:
       start_period: 60s
 
   eventos-frontend:
-    build: 
+    build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL}
     container_name: eventos-frontend
     ports:
       - "3000:80"
@@ -38,8 +42,6 @@ services:
     depends_on:
       eventos-backend:
         condition: service_healthy
-    environment:
-      - VITE_API_URL=http://localhost:8080
 
   mongodb:
     image: mongodb/mongodb-community-server
@@ -66,4 +68,4 @@ services:
       - eventos-network
 
 volumes:
-  mongo_data:
+    mongo_data:

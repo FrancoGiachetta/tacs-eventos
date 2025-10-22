@@ -14,15 +14,32 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # ---- Runtime Stage ----
-FROM eclipse-temurin:17-jdk AS runtime
+FROM eclipse-temurin:17-jre-jammy AS runtime
 
 # Instalar curl para el healthcheck
 RUN apt-get update && \
     apt-get install -y curl && \
     rm -rf /var/lib/apt/lists/*
 
+# Crear usuario no-root para seguridad
+RUN groupadd -r spring && useradd -r -g spring spring
+
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
+# Cambiar permisos
+RUN chown spring:spring app.jar
+
+# Cambiar a usuario no-root
+USER spring
+
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Configuración optimizada para contenedores
+ENTRYPOINT ["java", \
+    "-Xms512m", \
+    "-Xmx1024m", \
+    "-XX:+UseContainerSupport", \
+    "-XX:MaxRAMPercentage=75.0", \
+    "-jar", \
+    "app.jar"]

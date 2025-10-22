@@ -1,7 +1,25 @@
 import axios, { InternalAxiosRequestConfig } from 'axios'
 
+const getBaseURL = () => {
+    // Si hay variable de entorno de Vite, usarla
+    if (import.meta.env.VITE_API_BASE_URL) {
+        return import.meta.env.VITE_API_BASE_URL
+    }
+
+    // Detectar automáticamente basado en el hostname
+    const hostname = window.location.hostname
+    const protocol = window.location.protocol
+
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:8080'
+    } else {
+        // Si estamos en EC2, usar SOLO el protocolo, hostname y puerto 8080
+        return `${protocol}//${hostname}:8080`
+    }
+}
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080',
+    baseURL: getBaseURL(),
     withCredentials: true,
 })
 
