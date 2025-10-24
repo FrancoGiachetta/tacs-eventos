@@ -13,6 +13,8 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - SPRING_PROFILES_ACTIVE=docker
       - FRONTEND_ORIGIN=${FRONTEND_ORIGIN}
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
 
     ports:
       - "8080:8080"
@@ -43,19 +45,6 @@ services:
       eventos-backend:
         condition: service_healthy
 
-  mongodb:
-    image: mongodb/mongodb-community-server
-    container_name: mongodb
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: nraboy
-      MONGO_INITDB_ROOT_PASSWORD: password1234
-    restart: unless-stopped
-    networks:
-      - eventos-network
-    volumes:
-      - mongo_data:/data/db # Guarda acá los datos. Si se borra el contenedor, los datos persisten.
 
   redis:
     image: redis:8.2
