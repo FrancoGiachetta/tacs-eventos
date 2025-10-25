@@ -17,7 +17,7 @@ use crate::{
     error::{BotError, dialogue_error::DialogueError},
 };
 
-mod registration_dialogue;
+pub mod registration_dialogue;
 
 pub type DialogueResult<T> = Result<T, Box<DialogueError>>;
 
@@ -28,7 +28,6 @@ pub type DialogueStorage = InMemStorage<State>;
 pub enum State {
     #[default]
     Start,
-    CheckUser,
     Registration(RegisterState),
     Authenticated,
 }
@@ -73,7 +72,8 @@ Elegí una opción:\n\n\
         &Command::descriptions()
     );
     ctl.send_message(&greetings_message).await?;
-    ctl.update_dialogue_state(State::CheckUser).await?;
+    ctl.update_dialogue_state(State::Registration(RegisterState::CheckUser))
+        .await?;
 
     Ok(())
 }
