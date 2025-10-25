@@ -30,22 +30,24 @@ pub struct Event {
 // Defines how to format an Event struct.
 impl Display for Event {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "🎉 *{}*", self.title)?;
-        writeln!(f, "👤 Organizado por: _{}_", self.organizer)?;
+        writeln!(f, "<b>{}</b>", self.title)?;
         writeln!(f)?;
-        writeln!(f, "📝 *Descripción*")?;
+        writeln!(f, "👤 Organizado por: {}", self.organizer)?;
+        writeln!(f)?;
+        writeln!(f, "📝 <b>Descripción</b>")?;
         writeln!(f, "{}", self.description)?;
         writeln!(f)?;
-        writeln!(f, "📅 *Fecha y Hora*")?;
-        writeln!(f, "{}", self.start_date_time)?;
-        writeln!(f, "⏱ Duración: {} minutos", self.duration_minutes)?;
+        writeln!(f, "📅 <b>Fecha y Hora</b>: {}", self.start_date_time)?;
         writeln!(f)?;
-        writeln!(f, "📍 *Ubicación*")?;
-        writeln!(f, "{}", self.location)?;
+        writeln!(f, "⏱ <b>Duración</b>: {} minutos", self.duration_minutes)?;
         writeln!(f)?;
-        writeln!(f, "👥 Capacidad: {}", self.max_capacity)?;
-        writeln!(f, "💰 Precio: {}", self.price)?;
-        writeln!(f, "🏷 Categoría: {}", self.category)?;
+        writeln!(f, "📍 <b>Ubicación</b>: {}", self.location)?;
+        writeln!(f)?;
+        writeln!(f, "👥 <b>Capacidad</b>: {}", self.max_capacity)?;
+        writeln!(f)?;
+        writeln!(f, "💰 <b>Precio</b>: ${}", self.price)?;
+        writeln!(f)?;
+        writeln!(f, "🏷 <b>Categoría</b>: {}", self.category)?;
         Ok(())
     }
 }
