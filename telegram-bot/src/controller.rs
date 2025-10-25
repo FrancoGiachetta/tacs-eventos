@@ -2,8 +2,9 @@ use std::sync::Arc;
 
 use teloxide::{
     Bot,
+    payloads::SendMessageSetters,
     prelude::Requester,
-    types::{ChatId, Message},
+    types::{ChatId, Message, ParseMode},
 };
 
 use crate::{
@@ -60,7 +61,10 @@ impl Controller {
     }
 
     pub async fn send_message(&self, msg: &str) -> BotResult<()> {
-        self.bot.send_message(self.chat_id, msg).await?;
+        self.bot
+            .send_message(self.chat_id, msg)
+            .parse_mode(ParseMode::Html)
+            .await?;
 
         Ok(())
     }
@@ -68,6 +72,7 @@ impl Controller {
     pub async fn send_error_message(&self, msg: &str) -> Result<(), teloxide::RequestError> {
         self.bot
             .send_message(self.chat_id, format!("❌ {}", msg))
+            .parse_mode(ParseMode::Html)
             .await?;
 
         Ok(())

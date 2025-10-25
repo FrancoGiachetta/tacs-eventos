@@ -54,20 +54,24 @@ async fn greetings(ctl: Controller) -> BotResult<()> {
         ))?
         .full_name();
     let greetings_message = format!(
-"¡Hola, {}! 👋 Bienvenido al bot de TACS Eventos 🎉
-
-Soy tu asistente para descubrir y participar en eventos de forma rápida y sencilla. A través de mí podrás:
-
-✅ Buscar eventos por precio, fecha, categoría o palabras clave 🔍.
-✅ Ver los detalles de cada evento 📋.
-✅ Inscribirte a los eventos que te interesen 🎟️.
-✅ Consultar tus inscripciones activas 📅.
-
-Los comandos disponibles son:
-
-{}
-", username, &Command::descriptions());
-
+        "👋 ¡Hola, {}!\n\n\
+Bienvenido al bot de TACS Eventos 🎉\n\n\
+Soy tu asistente para descubrir y participar en eventos.\n\n\
+<b>¿Qué podés hacer?</b>\n\
+🔍 Buscar eventos por precio, fecha o categoría\n\
+📋 Ver detalles de cada evento\n\
+🎟️ Inscribirte a los que te interesen\n\
+📅 Consultar tus inscripciones\n\n\
+<b>Comandos disponibles:</b>\n\
+{}\n\n\
+🔐 <b>Para comenzar, necesitás una cuenta</b>\n\n\
+Elegí una opción:\n\
+✍️ A) Registrarme\n\
+🔑 B) Iniciar sesión\n\n\
+¿Qué querés hacer?",
+        username,
+        &Command::descriptions()
+    );
     ctl.send_message(&greetings_message).await?;
     ctl.update_dialogue_state(State::CheckUser).await?;
 
