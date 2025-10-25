@@ -1,0 +1,43 @@
+
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  merge_group:
+    types: [checks_requested]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+    check-bot-clippy:
+      name: clippy
+      runs-on: ubuntu-latest
+
+      steps:
+        - uses: actions/checkout@v4
+        - uses: dtolnay/rust-toolchain@1.89.0
+          with:
+            components: clippy, rustfmt
+        - uses: Swatinem/rust-cache@v2
+        - name: Check Clippy
+          run:  |
+            cd telegram-bot
+            cargo clippy --all-targets --all-features
+
+    check-bot-fmt:
+      name: rustfmt
+      runs-on: ubuntu-latest
+
+      steps:
+        - uses: actions/checkout@v4
+        - uses: dtolnay/rust-toolchain@1.89.0
+          with:
+            components: clippy, rustfmt
+        - uses: Swatinem/rust-cache@v2
+        - name: Check Clippy
+          run: |
+            cd telegram-bot
+            cargo fmt --all -- --check
