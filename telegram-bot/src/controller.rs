@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
 use teloxide::{
-    Bot,
     payloads::SendMessageSetters,
     prelude::Requester,
-    types::{ChatId, Message, ParseMode},
+    types::{ChatId, InlineKeyboardMarkup, Message, ParseMode},
+    Bot,
 };
 
 use crate::{
@@ -73,6 +73,20 @@ impl Controller {
         self.bot
             .send_message(self.chat_id, format!("❌ {}", msg))
             .parse_mode(ParseMode::Html)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn send_message_with_markup(
+        &self,
+        msg: &str,
+        markup: InlineKeyboardMarkup,
+    ) -> BotResult<()> {
+        self.bot
+            .send_message(self.chat_id, msg)
+            .parse_mode(ParseMode::Html)
+            .reply_markup(markup)
             .await?;
 
         Ok(())

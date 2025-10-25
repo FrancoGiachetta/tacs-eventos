@@ -1,12 +1,12 @@
 use std::sync::Arc;
 
 use teloxide::{
-    Bot,
-    dispatching::{UpdateFilterExt, dialogue as teloxide_dialogue},
+    dispatching::{dialogue as teloxide_dialogue, UpdateFilterExt},
     dptree,
     prelude::{Dispatcher, LoggingErrorHandler, Requester},
     types::Update,
     utils::command::BotCommands,
+    Bot,
 };
 use tracing::{info, warn};
 
@@ -18,6 +18,8 @@ use crate::{
     error::BotError,
     request_client::RequestClient,
 };
+
+use crate::callback;
 
 pub type BotResult<T> = Result<T, BotError>;
 
@@ -32,6 +34,11 @@ pub async fn run() -> BotResult<()> {
                 .filter_map(Controller::new)
                 .branch(command::create_command_handler())
                 .branch(dialogue::create_dialogue_handler()),
+        )
+        .branch(
+            Update::filter_callback_query()
+                .filter_map(Controller::new)
+                .endpoint(callback::handle_callback),
         );
 
         let req_client = Arc::new(RequestClient::new()?);

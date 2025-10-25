@@ -10,6 +10,7 @@ use teloxide::{
 };
 
 mod event;
+mod my_events;
 
 #[derive(BotCommands, Clone)]
 #[command(rename_rule = "lowercase")]
@@ -22,6 +23,8 @@ pub enum Command {
         parse_with = parse_event_filters
     )]
     ListEvents(EventFilter),
+    #[command(description = "List the events organized by the user.")]
+    MyEvents,
 }
 
 /// Creates a handler for commands.
@@ -34,6 +37,7 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
             // Check if session is still valid. If not, retrieve new token.
             .map_async(check_session)
             .branch(dptree::case![Command::ListEvents(filters)].endpoint(event::handle_list_events))
+            .branch(dptree::case![Command::MyEvents].endpoint(my_events::handle_my_events))
             .branch(dptree::case![Command::Help].endpoint(handle_help_command)),
     )
 }

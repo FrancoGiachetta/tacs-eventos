@@ -9,6 +9,7 @@ use crate::{
     error::request_client_error::RequestClientError,
     schemas::{
         event::{Event, EventFilter},
+        event_organizer_view::EventOrganizerView,
         user::{Token, UserIn, UserOut},
     },
 };
@@ -48,6 +49,51 @@ impl RequestClient {
             .await?;
 
         Ok(serde_json::from_value(response)?)
+    }
+
+    /// Gets all the events organized by the logged user
+    pub async fn send_get_my_events_list_request(
+        &self,
+        token: &str,
+    ) -> Result<Vec<EventOrganizerView>, RequestClientError> {
+        let response = self
+            .send_request_with_retry("mis-eventos", RequestMethod::Get(&[]), Some(token))
+            .await?;
+        Ok(serde_json::from_value(response)?)
+    }
+
+    pub async fn send_close_event_request(
+        &self,
+        event_id: String,
+        token: &str,
+    ) -> Result<(), RequestClientError> {
+        self.send_change_event_state_request(event_id, false, token)
+            .await
+    }
+
+    // TODO: add "Open event" button
+    pub async fn send_open_event_request(
+        &self,
+        event_id: String,
+        token: &str,
+    ) -> Result<(), RequestClientError> {
+        self.send_change_event_state_request(event_id, true, token)
+            .await
+    }
+
+    async fn send_change_event_state_request(
+        &self,
+        event_id: String,
+        open: bool,
+        token: &str,
+    ) -> Result<(), RequestClientError> {
+        self.send_request_with_retry(
+            &format!("evento/{}", event_id),
+            RequestMethod::Patch(serde_json::json!({ "abierto": open })),
+            Some(token),
+        )
+        .await?;
+        Ok(())
     }
 
     pub async fn send_get_events_list_request(
