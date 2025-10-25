@@ -13,11 +13,11 @@ use crate::{
     bot::BotResult,
     command::Command,
     controller::Controller,
-    dialogue::user::check_user_auth_selection,
+    dialogue::registration_dialogue::{RegisterState, handle_user_registration},
     error::{BotError, dialogue_error::DialogueError},
 };
 
-mod user;
+mod registration_dialogue;
 
 pub type DialogueResult<T> = Result<T, Box<DialogueError>>;
 
@@ -29,18 +29,7 @@ pub enum State {
     #[default]
     Start,
     CheckUser,
-    RegisterEmail,
-    RegisterPassword {
-        email: String,
-    },
-    ConfirmPassword {
-        email: String,
-        password: String,
-    },
-    LoginEmail,
-    LoginPassword {
-        email: String,
-    },
+    Registration(RegisterState),
     Authenticated,
 }
 
@@ -51,22 +40,7 @@ pub fn create_dialogue_handler() -> UpdateHandler<BotError> {
     dialogue::enter::<Update, DialogueStorage, State, _>()
         .branch(dptree::case![State::Start].endpoint(greetings))
         // Check user auth method.
-        .branch(dptree::case![State::CheckUser].endpoint(check_user_auth_selection))
-        // Register user.
-        .branch(dptree::case![State::RegisterEmail].endpoint(user::handle_register_email))
-        .branch(
-            dptree::case![State::RegisterPassword { email }]
-                .endpoint(user::handle_register_password),
-        )
-        .branch(
-            dptree::case![State::ConfirmPassword { email, password }]
-                .endpoint(user::handle_confirm_password),
-        )
-        // Login user.
-        .branch(dptree::case![State::LoginEmail].endpoint(user::handle_register_email))
-        .branch(
-            dptree::case![State::LoginPassword { email }].endpoint(user::handle_register_password),
-        )
+        .branch(dptree::case![State::Registration(state)].endpoint(handle_user_registration))
 }
 
 async fn greetings(ctl: Controller) -> BotResult<()> {
