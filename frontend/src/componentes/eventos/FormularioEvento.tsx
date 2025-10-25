@@ -69,7 +69,7 @@ export default function FormularioEvento({
                 className="mt-4 rounded-lg bg-white p-4"
             >
                 <div className="flex flex-col gap-3">
-                    {id && esAdmin(usuario) && (
+                    {id && (
                         <div className="flex flex-col gap-1">
                             <label
                                 htmlFor="idEvento"
