@@ -83,18 +83,18 @@ async fn greetings(ctl: Controller) -> BotResult<()> {
         "👋 ¡Hola, {}!\n\n\
 Bienvenido al bot de TACS Eventos 🎉\n\n\
 Soy tu asistente para descubrir y participar en eventos.\n\n\
-<b>¿Qué podés hacer?</b>\n\
+<b>¿Qué podés hacer?</b>\n\n\
 🔍 Buscar eventos por precio, fecha o categoría\n\
 📋 Ver detalles de cada evento\n\
 🎟️ Inscribirte a los que te interesen\n\
 📅 Consultar tus inscripciones\n\n\
-<b>Comandos disponibles:</b>\n\
+<b>Comandos disponibles:</b>\n\n\
 {}\n\n\
 🔐 <b>Para comenzar, necesitás una cuenta</b>\n\n\
-Elegí una opción:\n\
+Elegí una opción:\n\n\
 ✍️ A) Registrarme\n\
 🔑 B) Iniciar sesión\n\n\
-¿Qué querés hacer?",
+¿Qué deseas hacer?",
         username,
         &Command::descriptions()
     );

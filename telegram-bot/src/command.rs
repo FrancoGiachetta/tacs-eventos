@@ -59,8 +59,43 @@ async fn reset(ctl: Controller) -> BotResult<()> {
 
     if session_is_valid {
         ctl.update_dialogue_state(State::Authenticated).await?;
+        let username = ctl
+            .message()
+            .from
+            .ok_or(BotError::CustomError(
+                "Couldn't find message's sender".to_string(),
+            ))?
+            .full_name();
+        let greetings_message = format!(
+            "👋 ¡Hola, {}!\n\n\
+Bienvenido al bot de TACS Eventos 🎉\n\n\
+Soy tu asistente para descubrir y participar en eventos.\n\n\
+<b>¿Qué podés hacer?</b>\n\n\
+🔍 Buscar eventos por precio, fecha o categoría\n\
+📋 Ver detalles de cada evento\n\
+🎟️ Inscribirte a los que te interesen\n\
+📅 Consultar tus inscripciones\n\n\
+<b>Comandos disponibles:</b>\n\n\
+{}\n\n\
+🔐 <b>Para comenzar, necesitás una cuenta</b>\n\n\
+Elegí una opción:\n\n\
+✍️ A) Registrarme\n\
+🔑 B) Iniciar sesión\n\n\
+¿Qué deseas hacer?",
+            username,
+            &Command::descriptions()
+        );
+        ctl.send_message(&greetings_message).await?;
     } else {
         ctl.update_dialogue_state(State::CheckUser).await?;
+        ctl.send_message(
+            "🔐 <b>Para comenzar, necesitás una cuenta</b>\n\n\
+Elegí una opción:\n\n\
+✍️ A) Registrarme\n\
+🔑 B) Iniciar sesión\n\n\
+¿Qué deseas hacer?",
+        )
+        .await?;
     }
 
     Ok(())

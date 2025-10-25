@@ -28,6 +28,7 @@ pub async fn handle_list_events(ctl: Controller, filters: EventFilter) -> BotRes
             ctl.send_message(&format!("<b>📅 Estos son los eventos disponibles</b>\n\n<i>Según los criterios de búsqueda que ingresaste:</i>\n\n")).await?;
 
             for event in events_list {
+                dbg!(&event);
                 ctl.send_message(&format!("📅 <b>Evento</b>\n\n{}", event))
                     .await?;
             }
