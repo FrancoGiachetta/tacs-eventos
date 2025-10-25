@@ -76,12 +76,7 @@ Soy tu asistente para descubrir y participar en eventos.\n\n\
 🎟️ Inscribirte a los que te interesen\n\
 📅 Consultar tus inscripciones\n\n\
 <b>Comandos disponibles:</b>\n\n\
-{}\n\n\
-🔐 <b>Para comenzar, necesitás una cuenta</b>\n\n\
-Elegí una opción:\n\n\
-✍️ A) Registrarme\n\
-🔑 B) Iniciar sesión\n\n\
-¿Qué deseas hacer?",
+{}\n\n",
             username,
             &Command::descriptions()
         );

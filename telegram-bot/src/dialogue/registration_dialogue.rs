@@ -36,16 +36,6 @@ pub async fn handle_user_registration(ctl: Controller, state: RegisterState) -> 
 // one.
 
 pub async fn check_user_auth_selection(ctl: Controller) -> BotResult<()> {
-    let msg = "Para comenzar, necesitas tener una cuenta activa. 🔐
-Por favor, elige una opción para continuar:
-
-A) Registrarme ✍️
-B) Iniciar sesión 🔑
-
-¿Qué te gustaría hacer? 💬";
-
-    ctl.send_message(msg).await?;
-
     match &ctl.message().text().map(|m| m.to_lowercase()) {
         Some(m) if m == "a" => {
             let message = "<b>¡Perfecto! 🎉</b>\n\n\
@@ -65,7 +55,17 @@ Envíame tu email 📧";
             ctl.update_dialogue_state(State::Registration(RegisterState::LoginEmail))
                 .await?
         }
-        _ => {}
+        _ => {
+            let msg = "¡Esa no es una respueta valida! Para comenzar, necesitas tener una cuenta activa. 🔐
+Por favor, elige una opción para continuar:
+
+A) Registrarme ✍️
+B) Iniciar sesión 🔑
+
+¿Qué te gustaría hacer? 💬";
+
+            ctl.send_message(msg).await?;
+        }
     }
 
     Ok(())
@@ -111,7 +111,8 @@ Ahora necesito tu <b>contraseña</b> 🔒",
                         "Impossible state! {:?}. Should be RegisterEmail or LoginEmail",
                         state
                     );
-                    ctl.reset_dialogue().await?;
+                    ctl.update_dialogue_state(State::Registration(RegisterState::CheckUser))
+                        .await?;
                 }
             }
         }
