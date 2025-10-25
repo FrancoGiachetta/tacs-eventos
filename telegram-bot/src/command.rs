@@ -2,7 +2,7 @@ use crate::{
     auth::{Authenticator, check_session},
     bot::BotResult,
     controller::Controller,
-    dialogue::State,
+    dialogue::{State, registration_dialogue::RegisterState},
     error::BotError,
     schemas::event::EventFilter,
 };
@@ -87,7 +87,8 @@ Elegí una opción:\n\n\
         );
         ctl.send_message(&greetings_message).await?;
     } else {
-        ctl.update_dialogue_state(State::CheckUser).await?;
+        ctl.update_dialogue_state(State::Registration(RegisterState::CheckUser))
+            .await?;
         ctl.send_message(
             "🔐 <b>Para comenzar, necesitás una cuenta</b>\n\n\
 Elegí una opción:\n\n\

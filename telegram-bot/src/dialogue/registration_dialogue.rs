@@ -48,15 +48,19 @@ B) Iniciar sesión 🔑
 
     match &ctl.message().text().map(|m| m.to_lowercase()) {
         Some(m) if m == "a" => {
-            let message = "Okay! Elegiste crearte una cuenta nueva. Para eso voy a necesitar que me envies un mail";
-
+            let message = "<b>¡Perfecto! 🎉</b>\n\n\
+Elegiste <i>crear una cuenta nueva</i>.\n\n\
+<b>Para continuar:</b>\n\
+Por favor, envíame tu dirección de email 📧";
             ctl.send_message(message).await?;
             ctl.update_dialogue_state(State::Registration(RegisterState::RegisterEmail))
                 .await?
         }
         Some(m) if m == "b" => {
-            let message = "Okay! Parece que ya tenes una cuenta registrada. Para eso voy a necesitar que me envies tu mail";
-
+            let message = "<b>✅ ¡Genial!</b>\n\n\
+Veo que ya tenés una cuenta.\n\n\
+<b>Para acceder:</b>\n\
+Envíame tu email 📧";
             ctl.send_message(message).await?;
             ctl.update_dialogue_state(State::Registration(RegisterState::LoginEmail))
                 .await?
@@ -81,7 +85,11 @@ pub async fn handle_register_email(ctl: Controller, state: RegisterState) -> Bot
                 .is_match(email)
                 .map_err(|e| Box::new(DialogueError::from(e)))? =>
         {
-            ctl.send_message("Ahora necesito una contrasena").await?;
+            ctl.send_message(
+                "<b>Genial, ya casi estamos 🎯</b>\n\n\
+Ahora necesito tu <b>contraseña</b> 🔒",
+            )
+            .await?;
 
             match state {
                 RegisterState::RegisterEmail => {
@@ -108,7 +116,12 @@ pub async fn handle_register_email(ctl: Controller, state: RegisterState) -> Bot
             }
         }
         _ => {
-            ctl.send_message("Ese email no es valido!").await?;
+            ctl.send_message(
+                "<b>Email inválido</b>\n\n\
+Por favor, envíame un email correcto:\n\n\
+<code>usuario@gmail.com</code>",
+            )
+            .await?;
         }
     }
 
@@ -124,8 +137,11 @@ pub async fn handle_register_password(ctl: Controller, state: RegisterState) -> 
         {
             match state {
                 RegisterState::RegisterPassword { email } => {
-                    ctl.send_message("Ahora necesito que confirmes las contrasena")
-                        .await?;
+                    ctl.send_message(
+                        "<b>¡Bien! 👌</b>\n\n\
+Para confirmar, enviame la <b>contraseña nuevamente</b> 🔒",
+                    )
+                    .await?;
 
                     ctl.update_dialogue_state(State::Registration(
                         RegisterState::ConfirmPassword {
@@ -150,22 +166,27 @@ pub async fn handle_register_password(ctl: Controller, state: RegisterState) -> 
                         .new_session(ctl.chat_id(), password.to_string(), token)
                         .await?;
 
-                    ctl.send_message("Ya te loggeaste!").await?;
+                    ctl.send_message(
+                        "<b>✅ ¡Ya estás logueado!</b>\n\n\
+<i>Todo listo para empezar</i> 🎉",
+                    )
+                    .await?;
 
                     // Change to State::Authenticated so that the user can perform commands.
                     ctl.update_dialogue_state(State::Authenticated).await?;
                 }
                 _ => {
-                    let error_msg = "❌ Oops, algo salió mal. No pudimos completar tu autenticación.\n\
-\n\
-No te preocupes, simplemente elige qué deseas hacer:\n\
-\n\
-A) Crear una cuenta nueva 🆕\n\
-B) Iniciar sesión con tu cuenta existente 🔐";
+                    let error_msg = "<b>Oops, algo salió mal</b>\n\n\
+No pudimos completar tu autenticación.\n\n\
+<b>No te preocupes, elegí qué querés hacer:</b>\n\n\
+🆕 <b>A)</b> Crear una cuenta nueva\n\
+🔐 <b>B)</b> Iniciar sesión con tu cuenta existente";
+
                     error!(
                         "Impossible state! {:?}. Should be RegisterEmail or LoginEmail",
                         state
                     );
+
                     ctl.send_error_message(error_msg).await?;
                     ctl.update_dialogue_state(State::Registration(RegisterState::CheckUser))
                         .await?;
@@ -173,7 +194,15 @@ B) Iniciar sesión con tu cuenta existente 🔐";
             }
         }
         _ => {
-            ctl.send_message("Esa contrasena es invalida!").await?;
+            ctl.send_error_message(
+                "<b>Contraseña inválida</b>\n\n\
+Tu contraseña debe tener:\n\
+  • Mínimo <b>8 caracteres</b>\n\
+  • Al menos <b>una letra</b>\n\
+  • Al menos <b>un número</b>\n\n\
+<i>Intentá de nuevo</i> 🔒",
+            )
+            .await?;
         }
     }
 
@@ -201,13 +230,22 @@ pub async fn handle_confirm_password(
                 .new_session(ctl.chat_id(), password, token)
                 .await?;
 
-            ctl.send_message("Ya creaste tu cuenta!").await?;
-
+            ctl.send_message(
+                "<b>✅ ¡Listo!</b>\n\n\
+Tu cuenta fue creada <i>correctamente</i>.\n\
+<b>Bienvenido</b> 👋",
+            )
+            .await?;
             // Change to State::Authenticated so that the user can perform commands.
             ctl.update_dialogue_state(State::Authenticated).await?;
         }
         _ => {
-            ctl.send_message("Las contrasenas no coinciden!").await?;
+            ctl.send_error_message(
+                "<b>Las contraseñas no coinciden</b>\n\n\
+Asegurate de escribir la <b>misma contraseña</b> en ambos campos.\n\n\
+<i>Intentá de nuevo</i> 🔒",
+            )
+            .await?;
         }
     }
 
