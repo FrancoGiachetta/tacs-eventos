@@ -97,14 +97,30 @@ Por favor, envíame un email correcto:\n\n\
 
 pub async fn handle_register_password(ctl: Controller, email: String) -> BotResult<()> {
     match ctl.message().text() {
-        Some(password)
-            if PASSWORD_REGEX
-                .is_match(password)
-                .map_err(|e| Box::new(DialogueError::from(e)))? =>
-        {
+        Some(password) => {
+            // Decide flow depending on current dialogue state. For existing users (LoginPassword)
+            // we skip the strong-password regex validation. For new registrations (RegisterPassword)
+            // we apply the validation.
             match ctl.get_dialogue_state().await? {
                 Some(s) => match s {
                     State::RegisterPassword { .. } => {
+                        // For new registrations enforce the strong password regex.
+                        if !PASSWORD_REGEX
+                            .is_match(password)
+                            .map_err(|e| Box::new(DialogueError::from(e)))?
+                        {
+                            ctl.send_error_message(
+                                "<b>Contraseña inválida</b>\n\n\
+Tu contraseña debe tener:\n\
+  • Mínimo <b>8 caracteres</b>\n\
+  • Al menos <b>una letra</b>\n\
+  • Al menos <b>un número</b>\n\n\
+<i>Intentá de nuevo</i> 🔒",
+                            )
+                            .await?;
+                            return Ok(());
+                        }
+
                         ctl.send_message(
                             "<b>¡Bien! 👌</b>\n\n\
 Para confirmar, enviame la <b>contraseña nuevamente</b> 🔒",
@@ -118,6 +134,7 @@ Para confirmar, enviame la <b>contraseña nuevamente</b> 🔒",
                         .await?;
                     }
                     State::LoginPassword { .. } => {
+                        // Existing users: skip strong-password validation and try to log in.
                         let token = ctl
                             .request_client()
                             .send_user_login_request(UserOut {
@@ -162,6 +179,7 @@ No pudimos completar tu autenticación.\n\n\
             }
         }
         _ => {
+            // No text provided: show the same invalid-password message used for registration.
             ctl.send_error_message(
                 "<b>Contraseña inválida</b>\n\n\
 Tu contraseña debe tener:\n\
