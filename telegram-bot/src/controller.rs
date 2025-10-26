@@ -1,18 +1,18 @@
 use std::sync::Arc;
 
-use teloxide::{
-    payloads::SendMessageSetters,
-    prelude::Requester,
-    types::{ChatId, InlineKeyboardMarkup, Message, ParseMode},
-    Bot,
-};
-
 use crate::{
     auth::in_memory_auth::InMemoryAuth,
     bot::BotResult,
     dialogue::{DialogueResult, MyDialogue, State},
     error::dialogue_error::DialogueError,
     request_client::RequestClient,
+};
+use teloxide::prelude::CallbackQuery;
+use teloxide::{
+    payloads::SendMessageSetters,
+    prelude::Requester,
+    types::{ChatId, InlineKeyboardMarkup, Message, ParseMode},
+    Bot,
 };
 
 /// Utility struct which centralizes most of the actions we need to perform.
@@ -36,6 +36,25 @@ impl Controller {
     ) -> Option<Self> {
         Some(Self {
             chat_id: msg.chat.id,
+            msg,
+            bot,
+            req_client,
+            auth,
+            dialogue,
+        })
+    }
+
+    pub fn new_from_callback_query(
+        callback_query: CallbackQuery,
+        bot: Arc<Bot>,
+        req_client: Arc<RequestClient>,
+        auth: Arc<InMemoryAuth>,
+        dialogue: MyDialogue,
+    ) -> Option<Self> {
+        let chat_id = callback_query.clone().message.map(|msg| msg.chat().id)?;
+        let msg = callback_query.message?.regular_message()?.clone();
+        Some(Self {
+            chat_id,
             msg,
             bot,
             req_client,

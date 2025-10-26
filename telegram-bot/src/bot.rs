@@ -29,17 +29,18 @@ pub async fn run() -> BotResult<()> {
     bot.set_my_commands(Command::bot_commands()).await?;
 
     let mut dispatcher = {
-        let handler = teloxide_dialogue::enter::<Update, DialogueStorage, State, _>().branch(
-            Update::filter_message()
-                .filter_map(Controller::new)
-                .branch(command::create_command_handler())
-                .branch(dialogue::create_dialogue_handler()),
-        )
-        .branch(
-            Update::filter_callback_query()
-                .filter_map(Controller::new)
-                .endpoint(callback::handle_callback),
-        );
+        let handler = teloxide_dialogue::enter::<Update, DialogueStorage, State, _>()
+            .branch(
+                Update::filter_message()
+                    .filter_map(Controller::new)
+                    .branch(command::create_command_handler())
+                    .branch(dialogue::create_dialogue_handler()),
+            )
+            .branch(
+                Update::filter_callback_query()
+                    .filter_map(Controller::new_from_callback_query)
+                    .endpoint(callback::handle_callback),
+            );
 
         let req_client = Arc::new(RequestClient::new()?);
         let authenticator = Arc::new(InMemoryAuth::new(req_client.clone()));
