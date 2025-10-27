@@ -6,6 +6,7 @@ use std::{
 use async_trait::async_trait;
 use chrono::Utc;
 use teloxide::types::ChatId;
+use tracing::info;
 
 use crate::{
     auth::Authenticator,
@@ -51,6 +52,8 @@ impl Authenticator for InMemoryAuth {
         password: String,
         token: Token,
     ) -> Result<(), AuthError> {
+        info!("Creating new session");
+
         let UserIn { id, email, .. } = self.request_client.send_get_me(&token.token).await?;
 
         let session = Session {
@@ -70,6 +73,8 @@ impl Authenticator for InMemoryAuth {
     }
 
     async fn reset_token(&self, chat_id: &ChatId) -> Result<(), AuthError> {
+        info!("Reseting Token");
+
         let (email, password) = {
             let sessions = self
                 .sessions

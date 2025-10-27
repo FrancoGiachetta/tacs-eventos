@@ -13,9 +13,10 @@ use crate::{
     bot::BotResult,
     command::Command,
     controller::Controller,
-    dialogue::registration_dialogue::{RegisterState, handle_user_registration},
     error::{BotError, dialogue_error::DialogueError},
 };
+
+use registration_dialogue::State as RegisterState;
 
 pub mod registration_dialogue;
 
@@ -39,7 +40,7 @@ pub fn create_dialogue_handler() -> UpdateHandler<BotError> {
     dialogue::enter::<Update, DialogueStorage, State, _>()
         .branch(dptree::case![State::Start].endpoint(greetings))
         // Check user auth method.
-        .branch(dptree::case![State::Registration(state)].endpoint(handle_user_registration))
+        .branch(registration_dialogue::schema())
 }
 
 async fn greetings(ctl: Controller) -> BotResult<()> {

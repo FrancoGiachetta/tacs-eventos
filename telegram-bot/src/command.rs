@@ -2,7 +2,7 @@ use crate::{
     auth::{Authenticator, check_session},
     bot::BotResult,
     controller::Controller,
-    dialogue::{State, registration_dialogue::RegisterState},
+    dialogue::{State, registration_dialogue::State as RegisterState},
     error::BotError,
     schemas::event::EventFilter,
 };
