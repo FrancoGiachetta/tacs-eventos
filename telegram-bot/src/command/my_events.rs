@@ -34,13 +34,24 @@ pub async fn handle_my_events(controller: Controller) -> BotResult<()> {
 
 async fn send_event_message(controller: &Controller, event: &EventOrganizerView) -> BotResult<()> {
     let text = format!("{event}");
-    // TODO: add an 'open' button if the inscriptions are closed
-    let callback_data = Callback::CloseEvent(event.id().to_string()).query();
-    // Creates a button for closing the inscriptions for that event
-    let button = InlineKeyboardButton::callback("Cerrar inscripciones", callback_data);
+    let change_state_button = change_state_button(event);
     let keyboard = InlineKeyboardMarkup {
-        inline_keyboard: vec![vec![button]],
+        inline_keyboard: vec![vec![change_state_button]],
     };
-
     controller.send_message_with_markup(&text, keyboard).await
+}
+
+/// Creates a button for opening or closing the event
+fn change_state_button(event: &EventOrganizerView) -> InlineKeyboardButton {
+    if event.open() {
+        // if the event is open
+        // Creates a button for closing the inscriptions for that event
+        let callback_data = Callback::CloseEvent(event.id().to_string()).query();
+        InlineKeyboardButton::callback("Cerrar inscripciones", callback_data)
+    } else {
+        // if the event is closed
+        // Creates a button for opening the inscriptions for that event
+        let callback_data = Callback::OpenEvent(event.id().to_string()).query();
+        InlineKeyboardButton::callback("Abrir inscripciones", callback_data)
+    }
 }

@@ -6,38 +6,48 @@ use teloxide::{
 };
 
 use crate::bot::BotResult;
-use crate::callback::change_event_state::open_event;
-use crate::callback::Callback::CloseEvent;
+use crate::callback::change_event_state::{close_event, open_event};
+use crate::callback::Callback::{CloseEvent, OpenEvent};
 use crate::controller::Controller;
 
 const CLOSE_EVENT_PREFIX: &str = "close_event:";
+const OPEN_EVENT_PREFIX: &str = "open_event:";
 
 /// Callbacks that can be invoked by the buttons in the chatbot inline keyboard
 pub enum Callback {
     CloseEvent(String),
+    OpenEvent(String),
 }
 
 impl Callback {
+    /// Constructs the query that is sent to the bot when the button is pressed.
     pub fn query(&self) -> String {
         match self {
             CloseEvent(event_id) => format!("{}{}", CLOSE_EVENT_PREFIX, event_id),
-            // Other(event_id) => format!("{}{}", OTHER_PREFIX, param), // This is how another callback would be added
+            OpenEvent(event_id) => format!("{}{}", OPEN_EVENT_PREFIX, event_id),
         }
     }
+    /// Creates the Callback from the query sent to the bot (constructed by `query`)
     fn extract_from_query(query: &String) -> Option<Self> {
         query
             .strip_prefix(CLOSE_EVENT_PREFIX)
             .map(|event_id| CloseEvent(event_id.to_string()))
-        // .or(query.strip_prefix(OTHER_PREFIX).map(|param| OTHER(param.to_string())) // This is how another callback would be added
+            .or(query
+                .strip_prefix(OPEN_EVENT_PREFIX)
+                .map(|event_id| OpenEvent(event_id.to_string())))
     }
+    /// This message is sent to the user when the button has been pressed
     fn acknowledged_message(&self) -> String {
         match self {
-            CloseEvent(event_id) => format!("Cerrando evento {}", event_id),
+            CloseEvent(event_id) => format!("Cerrando inscripciones a evento {}", event_id),
+            OpenEvent(event_id) => format!("Abriendo inscripciones a evento {}", event_id),
         }
     }
+    /// This message is sent to the user when the action has been performed
     fn action_confirmation_message(&self) -> String {
         match self {
-            CloseEvent(event_id) => format!("Evento {} cerrado", event_id),
+            CloseEvent(event_id) => format!("Se cerraron las inscripciones al evento {}", event_id),
+            OpenEvent(event_id) => format!("Se cerraron las inscripciones al evento {}", event_id),
         }
     }
 }
@@ -53,7 +63,8 @@ pub async fn handle_callback(
     send_acknowledged(&bot, &query, &callback).await?;
     // Performs the action trigerred by the callback
     match &callback {
-        Some(CloseEvent(event_id)) => open_event(controller, event_id.to_string()).await?,
+        Some(CloseEvent(event_id)) => close_event(controller, event_id.to_string()).await?,
+        Some(OpenEvent(event_id)) => open_event(controller, event_id.to_string()).await?,
         None => (),
     }
     send_action_confirmation(bot.as_ref(), &query, &callback).await?;

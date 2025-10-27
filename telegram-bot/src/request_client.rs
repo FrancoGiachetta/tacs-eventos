@@ -57,7 +57,7 @@ impl RequestClient {
         token: &str,
     ) -> Result<Vec<EventOrganizerView>, RequestClientError> {
         let response = self
-            .send_request_with_retry("mis-eventos", RequestMethod::Get(&[]), Some(token))
+            .send_request_with_retry("usuario/mis-eventos", RequestMethod::Get(&[]), Some(token))
             .await?;
         Ok(serde_json::from_value(response)?)
     }
@@ -71,7 +71,6 @@ impl RequestClient {
             .await
     }
 
-    // TODO: add "Open event" button
     pub async fn send_open_event_request(
         &self,
         event_id: String,
@@ -89,7 +88,7 @@ impl RequestClient {
     ) -> Result<(), RequestClientError> {
         self.send_request_with_retry(
             &format!("evento/{}", event_id),
-            RequestMethod::Patch(serde_json::json!({ "abierto": open })),
+            RequestMethod::Patch(serde_json::json!({"abierto": open })),
             Some(token),
         )
         .await?;
