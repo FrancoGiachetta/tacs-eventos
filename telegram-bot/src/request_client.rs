@@ -165,10 +165,13 @@ impl RequestClient {
         let url = format!("{}/{}", *URL_BASE, url);
         let response = Self::retry(|| self.send_request(&url, &method, token)).await?;
 
-        response
-            .json::<Value>()
-            .await
-            .map_err(RequestClientError::from)
+        let resp_body = response.text().await?;
+        if resp_body.is_empty() {
+            // Si el body está vacío, no intenta parsearlo
+            Ok(Value::Null)
+        } else {
+            Ok(serde_json::from_str(&resp_body)?)
+        }
     }
 
     async fn send_request<'req>(

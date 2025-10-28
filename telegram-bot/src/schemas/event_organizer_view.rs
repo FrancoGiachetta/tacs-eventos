@@ -23,10 +23,10 @@ impl EventOrganizerView {
 impl Display for EventOrganizerView {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         // Writes the field in this structure
-        writeln!(f, "🏷️ Id de evento: _{}_", self.id)?;
+        writeln!(f, "🏷️ Id de evento: _{}_\n", self.id)?;
         writeln!(
             f,
-            "📋 Inscripciones abiertas: {}",
+            "📋 Inscripciones abiertas: {}\n",
             if self.open { "si" } else { "no" }
         )?;
         // Writes all the fields in the Event structure
@@ -41,7 +41,7 @@ impl<'de> Deserialize<'de> for EventOrganizerView {
         D: serde::Deserializer<'de>,
     {
         let json_value: serde_json::Value = Deserialize::deserialize(deserializer)?; // Json content
-        let id = json_value["id"].to_string();
+        let id = json_value["id"].as_str().unwrap().to_string();
         let open = json_value["abierto"].as_bool().unwrap();
         // Deserializes all the fields in the Event structure
         let event = Event::deserialize(json_value).unwrap();
