@@ -47,7 +47,7 @@ impl Callback {
     fn action_confirmation_message(&self) -> String {
         match self {
             CloseEvent(event_id) => format!("Se cerraron las inscripciones al evento {}", event_id),
-            OpenEvent(event_id) => format!("Se cerraron las inscripciones al evento {}", event_id),
+            OpenEvent(event_id) => format!("Se abrieron las inscripciones al evento {}", event_id),
         }
     }
 }
