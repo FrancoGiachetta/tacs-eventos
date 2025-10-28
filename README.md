@@ -156,6 +156,11 @@ Email: organizador@eventos.com
 Password: org123
 Permisos: Crear y gestionar eventos
 ```
+##CLOUD AWS-
+La aplicacion se instala en EC2- AWS //atlas mongoDB
+URL:http://ec2-3-94-168-55.compute-1.amazonaws.com:3000/login
+
+
 
 
 ## Equipo
