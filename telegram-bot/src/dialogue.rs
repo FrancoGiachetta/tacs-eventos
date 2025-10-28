@@ -13,11 +13,12 @@ use crate::{
     bot::BotResult,
     command::Command,
     controller::Controller,
-    dialogue::user::check_user_auth_selection,
     error::{BotError, dialogue_error::DialogueError},
 };
 
-mod user;
+use registration_dialogue::State as RegisterState;
+
+pub mod registration_dialogue;
 
 pub type DialogueResult<T> = Result<T, Box<DialogueError>>;
 
@@ -28,19 +29,7 @@ pub type DialogueStorage = InMemStorage<State>;
 pub enum State {
     #[default]
     Start,
-    CheckUser,
-    RegisterEmail,
-    RegisterPassword {
-        email: String,
-    },
-    ConfirmPassword {
-        email: String,
-        password: String,
-    },
-    LoginEmail,
-    LoginPassword {
-        email: String,
-    },
+    Registration(RegisterState),
     Authenticated,
 }
 
@@ -51,22 +40,7 @@ pub fn create_dialogue_handler() -> UpdateHandler<BotError> {
     dialogue::enter::<Update, DialogueStorage, State, _>()
         .branch(dptree::case![State::Start].endpoint(greetings))
         // Check user auth method.
-        .branch(dptree::case![State::CheckUser].endpoint(check_user_auth_selection))
-        // Register user.
-        .branch(dptree::case![State::RegisterEmail].endpoint(user::handle_register_email))
-        .branch(
-            dptree::case![State::RegisterPassword { email }]
-                .endpoint(user::handle_register_password),
-        )
-        .branch(
-            dptree::case![State::ConfirmPassword { email, password }]
-                .endpoint(user::handle_confirm_password),
-        )
-        // Login user.
-        .branch(dptree::case![State::LoginEmail].endpoint(user::handle_register_email))
-        .branch(
-            dptree::case![State::LoginPassword { email }].endpoint(user::handle_register_password),
-        )
+        .branch(registration_dialogue::schema())
 }
 
 async fn greetings(ctl: Controller) -> BotResult<()> {
@@ -83,23 +57,24 @@ async fn greetings(ctl: Controller) -> BotResult<()> {
         "👋 ¡Hola, {}!\n\n\
 Bienvenido al bot de TACS Eventos 🎉\n\n\
 Soy tu asistente para descubrir y participar en eventos.\n\n\
-<b>¿Qué podés hacer?</b>\n\
+<b>¿Qué podés hacer?</b>\n\n\
 🔍 Buscar eventos por precio, fecha o categoría\n\
 📋 Ver detalles de cada evento\n\
 🎟️ Inscribirte a los que te interesen\n\
 📅 Consultar tus inscripciones\n\n\
-<b>Comandos disponibles:</b>\n\
+<b>Comandos disponibles:</b>\n\n\
 {}\n\n\
 🔐 <b>Para comenzar, necesitás una cuenta</b>\n\n\
-Elegí una opción:\n\
+Elegí una opción:\n\n\
 ✍️ A) Registrarme\n\
 🔑 B) Iniciar sesión\n\n\
-¿Qué querés hacer?",
+¿Qué deseas hacer?",
         username,
         &Command::descriptions()
     );
     ctl.send_message(&greetings_message).await?;
-    ctl.update_dialogue_state(State::CheckUser).await?;
+    ctl.update_dialogue_state(State::Registration(RegisterState::CheckUser))
+        .await?;
 
     Ok(())
 }

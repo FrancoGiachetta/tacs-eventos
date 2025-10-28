@@ -124,11 +124,4 @@ impl Controller {
             .await
             .map_err(|e| Box::new(DialogueError::from(e)))
     }
-
-    pub async fn reset_dialogue(&self) -> DialogueResult<()> {
-        self.dialogue
-            .reset()
-            .await
-            .map_err(|e| Box::new(DialogueError::from(e)))
-    }
 }
