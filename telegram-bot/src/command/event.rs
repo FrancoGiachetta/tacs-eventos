@@ -19,11 +19,17 @@ use crate::{
 pub async fn handle_list_events(ctl: Controller, filters: EventFilter) -> BotResult<()> {
     info!("Listing list_events!");
 
+    let token = ctl.auth().get_session_token(&ctl.chat_id())?;
     match ctl
         .request_client()
-        .send_get_events_list_request(filters, &ctl.auth().get_session_token(&ctl.chat_id())?)
+        .send_get_events_list_request(filters, &token)
         .await
     {
+        Ok(events_list) if events_list.is_empty() => {
+            ctl.send_message(
+                &"<b>📅 No hay eventos disponibles</b>\n\n<i>Es posible que los filtros aplicados estén limitando los resultados. Intenta ajustarlos para ver más eventos.</i>\n\n"
+            ).await?;
+        }
         Ok(events_list) => {
             ctl.send_message(&"<b>📅 Estos son los eventos disponibles</b>\n\n<i>Según los criterios de búsqueda que ingresaste:</i>\n\n").await?;
 
@@ -42,17 +48,17 @@ pub async fn handle_list_events(ctl: Controller, filters: EventFilter) -> BotRes
                         .status()
                         .is_some_and(|e| matches!(e, StatusCode::FORBIDDEN)) =>
                 {
-                    "🔒 <b>Necesitás estar logueado</b>\n\n\
+                    "<b>Necesitás estar logueado</b>\n\n\
 Para usar este comando, primero iniciá sesión"
                 }
                 _ => {
-                    "⚠️ <b>Error al ejecutar el comando</b>\n\n\
+                    "<b>Error al ejecutar el comando</b>\n\n\
 Ocurrió un problema inesperado.\n\
 Intentá nuevamente en unos momentos ⏱️"
                 }
             };
 
-            ctl.send_message(error_msg).await?;
+            ctl.send_error_message(error_msg).await?;
         }
     }
 

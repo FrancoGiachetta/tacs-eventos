@@ -9,6 +9,7 @@ use crate::{
     error::request_client_error::RequestClientError,
     schemas::{
         event::{Event, EventFilter},
+        inscription::Inscription,
         user::{Token, UserIn, UserOut},
     },
 };
@@ -73,9 +74,23 @@ impl RequestClient {
             filter_query.push(("categoria", category));
         }
         // TODO: add palabrasClave query.
-
         let response = self
             .send_request_with_retry("evento", RequestMethod::Get(&filter_query), Some(token))
+            .await?;
+
+        Ok(serde_json::from_value(response)?)
+    }
+
+    pub async fn send_get_my_inscriptions_request(
+        &self,
+        token: &str,
+    ) -> Result<Vec<Inscription>, RequestClientError> {
+        let response = self
+            .send_request_with_retry(
+                "usuario/mis-inscripciones",
+                RequestMethod::Get(&[]),
+                Some(token),
+            )
             .await?;
 
         Ok(serde_json::from_value(response)?)
