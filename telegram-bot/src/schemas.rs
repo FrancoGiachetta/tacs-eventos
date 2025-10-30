@@ -1,3 +1,3 @@
 pub mod event;
-pub mod user;
 pub mod inscription;
+pub mod user;
