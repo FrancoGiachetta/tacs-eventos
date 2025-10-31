@@ -7,9 +7,10 @@ use reqwest::StatusCode;
 use teloxide::utils::command::ParseError;
 use tracing::{error, info};
 
+use crate::error::request_client_error::handle_http_request_error;
 use crate::{
     bot::BotResult, controller::Controller, error::request_client_error::RequestClientError,
-    schemas::event::EventFilter, error_handling::handle_error
+    schemas::event::EventFilter,
 };
 
 /// List open events.
@@ -33,7 +34,7 @@ pub async fn handle_list_events(ctl: Controller, filters: EventFilter) -> BotRes
             }
         }
         Err(err) => {
-            handle_error(ctl, err).await?;
+            handle_http_request_error(ctl, err).await?;
         }
     }
 
@@ -118,7 +119,7 @@ pub fn parse_event_filters(input: String) -> Result<(EventFilter,), ParseError> 
 mod tests {
     use chrono::NaiveDate;
 
-    use super::{EventFilter, parse_event_filters};
+    use super::{parse_event_filters, EventFilter};
 
     #[test]
     fn empty_filter() {

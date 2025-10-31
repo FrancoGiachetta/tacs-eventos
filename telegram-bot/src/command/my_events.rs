@@ -3,7 +3,7 @@ use tracing::{error, info};
 use crate::bot::BotResult;
 use crate::callback::Callback;
 use crate::controller::Controller;
-use crate::error_handling::handle_error;
+use crate::error::request_client_error::handle_http_request_error;
 use crate::schemas::event_organizer_view::EventOrganizerView;
 use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
 
@@ -25,7 +25,7 @@ pub async fn handle_my_events(controller: Controller) -> BotResult<()> {
             }
         }
         Err(err) => {
-            handle_error(controller, err).await?;
+            handle_http_request_error(controller, err).await?;
         }
     }
 
