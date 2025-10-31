@@ -1,11 +1,3 @@
-use fancy_regex::Regex;
-use lazy_static::lazy_static;
-use teloxide::{
-    dispatching::{UpdateFilterExt, UpdateHandler},
-    dptree,
-    types::Update,
-};
-
 use crate::{
     auth::Authenticator,
     bot::BotResult,
@@ -14,6 +6,14 @@ use crate::{
     error::{dialogue_error::DialogueError, BotError},
     schemas::user::UserOut,
 };
+use fancy_regex::Regex;
+use lazy_static::lazy_static;
+use teloxide::{
+    dispatching::{UpdateFilterExt, UpdateHandler},
+    dptree,
+    types::Update,
+};
+use tracing::error;
 
 #[derive(Clone, Debug)]
 pub enum State {
@@ -259,7 +259,8 @@ pub async fn handle_login_password(ctl: Controller, email: String) -> BotResult<
             ctl.update_dialogue_state(GlobalState::Authenticated)
                 .await?;
         }
-        Err(_) => {
+        Err(e) => {
+            error!("Error al loguearse: {}", e);
             ctl.send_error_message("<b>Error de inicio de sesión</b>\n")
                 .await?;
         }
