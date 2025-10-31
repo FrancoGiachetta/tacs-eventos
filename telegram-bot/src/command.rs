@@ -14,6 +14,7 @@ use teloxide::{
 };
 
 mod event;
+mod inscriptions;
 
 #[derive(BotCommands, Clone)]
 #[command(rename_rule = "lowercase")]
@@ -28,6 +29,9 @@ pub enum Command {
         parse_with = parse_event_filters
     )]
     ListEvents(EventFilter),
+
+    #[command(description = "Listar inscripciones activas")]
+    MyInscriptions,
 }
 
 /// Creates a handler for commands.
@@ -45,6 +49,8 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
                 .branch(
                     dptree::case![Command::ListEvents(filters)].endpoint(event::handle_list_events),
                 )
+                .branch(dptree::case![Command::MyInscriptions])
+                .endpoint(inscriptions::handle_my_inscriptions)
                 .branch(dptree::case![Command::Help].endpoint(handle_help_command)),
         )
 }
