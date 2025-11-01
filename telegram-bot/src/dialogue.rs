@@ -16,7 +16,7 @@ use crate::{
     error::{dialogue_error::DialogueError, BotError},
 };
 
-use crate::dialogue::event_creation_dialogue::EventCreationState;
+use crate::dialogue::event_creation_dialogue::EventCreationSteps;
 use registration_dialogue::State as RegisterState;
 
 mod event_creation_dialogue;
@@ -42,7 +42,7 @@ pub enum UseCase {
     /// The user can enter a new command
     EnterCommand,
     /// The user has entered the command for event creation, and must provide the neccesary information for creating a new event
-    EventCreation(EventCreationState),
+    EventCreation(EventCreationSteps),
 }
 
 /// Creates a handler for commands.
@@ -53,6 +53,7 @@ pub fn create_dialogue_handler() -> UpdateHandler<BotError> {
         .branch(dptree::case![State::Start].endpoint(greetings))
         // Check user auth method.
         .branch(registration_dialogue::schema())
+        .branch(event_creation_dialogue::schema())
 }
 
 async fn greetings(ctl: Controller) -> BotResult<()> {
