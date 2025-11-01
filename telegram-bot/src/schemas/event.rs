@@ -1,8 +1,10 @@
 use std::{fmt::Display, str::FromStr};
 
 use chrono::{NaiveDate, NaiveDateTime};
-use serde::{Deserialize, de};
+use serde::{de, Deserialize};
 use serde_json::Value;
+
+use derive_builder::Builder;
 
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct EventFilter {
@@ -14,7 +16,8 @@ pub struct EventFilter {
     pub keywords: Option<Vec<String>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
+#[builder(derive(Debug))]
 pub struct Event {
     title: String,
     description: String,
