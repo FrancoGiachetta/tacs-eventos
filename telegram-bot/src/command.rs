@@ -1,8 +1,9 @@
+use crate::dialogue::UseCase::EnterCommand;
 use crate::{
-    auth::{Authenticator, check_session},
+    auth::{check_session, Authenticator},
     bot::BotResult,
     controller::Controller,
-    dialogue::{State, registration_dialogue::State as RegisterState},
+    dialogue::{registration_dialogue::State as RegisterState, State},
     error::BotError,
     schemas::event::EventFilter,
 };
@@ -43,7 +44,7 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
         .branch(dptree::case![Command::Reset].endpoint(reset))
         .branch(
             // A command can only be handled if the current State is State::Start.
-            dptree::case![State::Authenticated]
+            dptree::case![State::Authenticated(EnterCommand)]
                 // Check if session is still valid. If not, retrieve new token.
                 .map_async(check_session)
                 .branch(
@@ -64,7 +65,8 @@ async fn reset(ctl: Controller) -> BotResult<()> {
     let session_is_valid = ctl.auth().validate_session(&ctl.chat_id())?;
 
     if session_is_valid {
-        ctl.update_dialogue_state(State::Authenticated).await?;
+        ctl.update_dialogue_state(State::Authenticated(EnterCommand))
+            .await?;
         let username = ctl
             .message()
             .from

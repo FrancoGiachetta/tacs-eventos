@@ -6,12 +6,13 @@ use teloxide::{
     types::Update,
 };
 
+use crate::dialogue::UseCase::EnterCommand;
 use crate::{
     auth::Authenticator,
     bot::BotResult,
     controller::Controller,
     dialogue::State as GlobalState,
-    error::{BotError, dialogue_error::DialogueError},
+    error::{dialogue_error::DialogueError, BotError},
     schemas::user::UserOut,
 };
 
@@ -181,7 +182,7 @@ Tu cuenta fue creada <i>correctamente</i>.\n\
             )
             .await?;
             // Change to State::Authenticated so that the user can perform commands.
-            ctl.update_dialogue_state(GlobalState::Authenticated)
+            ctl.update_dialogue_state(GlobalState::Authenticated(EnterCommand))
                 .await?;
         }
         _ => {
@@ -258,7 +259,7 @@ pub async fn handle_login_password(ctl: Controller, email: String) -> BotResult<
             .await?;
 
             // Change to State::Authenticated so that the user can perform commands.
-            ctl.update_dialogue_state(GlobalState::Authenticated)
+            ctl.update_dialogue_state(GlobalState::Authenticated(EnterCommand))
                 .await?;
         }
         _ => {

@@ -1,7 +1,7 @@
 use teloxide::{
     dispatching::{
-        UpdateHandler,
         dialogue::{self, InMemStorage},
+        UpdateHandler,
     },
     dptree,
     prelude::Dialogue,
@@ -13,11 +13,13 @@ use crate::{
     bot::BotResult,
     command::Command,
     controller::Controller,
-    error::{BotError, dialogue_error::DialogueError},
+    error::{dialogue_error::DialogueError, BotError},
 };
 
+use crate::dialogue::event_creation_dialogue::EventCreationState;
 use registration_dialogue::State as RegisterState;
 
+mod event_creation_dialogue;
 pub mod registration_dialogue;
 
 pub type DialogueResult<T> = Result<T, Box<DialogueError>>;
@@ -29,8 +31,18 @@ pub type DialogueStorage = InMemStorage<State>;
 pub enum State {
     #[default]
     Start,
+    /// The user is performing the login
     Registration(RegisterState),
-    Authenticated,
+    /// The user is logged-in and can use the app
+    Authenticated(UseCase),
+}
+
+#[derive(Clone, Debug)]
+pub enum UseCase {
+    /// The user can enter a new command
+    EnterCommand,
+    /// The user has entered the command for event creation, and must provide the neccesary information for creating a new event
+    EventCreation(EventCreationState),
 }
 
 /// Creates a handler for commands.
