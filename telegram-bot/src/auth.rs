@@ -1,6 +1,9 @@
 use teloxide::types::ChatId;
 
-use crate::{controller::Controller, error::auth_error::AuthError, schemas::user::Token};
+use crate::{
+    controller::general_controller::GeneralController, error::auth_error::AuthError,
+    schemas::user::Token,
+};
 use async_trait::async_trait;
 
 pub mod in_memory_auth;
@@ -22,7 +25,7 @@ pub trait Authenticator {
 /// If the session is not valid, then it resets the token to make is valid
 /// again.
 /// Returns an `AuthError` if the session does not exist.
-pub async fn check_session(ctl: Controller) -> Result<(), AuthError> {
+pub async fn check_session(ctl: GeneralController) -> Result<(), AuthError> {
     let authenticator = ctl.auth();
 
     if !authenticator.validate_session(&ctl.chat_id())? {

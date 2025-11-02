@@ -1,9 +1,9 @@
 use crate::{
     auth::Authenticator,
     bot::BotResult,
-    controller::Controller,
+    controller::general_controller::GeneralController,
     dialogue::State as GlobalState,
-    error::{dialogue_error::DialogueError, BotError},
+    error::{BotError, dialogue_error::DialogueError},
     schemas::user::UserOut,
 };
 use fancy_regex::Regex;
@@ -45,7 +45,7 @@ pub fn schema() -> UpdateHandler<BotError> {
 // User first choice, either registering a new account logging with an existing
 // one.
 
-pub async fn check_user_auth_selection(ctl: Controller) -> BotResult<()> {
+pub async fn check_user_auth_selection(ctl: GeneralController) -> BotResult<()> {
     match &ctl.message().text().map(|m| m.to_lowercase()) {
         Some(m) if m == "a" => {
             let message = "<b>¡Perfecto! 🎉</b>\n\n\
@@ -88,7 +88,7 @@ lazy_static! {
     static ref PASSWORD_REGEX: Regex = Regex::new(r"^(?=.*[A-Za-z])(?=.*\d).{8,72}$").unwrap();
 }
 
-pub async fn handle_register_email(ctl: Controller) -> BotResult<()> {
+pub async fn handle_register_email(ctl: GeneralController) -> BotResult<()> {
     match ctl.message().text() {
         Some(email)
             if EMAIL_REGEX
@@ -119,7 +119,7 @@ Por favor, envíame un email correcto:\n\n\
     Ok(())
 }
 
-pub async fn handle_register_password(ctl: Controller, email: String) -> BotResult<()> {
+pub async fn handle_register_password(ctl: GeneralController, email: String) -> BotResult<()> {
     match ctl.message().text() {
         Some(password)
             if PASSWORD_REGEX
@@ -155,7 +155,7 @@ Tu contraseña debe tener:\n\
 }
 
 pub async fn handle_confirm_password(
-    ctl: Controller,
+    ctl: GeneralController,
     (email, password): (String, String),
 ) -> BotResult<()> {
     match ctl.message().text() {
@@ -199,7 +199,7 @@ Asegurate de escribir la <b>misma contraseña</b> en ambos campos.\n\n\
 
 // User Login Dialogue.
 
-pub async fn handle_login_email(ctl: Controller) -> BotResult<()> {
+pub async fn handle_login_email(ctl: GeneralController) -> BotResult<()> {
     match ctl.message().text() {
         Some(email)
             if EMAIL_REGEX
@@ -230,7 +230,7 @@ Por favor, envíame un email correcto:\n\n\
     Ok(())
 }
 
-pub async fn handle_login_password(ctl: Controller, email: String) -> BotResult<()> {
+pub async fn handle_login_password(ctl: GeneralController, email: String) -> BotResult<()> {
     let password = ctl.message().text().unwrap_or_default().to_string();
 
     let login_result = ctl

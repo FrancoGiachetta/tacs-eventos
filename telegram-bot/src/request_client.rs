@@ -64,7 +64,7 @@ impl RequestClient {
 
     pub async fn send_close_event_request(
         &self,
-        event_id: String,
+        event_id: &str,
         token: &str,
     ) -> Result<(), RequestClientError> {
         self.send_change_event_state_request(event_id, false, token)
@@ -73,7 +73,7 @@ impl RequestClient {
 
     pub async fn send_open_event_request(
         &self,
-        event_id: String,
+        event_id: &str,
         token: &str,
     ) -> Result<(), RequestClientError> {
         self.send_change_event_state_request(event_id, true, token)
@@ -82,7 +82,7 @@ impl RequestClient {
 
     async fn send_change_event_state_request(
         &self,
-        event_id: String,
+        event_id: &str,
         open: bool,
         token: &str,
     ) -> Result<(), RequestClientError> {

@@ -1,19 +1,19 @@
 use std::sync::Arc;
 
 use teloxide::{
-    dispatching::{dialogue as teloxide_dialogue, UpdateFilterExt},
+    Bot,
+    dispatching::{UpdateFilterExt, dialogue as teloxide_dialogue},
     dptree,
     prelude::{Dispatcher, LoggingErrorHandler, Requester},
     types::Update,
     utils::command::BotCommands,
-    Bot,
 };
 use tracing::{info, warn};
 
 use crate::{
     auth::in_memory_auth::InMemoryAuth,
     command::{self, Command},
-    controller::Controller,
+    controller::{general_controller::GeneralController, query_controller::QueryController},
     dialogue::{self, DialogueStorage, State},
     error::BotError,
     request_client::RequestClient,
@@ -32,14 +32,14 @@ pub async fn run() -> BotResult<()> {
         let handler = teloxide_dialogue::enter::<Update, DialogueStorage, State, _>()
             .branch(
                 Update::filter_message()
-                    .filter_map(Controller::new)
+                    .filter_map(GeneralController::new_option)
                     .branch(command::create_command_handler())
                     .branch(dialogue::create_dialogue_handler()),
             )
             .branch(
                 Update::filter_callback_query()
-                    .filter_map(Controller::new_from_callback_query)
-                    .endpoint(callback::handle_callback),
+                    .filter_map(QueryController::new)
+                    .branch(callback::create_callback_handler()),
             );
 
         let req_client = Arc::new(RequestClient::new()?);

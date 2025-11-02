@@ -1,5 +1,5 @@
 use crate::bot::BotResult;
-use crate::controller::Controller;
+use crate::controller::general_controller::GeneralController;
 use reqwest::StatusCode;
 use thiserror::Error;
 use tracing::error;
@@ -15,7 +15,10 @@ pub enum RequestClientError {
 }
 
 /// Handles an api error
-pub async fn handle_http_request_error(ctl: Controller, err: RequestClientError) -> BotResult<()> {
+pub async fn handle_http_request_error(
+    ctl: &GeneralController,
+    err: RequestClientError,
+) -> BotResult<()> {
     error!("Got an error while performing the request: {}", err);
 
     let error_msg = match err {
