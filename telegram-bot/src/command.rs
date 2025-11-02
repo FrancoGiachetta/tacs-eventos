@@ -16,6 +16,7 @@ use teloxide::{
 
 mod event;
 mod my_events;
+mod inscriptions;
 
 #[derive(BotCommands, Clone)]
 #[command(rename_rule = "lowercase")]
@@ -32,6 +33,9 @@ pub enum Command {
     ListEvents(EventFilter),
     #[command(description = "Listar los eventos organizados por usted")]
     MyEvents,
+
+    #[command(description = "Listar inscripciones activas")]
+    MyInscriptions,
 }
 
 /// Creates a handler for commands.
@@ -50,6 +54,8 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
                     dptree::case![Command::ListEvents(filters)].endpoint(event::handle_list_events),
                 )
                 .branch(dptree::case![Command::MyEvents].endpoint(my_events::handle_my_events))
+                .branch(dptree::case![Command::MyInscriptions])
+                .endpoint(inscriptions::handle_my_inscriptions)
                 .branch(dptree::case![Command::Help].endpoint(handle_help_command)),
         )
 }
