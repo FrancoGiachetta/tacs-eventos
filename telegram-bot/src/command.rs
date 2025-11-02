@@ -33,7 +33,6 @@ pub enum Command {
     ListEvents(EventFilter),
     #[command(description = "Listar los eventos organizados por usted")]
     MyEvents,
-
     #[command(description = "Listar inscripciones activas")]
     MyInscriptions,
 }

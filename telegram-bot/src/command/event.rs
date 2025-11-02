@@ -3,10 +3,14 @@ use std::str::FromStr;
 use chrono::NaiveDate;
 use fancy_regex::Regex;
 use lazy_static::lazy_static;
+use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
 use teloxide::utils::command::ParseError;
 use tracing::info;
 
+use crate::callback::inscription_callback::INSCRIPTION_ENROL_PREFIX;
+use crate::error::BotError;
 use crate::error::request_client_error::handle_http_request_error;
+use crate::schemas::event::Event;
 use crate::{
     bot::BotResult, controller::general_controller::GeneralController, schemas::event::EventFilter,
 };
@@ -39,6 +43,26 @@ pub async fn handle_list_events(ctl: GeneralController, filters: EventFilter) ->
         }
         Err(err) => handle_http_request_error(&ctl, err).await?,
     }
+
+    Ok(())
+}
+
+/// Creates a message for event information.
+///
+/// Along with the info, it adds a button for the user to enrol himself to the
+/// event.
+async fn send_event_message(ctl: &GeneralController, event: Event) -> BotResult<()> {
+    let callback = InlineKeyboardButton::callback(
+        "Inscribirse",
+        format!("{}{}", INSCRIPTION_ENROL_PREFIX, event.id),
+    );
+    let keyboard = InlineKeyboardMarkup {
+        inline_keyboard: vec![vec![callback]],
+    };
+
+    ctl.send_message_with_callback(&format!("{event}"), keyboard)
+        .await
+        .map_err(BotError::from)?;
 
     Ok(())
 }

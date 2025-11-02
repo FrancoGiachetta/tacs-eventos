@@ -93,6 +93,7 @@ impl RequestClient {
             Some(token),
         )
         .await?;
+
         Ok(())
     }
 
@@ -139,6 +140,38 @@ impl RequestClient {
             .await?;
 
         Ok(serde_json::from_value(response)?)
+    }
+
+    pub async fn send_enrolment_request(
+        &self,
+        token: &str,
+        event_id: &str,
+        user_id: &str,
+    ) -> Result<(), RequestClientError> {
+        self.send_request_with_retry(
+            &format!("evento/{event_id}/inscripcion/{user_id}"),
+            RequestMethod::Post(Value::Null),
+            Some(token),
+        )
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn send_cancel_inscription_request(
+        &self,
+        token: &str,
+        event_id: &str,
+        user_id: &str,
+    ) -> Result<(), RequestClientError> {
+        self.send_request_with_retry(
+            &format!("evento/{event_id}/inscripcion/{user_id}"),
+            RequestMethod::Delete(Value::Null),
+            Some(token),
+        )
+        .await?;
+
+        Ok(())
     }
 
     pub async fn send_user_registration_request(
