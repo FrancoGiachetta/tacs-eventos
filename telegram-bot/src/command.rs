@@ -1,7 +1,7 @@
 use crate::{
     auth::{Authenticator, check_session},
     bot::BotResult,
-    controller::{general_controller::GeneralController},
+    controller::general_controller::GeneralController,
     dialogue::{State, registration_dialogue::State as RegisterState},
     error::BotError,
     schemas::event::EventFilter,
