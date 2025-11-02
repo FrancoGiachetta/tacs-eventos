@@ -26,7 +26,7 @@ pub async fn handle_list_events(ctl: GeneralController, filters: EventFilter) ->
     {
         Ok(events_list) if events_list.is_empty() => {
             ctl.send_message(
-                &"<b>📅 No hay eventos disponibles</b>\n\n<i>Es posible que los filtros aplicados estén limitando los resultados. Intenta ajustarlos para ver más eventos.</i>\n\n"
+                "<b>📅 No hay eventos disponibles</b>\n\n<i>Es posible que los filtros aplicados estén limitando los resultados. Intenta ajustarlos para ver más eventos.</i>\n\n"
             ).await?;
         }
         Ok(events_list) => {
@@ -37,9 +37,7 @@ pub async fn handle_list_events(ctl: GeneralController, filters: EventFilter) ->
                     .await?;
             }
         }
-        Err(err) => {
-            handle_http_request_error(&ctl, err).await?;
-        }
+        Err(err) => handle_http_request_error(&ctl, err).await?,
     }
 
     Ok(())

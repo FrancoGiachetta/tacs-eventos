@@ -1,7 +1,7 @@
 use crate::{
     auth::{Authenticator, check_session},
     bot::BotResult,
-    controller::{general_controller::GeneralController, query_controller::QueryController},
+    controller::{general_controller::GeneralController},
     dialogue::{State, registration_dialogue::State as RegisterState},
     error::BotError,
     schemas::event::EventFilter,
@@ -15,8 +15,8 @@ use teloxide::{
 };
 
 mod event;
+mod inscription;
 mod my_events;
-mod inscriptions;
 
 #[derive(BotCommands, Clone)]
 #[command(rename_rule = "lowercase")]
@@ -54,8 +54,10 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
                     dptree::case![Command::ListEvents(filters)].endpoint(event::handle_list_events),
                 )
                 .branch(dptree::case![Command::MyEvents].endpoint(my_events::handle_my_events))
-                .branch(dptree::case![Command::MyInscriptions])
-                .endpoint(inscriptions::handle_my_inscriptions)
+                .branch(
+                    dptree::case![Command::MyInscriptions]
+                        .endpoint(inscription::handle_my_inscriptions),
+                )
                 .branch(dptree::case![Command::Help].endpoint(handle_help_command)),
         )
 }

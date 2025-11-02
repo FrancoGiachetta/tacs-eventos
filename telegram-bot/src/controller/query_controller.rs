@@ -34,18 +34,6 @@ impl QueryController {
         })
     }
 
-    pub fn from_general_ctl(
-        bot: Arc<Bot>,
-        query: CallbackQuery,
-        general_ctl: GeneralController,
-    ) -> Option<Self> {
-        Some(Self {
-            general_ctl,
-            query,
-            bot,
-        })
-    }
-
     pub fn general_ctl(&self) -> &GeneralController {
         &self.general_ctl
     }
