@@ -13,11 +13,13 @@ use tracing::{info, warn};
 use crate::{
     auth::in_memory_auth::InMemoryAuth,
     command::{self, Command},
-    controller::Controller,
+    controller::{general_controller::GeneralController, query_controller::QueryController},
     dialogue::{self, DialogueStorage, State},
     error::BotError,
     request_client::RequestClient,
 };
+
+use crate::callback;
 
 pub type BotResult<T> = Result<T, BotError>;
 
@@ -27,12 +29,18 @@ pub async fn run() -> BotResult<()> {
     bot.set_my_commands(Command::bot_commands()).await?;
 
     let mut dispatcher = {
-        let handler = teloxide_dialogue::enter::<Update, DialogueStorage, State, _>().branch(
-            Update::filter_message()
-                .filter_map(Controller::new)
-                .branch(command::create_command_handler())
-                .branch(dialogue::create_dialogue_handler()),
-        );
+        let handler = teloxide_dialogue::enter::<Update, DialogueStorage, State, _>()
+            .branch(
+                Update::filter_message()
+                    .filter_map(GeneralController::new_option)
+                    .branch(command::create_command_handler())
+                    .branch(dialogue::create_dialogue_handler()),
+            )
+            .branch(
+                Update::filter_callback_query()
+                    .filter_map(QueryController::new)
+                    .branch(callback::create_callback_handler()),
+            );
 
         let req_client = Arc::new(RequestClient::new()?);
         let authenticator = Arc::new(InMemoryAuth::new(req_client.clone()));

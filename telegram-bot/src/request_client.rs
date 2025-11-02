@@ -9,6 +9,7 @@ use crate::{
     error::request_client_error::RequestClientError,
     schemas::{
         event::{Event, EventFilter},
+        event_organizer_view::EventOrganizerView,
         inscription::Inscription,
         user::{Token, UserIn, UserOut},
     },
@@ -49,6 +50,50 @@ impl RequestClient {
             .await?;
 
         Ok(serde_json::from_value(response)?)
+    }
+
+    /// Gets all the events organized by the logged user
+    pub async fn send_get_my_events_list_request(
+        &self,
+        token: &str,
+    ) -> Result<Vec<EventOrganizerView>, RequestClientError> {
+        let response = self
+            .send_request_with_retry("usuario/mis-eventos", RequestMethod::Get(&[]), Some(token))
+            .await?;
+        Ok(serde_json::from_value(response)?)
+    }
+
+    pub async fn send_close_event_request(
+        &self,
+        event_id: &str,
+        token: &str,
+    ) -> Result<(), RequestClientError> {
+        self.send_change_event_state_request(event_id, false, token)
+            .await
+    }
+
+    pub async fn send_open_event_request(
+        &self,
+        event_id: &str,
+        token: &str,
+    ) -> Result<(), RequestClientError> {
+        self.send_change_event_state_request(event_id, true, token)
+            .await
+    }
+
+    async fn send_change_event_state_request(
+        &self,
+        event_id: &str,
+        open: bool,
+        token: &str,
+    ) -> Result<(), RequestClientError> {
+        self.send_request_with_retry(
+            &format!("evento/{}", event_id),
+            RequestMethod::Patch(serde_json::json!({"abierto": open })),
+            Some(token),
+        )
+        .await?;
+        Ok(())
     }
 
     pub async fn send_get_events_list_request(
@@ -135,10 +180,13 @@ impl RequestClient {
         let url = format!("{}/{}", *URL_BASE, url);
         let response = Self::retry(|| self.send_request(&url, &method, token)).await?;
 
-        response
-            .json::<Value>()
-            .await
-            .map_err(RequestClientError::from)
+        let resp_body = response.text().await?;
+        if resp_body.is_empty() {
+            // Si el body está vacío, no intenta parsearlo
+            Ok(Value::Null)
+        } else {
+            Ok(serde_json::from_str(&resp_body)?)
+        }
     }
 
     async fn send_request<'req>(

@@ -12,7 +12,7 @@ use teloxide::{
 use crate::{
     bot::BotResult,
     command::Command,
-    controller::Controller,
+    controller::general_controller::GeneralController,
     error::{BotError, dialogue_error::DialogueError},
 };
 
@@ -43,7 +43,7 @@ pub fn create_dialogue_handler() -> UpdateHandler<BotError> {
         .branch(registration_dialogue::schema())
 }
 
-async fn greetings(ctl: Controller) -> BotResult<()> {
+async fn greetings(ctl: GeneralController) -> BotResult<()> {
     // This bot is supposed to be used by individual users (not channels),
     // there's no way the sender or the user's name are None.
     let username = ctl

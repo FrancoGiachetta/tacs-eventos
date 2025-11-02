@@ -1,3 +1,11 @@
+use crate::{
+    auth::Authenticator,
+    bot::BotResult,
+    controller::general_controller::GeneralController,
+    dialogue::State as GlobalState,
+    error::{BotError, dialogue_error::DialogueError},
+    schemas::user::UserOut,
+};
 use fancy_regex::Regex;
 use lazy_static::lazy_static;
 use teloxide::{
@@ -5,15 +13,7 @@ use teloxide::{
     dptree,
     types::Update,
 };
-
-use crate::{
-    auth::Authenticator,
-    bot::BotResult,
-    controller::Controller,
-    dialogue::State as GlobalState,
-    error::{BotError, dialogue_error::DialogueError},
-    schemas::user::UserOut,
-};
+use tracing::error;
 
 #[derive(Clone, Debug)]
 pub enum State {
@@ -45,7 +45,7 @@ pub fn schema() -> UpdateHandler<BotError> {
 // User first choice, either registering a new account logging with an existing
 // one.
 
-pub async fn check_user_auth_selection(ctl: Controller) -> BotResult<()> {
+pub async fn check_user_auth_selection(ctl: GeneralController) -> BotResult<()> {
     match &ctl.message().text().map(|m| m.to_lowercase()) {
         Some(m) if m == "a" => {
             let message = "<b>¡Perfecto! 🎉</b>\n\n\
@@ -88,7 +88,7 @@ lazy_static! {
     static ref PASSWORD_REGEX: Regex = Regex::new(r"^(?=.*[A-Za-z])(?=.*\d).{8,72}$").unwrap();
 }
 
-pub async fn handle_register_email(ctl: Controller) -> BotResult<()> {
+pub async fn handle_register_email(ctl: GeneralController) -> BotResult<()> {
     match ctl.message().text() {
         Some(email)
             if EMAIL_REGEX
@@ -119,7 +119,7 @@ Por favor, envíame un email correcto:\n\n\
     Ok(())
 }
 
-pub async fn handle_register_password(ctl: Controller, email: String) -> BotResult<()> {
+pub async fn handle_register_password(ctl: GeneralController, email: String) -> BotResult<()> {
     match ctl.message().text() {
         Some(password)
             if PASSWORD_REGEX
@@ -155,7 +155,7 @@ Tu contraseña debe tener:\n\
 }
 
 pub async fn handle_confirm_password(
-    ctl: Controller,
+    ctl: GeneralController,
     (email, password): (String, String),
 ) -> BotResult<()> {
     match ctl.message().text() {
@@ -199,7 +199,7 @@ Asegurate de escribir la <b>misma contraseña</b> en ambos campos.\n\n\
 
 // User Login Dialogue.
 
-pub async fn handle_login_email(ctl: Controller) -> BotResult<()> {
+pub async fn handle_login_email(ctl: GeneralController) -> BotResult<()> {
     match ctl.message().text() {
         Some(email)
             if EMAIL_REGEX
@@ -230,25 +230,23 @@ Por favor, envíame un email correcto:\n\n\
     Ok(())
 }
 
-pub async fn handle_login_password(ctl: Controller, email: String) -> BotResult<()> {
-    match ctl.message().text() {
-        Some(password)
-            if PASSWORD_REGEX
-                .is_match(password)
-                .map_err(|e| Box::new(DialogueError::from(e)))? =>
-        {
-            let token = ctl
-                .request_client()
-                .send_user_login_request(UserOut {
-                    email: email,
-                    password: password.to_string(),
-                    user_type: None,
-                })
-                .await?;
+pub async fn handle_login_password(ctl: GeneralController, email: String) -> BotResult<()> {
+    let password = ctl.message().text().unwrap_or_default().to_string();
 
+    let login_result = ctl
+        .request_client()
+        .send_user_login_request(UserOut {
+            email,
+            password: password.clone(),
+            user_type: None,
+        })
+        .await;
+
+    match login_result {
+        Ok(token) => {
             // Create the new session.
             ctl.auth()
-                .new_session(ctl.chat_id(), password.to_string(), token)
+                .new_session(ctl.chat_id(), password, token)
                 .await?;
 
             ctl.send_message(
@@ -261,16 +259,10 @@ pub async fn handle_login_password(ctl: Controller, email: String) -> BotResult<
             ctl.update_dialogue_state(GlobalState::Authenticated)
                 .await?;
         }
-        _ => {
-            ctl.send_error_message(
-                "<b>Contraseña inválida</b>\n\n\
-Tu contraseña debe tener:\n\
-  • Mínimo <b>8 caracteres</b>\n\
-  • Al menos <b>una letra</b>\n\
-  • Al menos <b>un número</b>\n\n\
-<i>Intentá de nuevo</i> 🔒",
-            )
-            .await?;
+        Err(e) => {
+            error!("Error al loguearse: {}", e);
+            ctl.send_error_message("<b>Error de inicio de sesión</b>\n")
+                .await?;
         }
     }
 
