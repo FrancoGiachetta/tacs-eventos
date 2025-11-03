@@ -16,10 +16,10 @@ use crate::{
     error::{dialogue_error::DialogueError, BotError},
 };
 
-use crate::dialogue::event_creation_dialogue::EventCreationSteps;
+use crate::dialogue::event_creation_dialogue::EventCreationStep;
 use registration_dialogue::State as RegisterState;
 
-mod event_creation_dialogue;
+pub(crate) mod event_creation_dialogue;
 pub mod registration_dialogue;
 
 pub type DialogueResult<T> = Result<T, Box<DialogueError>>;
@@ -42,7 +42,7 @@ pub enum UseCase {
     /// The user can enter a new command
     EnterCommand,
     /// The user has entered the command for event creation, and must provide the neccesary information for creating a new event
-    EventCreation(EventCreationSteps),
+    EventCreation(EventCreationStep),
 }
 
 /// Creates a handler for commands.
