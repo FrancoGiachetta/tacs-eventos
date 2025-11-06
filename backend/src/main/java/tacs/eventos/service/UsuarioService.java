@@ -4,11 +4,9 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import tacs.eventos.dto.EstadoInscripcionResponse;
 import tacs.eventos.dto.InscripcionResponse;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
-import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
 import tacs.eventos.repository.usuario.UsuarioRepository;
@@ -89,16 +87,8 @@ public class UsuarioService {
 
         List<InscripcionEvento> inscripciones = inscripcionesRepository.noCanceladasDeParticipante(usuario);
         List<InscripcionResponse> inscripcionResponses = inscripciones.stream()
-                .map(insc -> new InscripcionResponse(insc.getEvento().getId(), mapEstado(insc.getEstado()))).toList();
+                .map(InscripcionResponse::fromInscripcion).toList();
         return inscripcionResponses;
-    }
-
-    private EstadoInscripcionResponse mapEstado(EstadoInscripcion estado) {
-        return switch (estado) {
-        case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
-        case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
-        case PENDIENTE -> EstadoInscripcionResponse.PENDIENTE;
-        };
     }
 
     // Métodos para gestión de roles (solo admin)
