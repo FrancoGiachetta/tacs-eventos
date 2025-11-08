@@ -2,6 +2,7 @@ use crate::bot::BotResult;
 
 mod auth;
 mod bot;
+mod callback;
 pub mod command;
 mod controller;
 pub mod dialogue;

@@ -1,5 +1,5 @@
 use crate::bot::BotResult;
-use crate::controller::Controller;
+use crate::controller::general_controller::GeneralController;
 use crate::dialogue::State;
 use crate::dialogue::UseCase;
 use crate::error::BotError;
@@ -60,7 +60,7 @@ pub fn schema() -> UpdateHandler<BotError> {
     )
 }
 
-async fn handle_enter_title(controller: Controller) -> BotResult<()> {
+async fn handle_enter_title(controller: GeneralController) -> BotResult<()> {
     match get_string_input_data(&controller, 0, 100) {
         Ok(title) => {
             controller
@@ -84,7 +84,7 @@ async fn handle_enter_title(controller: Controller) -> BotResult<()> {
 }
 
 async fn handle_enter_description(
-    controller: Controller,
+    controller: GeneralController,
     event_builder: EventBuilder,
 ) -> BotResult<()> {
     match get_string_input_data(&controller, 10, 1000) {
@@ -155,7 +155,7 @@ impl FromStr for Category {
     }
 }
 
-async fn handle_enter_date(controller: Controller, event_builder: EventBuilder) -> BotResult<()> {
+async fn handle_enter_date(controller: GeneralController, event_builder: EventBuilder) -> BotResult<()> {
     match get_input_data::<Date>(
         &controller,
         Some("Ingrese una fecha en el siguiente formato: DIA/MES/AÑO HORAS:MINUTOS".to_string()),
@@ -193,7 +193,7 @@ async fn handle_enter_date(controller: Controller, event_builder: EventBuilder) 
 }
 
 async fn handle_enter_duration(
-    controller: Controller,
+    controller: GeneralController,
     event_builder: EventBuilder,
 ) -> BotResult<()> {
     match get_integer_input_data(&controller, Some(1), None) {
@@ -221,7 +221,7 @@ async fn handle_enter_duration(
 }
 
 async fn handle_enter_location(
-    controller: Controller,
+    controller: GeneralController,
     event_builder: EventBuilder,
 ) -> BotResult<()> {
     match get_string_input_data(&controller, 3, 300) {
@@ -249,7 +249,7 @@ async fn handle_enter_location(
 }
 
 async fn handle_enter_max_capacity(
-    controller: Controller,
+    controller: GeneralController,
     event_builder: EventBuilder,
 ) -> BotResult<()> {
     match get_integer_input_data(&controller, Some(0), None) {
@@ -276,7 +276,7 @@ async fn handle_enter_max_capacity(
     }
 }
 
-async fn handle_enter_price(controller: Controller, event_builder: EventBuilder) -> BotResult<()> {
+async fn handle_enter_price(controller: GeneralController, event_builder: EventBuilder) -> BotResult<()> {
     match get_double_input_data(&controller, Some(0.00), None, Some(2)) {
         Ok(price) => {
             let mut updated_event_data = event_builder.clone();
@@ -305,7 +305,7 @@ async fn handle_enter_price(controller: Controller, event_builder: EventBuilder)
 }
 
 async fn handle_enter_category(
-    controller: Controller,
+    controller: GeneralController,
     event_builder: EventBuilder,
 ) -> BotResult<()> {
     match get_input_data::<Category>(
@@ -331,7 +331,7 @@ async fn handle_enter_category(
 }
 
 async fn create_and_send_event(
-    controller: &Controller,
+    controller: &GeneralController,
     mut event_builder: EventBuilder,
 ) -> BotResult<()> {
     let chat_id = controller.chat_id();
@@ -349,7 +349,7 @@ async fn create_and_send_event(
 }
 
 async fn set_step(
-    controller: &Controller,
+    controller: &GeneralController,
     event_creation_step: EventCreationStep,
 ) -> BotResult<()> {
     controller
@@ -360,7 +360,7 @@ async fn set_step(
     Ok(())
 }
 
-fn get_input_data<T>(controller: &Controller, parse_error_message: Option<String>) -> BotResult<T>
+fn get_input_data<T>(controller: &GeneralController, parse_error_message: Option<String>) -> BotResult<T>
 where
     T: FromStr,
 {
@@ -373,7 +373,7 @@ where
     })
 }
 
-fn raw_input(controller: &Controller) -> Result<String, BotError> {
+fn raw_input(controller: &GeneralController) -> Result<String, BotError> {
     controller
         .message()
         .text()
@@ -384,7 +384,7 @@ fn raw_input(controller: &Controller) -> Result<String, BotError> {
 }
 
 fn get_integer_input_data(
-    controller: &Controller,
+    controller: &GeneralController,
     min_value: Option<u32>,
     max_value: Option<u32>,
 ) -> BotResult<u32> {
@@ -396,7 +396,7 @@ fn get_integer_input_data(
 }
 
 fn get_string_input_data(
-    controller: &Controller,
+    controller: &GeneralController,
     min_length: u32,
     max_length: u32,
 ) -> BotResult<String> {
@@ -418,7 +418,7 @@ fn get_string_input_data(
 }
 
 fn get_double_input_data(
-    controller: &Controller,
+    controller: &GeneralController,
     min_value: Option<f32>,
     max_value: Option<f32>,
     max_digits: Option<u32>,

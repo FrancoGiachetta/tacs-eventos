@@ -2,21 +2,23 @@ use crate::dialogue::UseCase::EnterCommand;
 use crate::{
     auth::{check_session, Authenticator},
     bot::BotResult,
-    controller::Controller,
-    dialogue::{registration_dialogue::State as RegisterState, State},
+    controller::general_controller::GeneralController,
+    dialogue::{State, registration_dialogue::State as RegisterState},
     error::BotError,
     schemas::event::EventFilter,
 };
 use event::parse_event_filters;
 use teloxide::{
-    dispatching::{HandlerExt, UpdateHandler},
+    dispatching::{HandlerExt, UpdateFilterExt, UpdateHandler},
     dptree,
+    types::Update,
     utils::command::BotCommands,
 };
 
 mod create_event;
 mod event;
-mod inscriptions;
+mod inscription;
+mod my_events;
 
 #[derive(BotCommands, Clone)]
 #[command(rename_rule = "lowercase")]
@@ -31,6 +33,8 @@ pub enum Command {
         parse_with = parse_event_filters
     )]
     ListEvents(EventFilter),
+    #[command(description = "Listar los eventos organizados por usted")]
+    MyEvents,
     #[command(description = "Listar inscripciones activas")]
     MyInscriptions,
     #[command(description = "Crear un nuevo evento")]
@@ -41,7 +45,7 @@ pub enum Command {
 ///
 /// Each branch matches a command and executes its respective endpoint.
 pub fn create_command_handler() -> UpdateHandler<BotError> {
-    dptree::entry()
+    Update::filter_message()
         .filter_command::<Command>()
         .branch(dptree::case![Command::Reset].endpoint(reset))
         .branch(
@@ -52,8 +56,11 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
                 .branch(
                     dptree::case![Command::ListEvents(filters)].endpoint(event::handle_list_events),
                 )
-                .branch(dptree::case![Command::MyInscriptions])
-                .endpoint(inscriptions::handle_my_inscriptions)
+                .branch(dptree::case![Command::MyEvents].endpoint(my_events::handle_my_events))
+                .branch(
+                    dptree::case![Command::MyInscriptions]
+                        .endpoint(inscription::handle_my_inscriptions),
+                )
                 .branch(dptree::case![Command::CreateEvent])
                 .endpoint(create_event::handle_create_event)
                 .branch(dptree::case![Command::Help].endpoint(handle_help_command)),
@@ -65,7 +72,7 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
 /// Checks wether there's a session associated to the chat. If there's one,
 /// then it resets the dialogue to `State::Authenticated`. If not, it resets it
 /// to `State::CheckUser` for the user to create a session.
-async fn reset(ctl: Controller) -> BotResult<()> {
+async fn reset(ctl: GeneralController) -> BotResult<()> {
     let session_is_valid = ctl.auth().validate_session(&ctl.chat_id())?;
 
     if session_is_valid {
@@ -109,7 +116,7 @@ Elegí una opción:\n\n\
     Ok(())
 }
 
-async fn handle_help_command(ctl: Controller) -> BotResult<()> {
+async fn handle_help_command(ctl: GeneralController) -> BotResult<()> {
     ctl.send_message(&Command::descriptions().to_string())
         .await?;
 

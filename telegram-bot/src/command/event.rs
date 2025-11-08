@@ -3,20 +3,19 @@ use std::str::FromStr;
 use chrono::NaiveDate;
 use fancy_regex::Regex;
 use lazy_static::lazy_static;
-use reqwest::StatusCode;
 use teloxide::utils::command::ParseError;
-use tracing::{error, info};
+use tracing::info;
 
+use crate::error::request_client_error::handle_http_request_error;
 use crate::{
-    bot::BotResult, controller::Controller, error::request_client_error::RequestClientError,
-    schemas::event::EventFilter,
+    bot::BotResult, controller::general_controller::GeneralController, schemas::event::EventFilter,
 };
 
 /// List open events.
 ///
 /// Sends a GET request looking for all the still open events. The command also
 /// allows to pass arguments to filter events.
-pub async fn handle_list_events(ctl: Controller, filters: EventFilter) -> BotResult<()> {
+pub async fn handle_list_events(ctl: GeneralController, filters: EventFilter) -> BotResult<()> {
     info!("Listing list_events!");
 
     let token = ctl.auth().get_session_token(&ctl.chat_id())?;
@@ -27,39 +26,18 @@ pub async fn handle_list_events(ctl: Controller, filters: EventFilter) -> BotRes
     {
         Ok(events_list) if events_list.is_empty() => {
             ctl.send_message(
-                &"<b>📅 No hay eventos disponibles</b>\n\n<i>Es posible que los filtros aplicados estén limitando los resultados. Intenta ajustarlos para ver más eventos.</i>\n\n"
+                "<b>📅 No hay eventos disponibles</b>\n\n<i>Es posible que los filtros aplicados estén limitando los resultados. Intenta ajustarlos para ver más eventos.</i>\n\n"
             ).await?;
         }
         Ok(events_list) => {
-            ctl.send_message(&"<b>📅 Estos son los eventos disponibles</b>\n\n<i>Según los criterios de búsqueda que ingresaste:</i>\n\n").await?;
+            ctl.send_message("<b>📅 Estos son los eventos disponibles</b>\n\n<i>Según los criterios de búsqueda que ingresaste:</i>\n\n").await?;
 
             for event in events_list {
                 ctl.send_message(&format!("📅 <b>Evento</b>\n\n{}", event))
                     .await?;
             }
         }
-        Err(err) => {
-            error!("Got an error while performing the request: {}", err);
-
-            let error_msg = match err {
-                // This command requires the user to be logged in.
-                RequestClientError::Reqwest(req_err)
-                    if req_err
-                        .status()
-                        .is_some_and(|e| matches!(e, StatusCode::FORBIDDEN)) =>
-                {
-                    "<b>Necesitás estar logueado</b>\n\n\
-Para usar este comando, primero iniciá sesión"
-                }
-                _ => {
-                    "<b>Error al ejecutar el comando</b>\n\n\
-Ocurrió un problema inesperado.\n\
-Intentá nuevamente en unos momentos ⏱️"
-                }
-            };
-
-            ctl.send_error_message(error_msg).await?;
-        }
+        Err(err) => handle_http_request_error(&ctl, err).await?,
     }
 
     Ok(())

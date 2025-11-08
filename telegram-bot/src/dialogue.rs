@@ -1,7 +1,7 @@
 use teloxide::{
     dispatching::{
-        dialogue::{self, InMemStorage},
         UpdateHandler,
+        dialogue::{self, InMemStorage},
     },
     dptree,
     prelude::Dialogue,
@@ -12,8 +12,8 @@ use teloxide::{
 use crate::{
     bot::BotResult,
     command::Command,
-    controller::Controller,
-    error::{dialogue_error::DialogueError, BotError},
+    controller::general_controller::GeneralController,
+    error::{BotError, dialogue_error::DialogueError},
 };
 
 use crate::dialogue::event_creation_dialogue::EventCreationStep;
@@ -56,7 +56,7 @@ pub fn create_dialogue_handler() -> UpdateHandler<BotError> {
         .branch(event_creation_dialogue::schema())
 }
 
-async fn greetings(ctl: Controller) -> BotResult<()> {
+async fn greetings(ctl: GeneralController) -> BotResult<()> {
     // This bot is supposed to be used by individual users (not channels),
     // there's no way the sender or the user's name are None.
     let username = ctl
