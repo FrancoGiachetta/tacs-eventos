@@ -4,7 +4,7 @@ use crate::{
     auth::Authenticator,
     bot::BotResult,
     controller::{general_controller::GeneralController, query_controller::QueryController},
-    error::{BotError, request_client_error::RequestClientError},
+    error::BotError,
     schemas::{inscription::InscriptionState, user::Session},
 };
 

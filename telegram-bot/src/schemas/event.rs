@@ -20,7 +20,7 @@ pub struct EventFilter {
 #[builder(derive(Debug))]
 pub struct Event {
     pub id: String,
-    title: String,
+    pub title: String,
     description: String,
     start_date_time: NaiveDateTime,
     duration_minutes: u32,

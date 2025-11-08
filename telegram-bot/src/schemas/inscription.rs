@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
-use chrono::{DateTime, NaiveDateTime, Utc};
-use serde::{Deserialize, Deserializer};
+use chrono::NaiveDateTime;
+use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub enum InscriptionState {
