@@ -155,10 +155,13 @@ impl FromStr for Category {
     }
 }
 
-async fn handle_enter_date(controller: GeneralController, event_builder: EventBuilder) -> BotResult<()> {
+async fn handle_enter_date(
+    controller: GeneralController,
+    event_builder: EventBuilder,
+) -> BotResult<()> {
     match get_input_data::<Date>(
         &controller,
-        Some("Ingrese una fecha en el siguiente formato: DIA/MES/AÑO HORAS:MINUTOS".to_string()),
+        Some("Ingrese una fecha en el siguiente formato: \n DIA/MES/AÑO HORAS:MINUTOS".to_string()),
     ) {
         Ok(Date(date)) => {
             let current_date = chrono::Local::now().naive_local();
@@ -276,7 +279,10 @@ async fn handle_enter_max_capacity(
     }
 }
 
-async fn handle_enter_price(controller: GeneralController, event_builder: EventBuilder) -> BotResult<()> {
+async fn handle_enter_price(
+    controller: GeneralController,
+    event_builder: EventBuilder,
+) -> BotResult<()> {
     match get_double_input_data(&controller, Some(0.00), None, Some(2)) {
         Ok(price) => {
             let mut updated_event_data = event_builder.clone();
@@ -319,7 +325,7 @@ async fn handle_enter_category(
             let mut updated_event_data = event_builder.clone();
             updated_event_data.category(category);
 
-            create_and_send_event(&controller, updated_event_data).await?;
+            create_event_and_return_to_main_menu(&controller, updated_event_data).await?;
             Ok(())
         }
         Err(BotError::CustomError(msg)) => {
@@ -330,22 +336,41 @@ async fn handle_enter_category(
     }
 }
 
-async fn create_and_send_event(
+async fn create_event_and_return_to_main_menu(
     controller: &GeneralController,
     mut event_builder: EventBuilder,
 ) -> BotResult<()> {
-    let chat_id = controller.chat_id();
-    let token = controller.auth().get_session_token(&chat_id)?;
+    // Returns to the main menu
+    controller
+        .update_dialogue_state(State::Authenticated(UseCase::EnterCommand))
+        .await?;
+    // Sends to the backend an event creation request
+    // TODO: manejar error 400 (como el que ocurre cuando le pasas capacidad 0)
+    // TODO: hacer que la capacidad minima sea 1 en vez de 0
+    let event_name = create_and_send_event(&controller, &mut event_builder).await?;
+    // Sends a confirmation message
+    controller
+        .send_message(&format!("¡Evento {} creado correctamente!", event_name))
+        .await?;
+    Ok(())
+}
+
+/// Sends an event creation request to the backend, and returns the event name.
+async fn create_and_send_event(
+    controller: &&GeneralController,
+    event_builder: &mut EventBuilder,
+) -> Result<String, BotError> {
     // This field is set in the backend based on the token
     event_builder.organizer("placeholder".to_string());
     let event = event_builder
         .build()
         .map_err(|e| BotError::CustomError(e.to_string()))?;
     let request_client = controller.request_client();
+    let token = controller.auth().get_session_token(&controller.chat_id())?;
     request_client
-        .send_create_event_request(event, &token)
+        .send_create_event_request(&event, &token)
         .await?;
-    Ok(())
+    Ok(event.title)
 }
 
 async fn set_step(
@@ -360,7 +385,10 @@ async fn set_step(
     Ok(())
 }
 
-fn get_input_data<T>(controller: &GeneralController, parse_error_message: Option<String>) -> BotResult<T>
+fn get_input_data<T>(
+    controller: &GeneralController,
+    parse_error_message: Option<String>,
+) -> BotResult<T>
 where
     T: FromStr,
 {
