@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Import({TestRedisConfiguration.class, TestMongoConfiguration.class})
+@Import({ TestRedisConfiguration.class, TestMongoConfiguration.class })
 @ActiveProfiles("test")
 @Testcontainers
 class UsuarioServiceTest {
@@ -112,8 +112,7 @@ class UsuarioServiceTest {
 
         var result = usuarioService.obtenerInscripcionesNoCanceladas(usuario.getId());
 
-        var esperado = Set.of(
-                InscripcionResponse.fromInscripcion(inscripcionEvento1),
+        var esperado = Set.of(InscripcionResponse.fromInscripcion(inscripcionEvento1),
                 InscripcionResponse.fromInscripcion(inscripcionEvento2),
                 InscripcionResponse.fromInscripcion(inscripcionEvento3));
         assertEquals(esperado, new HashSet<>(result));
