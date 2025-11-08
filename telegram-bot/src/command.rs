@@ -1,3 +1,4 @@
+use crate::dialogue::UseCase::EnterCommand;
 use crate::{
     auth::{Authenticator, check_session},
     bot::BotResult,
@@ -14,6 +15,7 @@ use teloxide::{
     utils::command::BotCommands,
 };
 
+mod create_event;
 mod event;
 mod inscription;
 mod my_events;
@@ -35,6 +37,8 @@ pub enum Command {
     MyEvents,
     #[command(description = "Listar inscripciones activas")]
     MyInscriptions,
+    #[command(description = "Crear un nuevo evento")]
+    CreateEvent,
 }
 
 /// Creates a handler for commands.
@@ -46,7 +50,7 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
         .branch(dptree::case![Command::Reset].endpoint(reset))
         .branch(
             // A command can only be handled if the current State is State::Start.
-            dptree::case![State::Authenticated]
+            dptree::case![State::Authenticated(EnterCommand)]
                 // Check if session is still valid. If not, retrieve new token.
                 .map_async(check_session)
                 .branch(
@@ -57,6 +61,8 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
                     dptree::case![Command::MyInscriptions]
                         .endpoint(inscription::handle_my_inscriptions),
                 )
+                .branch(dptree::case![Command::CreateEvent])
+                .endpoint(create_event::handle_create_event)
                 .branch(dptree::case![Command::Help].endpoint(handle_help_command)),
         )
 }
@@ -70,7 +76,8 @@ async fn reset(ctl: GeneralController) -> BotResult<()> {
     let session_is_valid = ctl.auth().validate_session(&ctl.chat_id())?;
 
     if session_is_valid {
-        ctl.update_dialogue_state(State::Authenticated).await?;
+        ctl.update_dialogue_state(State::Authenticated(EnterCommand))
+            .await?;
         let username = ctl
             .message()
             .from

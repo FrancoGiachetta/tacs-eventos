@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 async-trait = "0.1.89"
 chrono = { version = "0.4.42", features = ["serde"] }
+derive_builder = "0.20.2"
 dotenv = "0.15.0"
 fancy-regex = "0.16.2"
 lazy_static = "1.5.0"
