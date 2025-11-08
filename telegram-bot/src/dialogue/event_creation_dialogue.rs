@@ -89,15 +89,9 @@ async fn handle_enter_description(
 ) -> BotResult<()> {
     match get_string_input_data(&controller, 10, 1000) {
         Ok(description) => {
-            let mut updated_event_data = event_builder.clone();
-            updated_event_data.description(description.to_string());
-            set_step(
-                &controller,
-                EventCreationStep::EnterDate {
-                    event_builder: updated_event_data,
-                },
-            )
-            .await?;
+            let mut event_builder = event_builder;
+            event_builder.description(description.to_string());
+            set_step(&controller, EventCreationStep::EnterDate { event_builder }).await?;
             controller
                 .send_message("Ahora ingresá la fecha de inicio del evento.")
                 .await?;
@@ -172,13 +166,11 @@ async fn handle_enter_date(
                     )
                     .await?;
             } else {
-                let mut updated_event_data = event_builder.clone();
-                updated_event_data.start_date_time(date);
+                let mut event_builder = event_builder;
+                event_builder.start_date_time(date);
                 set_step(
                     &controller,
-                    EventCreationStep::EnterDuration {
-                        event_builder: updated_event_data,
-                    },
+                    EventCreationStep::EnterDuration { event_builder },
                 )
                 .await?;
                 controller
@@ -201,13 +193,11 @@ async fn handle_enter_duration(
 ) -> BotResult<()> {
     match get_integer_input_data(&controller, Some(1), None) {
         Ok(duration_minutes) => {
-            let mut updated_event_data = event_builder.clone();
-            updated_event_data.duration_minutes(duration_minutes);
+            let mut event_builder = event_builder;
+            event_builder.duration_minutes(duration_minutes);
             set_step(
                 &controller,
-                EventCreationStep::EnterLocation {
-                    event_builder: updated_event_data,
-                },
+                EventCreationStep::EnterLocation { event_builder },
             )
             .await?;
             controller
@@ -229,13 +219,11 @@ async fn handle_enter_location(
 ) -> BotResult<()> {
     match get_string_input_data(&controller, 3, 300) {
         Ok(location) => {
-            let mut updated_event_data = event_builder.clone();
-            updated_event_data.location(location.to_string());
+            let mut event_builder = event_builder;
+            event_builder.location(location.to_string());
             set_step(
                 &controller,
-                EventCreationStep::EnterMaxCapacity {
-                    event_builder: updated_event_data,
-                },
+                EventCreationStep::EnterMaxCapacity { event_builder },
             )
             .await?;
             controller
@@ -257,15 +245,9 @@ async fn handle_enter_max_capacity(
 ) -> BotResult<()> {
     match get_integer_input_data(&controller, Some(1), None) {
         Ok(max_capacity) => {
-            let mut updated_event_data = event_builder.clone();
-            updated_event_data.max_capacity(max_capacity);
-            set_step(
-                &controller,
-                EventCreationStep::EnterPrice {
-                    event_builder: updated_event_data,
-                },
-            )
-            .await?;
+            let mut event_builder = event_builder;
+            event_builder.max_capacity(max_capacity);
+            set_step(&controller, EventCreationStep::EnterPrice { event_builder }).await?;
             controller
                 .send_message("Ahora ingresá el precio del evento.")
                 .await?;
@@ -285,13 +267,11 @@ async fn handle_enter_price(
 ) -> BotResult<()> {
     match get_double_input_data(&controller, Some(0.00), None, Some(2)) {
         Ok(price) => {
-            let mut updated_event_data = event_builder.clone();
-            updated_event_data.price(price);
+            let mut event_builder = event_builder;
+            event_builder.price(price);
             set_step(
                 &controller,
-                EventCreationStep::EnterCategory {
-                    event_builder: updated_event_data,
-                },
+                EventCreationStep::EnterCategory { event_builder },
             )
             .await?;
             controller
@@ -322,10 +302,10 @@ async fn handle_enter_category(
         )),
     ) {
         Ok(Category(category)) => {
-            let mut updated_event_data = event_builder.clone();
-            updated_event_data.category(category);
+            let mut event_builder = event_builder;
+            event_builder.category(category);
 
-            create_event_and_return_to_main_menu(&controller, updated_event_data).await?;
+            create_event_and_return_to_main_menu(&controller, event_builder).await?;
             Ok(())
         }
         Err(BotError::CustomError(msg)) => {

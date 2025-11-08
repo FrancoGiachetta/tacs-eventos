@@ -12,7 +12,7 @@ use crate::{
     bot::BotResult,
     controller::general_controller::GeneralController,
     dialogue::State as GlobalState,
-    error::{dialogue_error::DialogueError, BotError},
+    error::{BotError, dialogue_error::DialogueError},
     schemas::user::UserOut,
 };
 use tracing::error;
