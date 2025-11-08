@@ -28,7 +28,7 @@ pub struct Token {
     pub expires_at: DateTime<Utc>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Session {
     pub user_id: String,
     pub email: String,

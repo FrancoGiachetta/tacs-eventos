@@ -75,20 +75,9 @@ impl Authenticator for InMemoryAuth {
     async fn reset_token(&self, chat_id: &ChatId) -> Result<(), AuthError> {
         info!("Reseting Token");
 
-        let (email, password) = {
-            let sessions = self
-                .sessions
-                .read()
-                .map_err(|e| AuthError::SessionLockError(e.to_string()))?;
-
-            let Session {
-                email, password, ..
-            } = sessions
-                .get(chat_id)
-                .ok_or(AuthError::SessionNotFound(chat_id.to_string()))?;
-
-            (email.clone(), password.clone())
-        };
+        let Session {
+            email, password, ..
+        } = self.get_session(chat_id)?;
 
         let token = self
             .request_client
@@ -107,6 +96,18 @@ impl Authenticator for InMemoryAuth {
             .token = token;
 
         Ok(())
+    }
+
+    fn get_session(&self, chat_id: &ChatId) -> Result<Session, AuthError> {
+        let sessions = self
+            .sessions
+            .read()
+            .map_err(|e| AuthError::SessionLockError(e.to_string()))?;
+
+        sessions
+            .get(chat_id)
+            .cloned()
+            .ok_or(AuthError::SessionNotFound(chat_id.to_string()))
     }
 
     /// Validates wether a given token is still valid.

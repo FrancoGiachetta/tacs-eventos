@@ -1,5 +1,6 @@
 package tacs.eventos.dto;
 
+import tacs.eventos.model.inscripcion.EstadoInscripcion;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 
 import java.time.LocalDateTime;
@@ -48,5 +49,25 @@ public record InscripcionResponse(String eventoId, EstadoInscripcionResponse est
         return new InscripcionResponse(eventoId, EstadoInscripcionResponse.PENDIENTE,
                 inscripcion.getParticipante().getEmail(), inscripcion.getFechahoraConfirmacion().orElse(null),
                 inscripcion.getId());
+    }
+
+    // TODO: esto en realidad debería realizarlo un mapper
+    public static InscripcionResponse fromInscripcion(InscripcionEvento inscripcion) {
+        /*
+         * En el campo fechaInscripcion, retorna la fecha en la que la inscripción se confirmó, o, si no fue confirmada,
+         * la fecha en la que pasó a waitlist
+         */
+        return new InscripcionResponse(inscripcion.getEvento().getId(), mapEstado(inscripcion.getEstado()),
+                inscripcion.getParticipante().getEmail(),
+                inscripcion.getFechahoraConfirmacion().or(inscripcion::getFechaHoraIngresoAWaitlist).orElse(null),
+                inscripcion.getId());
+    }
+
+    private static EstadoInscripcionResponse mapEstado(EstadoInscripcion estado) {
+        return switch (estado) {
+        case CONFIRMADA -> EstadoInscripcionResponse.CONFIRMADA;
+        case CANCELADA -> EstadoInscripcionResponse.CANCELADA;
+        case PENDIENTE -> EstadoInscripcionResponse.PENDIENTE;
+        };
     }
 }

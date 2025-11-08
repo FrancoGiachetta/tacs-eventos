@@ -19,15 +19,17 @@ pub struct EventFilter {
 #[derive(Debug, Builder)]
 #[builder(derive(Debug))]
 pub struct Event {
+    pub id: String,
     pub title: String,
-    pub description: String,
-    pub start_date_time: NaiveDateTime,
-    pub duration_minutes: u32,
-    pub location: String,
-    pub max_capacity: u32,
-    pub price: f32,
-    pub category: String,
-    pub organizer: String,
+    description: String,
+    start_date_time: NaiveDateTime,
+    duration_minutes: u32,
+    location: String,
+    max_capacity: u32,
+    price: f32,
+    category: String,
+    organizer: String,
+    pub is_open: bool,
 }
 
 // Defines how to format an Event struct.
@@ -92,7 +94,8 @@ fn serialize_event(event: &Event) -> serde_json::Result<Value> {
 
 fn derialize_event(json_value: Value) -> serde_json::Result<Event> {
     // Unwrapig is safe here because we are guaranteed these values are set. If
-    // there whever any error, that would be due a bad parsing.
+    // there were any error, that would be duet to bad parsing.
+    let id = json_value["id"].as_str().unwrap().to_string();
     let title = json_value["titulo"].to_string();
     let description = json_value["descripcion"].to_string();
     let start_date_time = {
@@ -112,8 +115,10 @@ fn derialize_event(json_value: Value) -> serde_json::Result<Event> {
     let price = json_value["precio"].to_string().parse::<f32>().unwrap();
     let category = json_value["categoria"].to_string();
     let organizer = json_value["organizador"]["email"].to_string();
+    let is_open = json_value["abierto"].as_bool().unwrap();
 
     Ok(Event {
+        id,
         title,
         description,
         start_date_time,
@@ -123,5 +128,6 @@ fn derialize_event(json_value: Value) -> serde_json::Result<Event> {
         price,
         category,
         organizer,
+        is_open,
     })
 }
