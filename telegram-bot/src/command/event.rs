@@ -37,8 +37,9 @@ pub async fn handle_list_events(ctl: GeneralController, filters: EventFilter) ->
             ctl.send_message("<b>📅 Estos son los eventos disponibles</b>\n\n<i>Según los criterios de búsqueda que ingresaste:</i>\n\n").await?;
 
             for event in events_list {
-                ctl.send_message(&format!("📅 <b>Evento</b>\n\n{}", event))
-                    .await?;
+                if event.is_open {
+                    send_event_message(&ctl, event).await?;
+                }
             }
         }
         Err(err) => handle_http_request_error(&ctl, err).await?,
@@ -60,7 +61,7 @@ async fn send_event_message(ctl: &GeneralController, event: Event) -> BotResult<
         inline_keyboard: vec![vec![callback]],
     };
 
-    ctl.send_message_with_callback(&format!("{event}"), keyboard)
+    ctl.send_message_with_callback(&format!("📅 <b>Evento</b>\n\n{event}"), keyboard)
         .await
         .map_err(BotError::from)?;
 

@@ -15,7 +15,7 @@ pub async fn handle_cancel_inscription(
     let event_id = query
         .strip_prefix(INSCRIPTION_CANCEL_PREFIX)
         .ok_or(BotError::CustomError(
-            "envet id should be there".to_string(),
+            "event id should be there".to_string(),
         ))?;
     let general_ctl = controller.general_ctl();
 
@@ -42,9 +42,9 @@ pub async fn handle_inscription_enrolment(
     query: String,
 ) -> BotResult<()> {
     let event_id = query
-        .strip_prefix(INSCRIPTION_CANCEL_PREFIX)
+        .strip_prefix(INSCRIPTION_ENROL_PREFIX)
         .ok_or(BotError::CustomError(
-            "envet id should be there".to_string(),
+            "event id should be there".to_string(),
         ))?;
     let general_ctl = controller.general_ctl();
 
@@ -70,7 +70,7 @@ pub fn schema() -> UpdateHandler<BotError> {
     dptree::entry()
         .branch(
             dptree::filter(|data: String| data.starts_with(INSCRIPTION_CANCEL_PREFIX))
-                .endpoint(handle_inscription_enrolment),
+                .endpoint(handle_cancel_inscription),
         )
         .branch(
             dptree::filter(|data: String| data.starts_with(INSCRIPTION_ENROL_PREFIX))
