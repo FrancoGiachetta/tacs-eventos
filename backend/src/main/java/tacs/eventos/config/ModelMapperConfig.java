@@ -31,8 +31,9 @@ public class ModelMapperConfig {
         // Convertidor para EstadoEvento a boolean
         Converter<EstadoEvento, Boolean> estadoEventoToBooleanConverter = ctx -> ctx
                 .getSource() == EstadoEvento.ABIERTO;
-        Converter<Usuario, UsuarioResponse> usuarioToUsuarioResponseConverter = ctx ->
-                Optional.ofNullable(ctx.getSource()).map(u -> new UsuarioResponse(u.getId(), u.getEmail(), Set.of())).orElse(null);
+        Converter<Usuario, UsuarioResponse> usuarioToUsuarioResponseConverter = ctx -> Optional
+                .ofNullable(ctx.getSource()).map(u -> new UsuarioResponse(u.getId(), u.getEmail(), Set.of()))
+                .orElse(null);
 
         mapper.addMappings(new PropertyMap<Evento, EventoResponse>() {
             @Override
