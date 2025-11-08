@@ -111,7 +111,7 @@ fn derialize_event(json_value: Value) -> serde_json::Result<Event> {
     let max_capacity = json_value["cupoMaximo"].to_string().parse::<u32>().unwrap();
     let price = json_value["precio"].to_string().parse::<f32>().unwrap();
     let category = json_value["categoria"].to_string();
-    let organizer = json_value["organizador"]["nombre"].to_string();
+    let organizer = json_value["organizador"]["email"].to_string();
 
     Ok(Event {
         title,
