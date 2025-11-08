@@ -255,7 +255,7 @@ async fn handle_enter_max_capacity(
     controller: GeneralController,
     event_builder: EventBuilder,
 ) -> BotResult<()> {
-    match get_integer_input_data(&controller, Some(0), None) {
+    match get_integer_input_data(&controller, Some(1), None) {
         Ok(max_capacity) => {
             let mut updated_event_data = event_builder.clone();
             updated_event_data.max_capacity(max_capacity);
@@ -345,8 +345,7 @@ async fn create_event_and_return_to_main_menu(
         .update_dialogue_state(State::Authenticated(UseCase::EnterCommand))
         .await?;
     // Sends to the backend an event creation request
-    // TODO: manejar error 400 (como el que ocurre cuando le pasas capacidad 0)
-    // TODO: hacer que la capacidad minima sea 1 en vez de 0
+    // TODO: manejar error 400 (para probarlo, pasarle capacidad 0, antes modificando la validación que hace el bot sobre ese campo)
     let event_name = create_and_send_event(&controller, &mut event_builder).await?;
     // Sends a confirmation message
     controller
