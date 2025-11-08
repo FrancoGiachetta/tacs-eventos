@@ -15,6 +15,7 @@ impl EventOrganizerView {
     pub fn id(&self) -> &String {
         &self.id
     }
+
     pub fn open(&self) -> bool {
         self.open
     }
@@ -34,17 +35,18 @@ impl Display for EventOrganizerView {
     }
 }
 
-// Implement deserialization for an EventOrganizerView.
+// // Implement deserialization for an EventOrganizerView.
 impl<'de> Deserialize<'de> for EventOrganizerView {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
         let json_value: serde_json::Value = Deserialize::deserialize(deserializer)?; // Json content
+
         let id = json_value["id"].as_str().unwrap().to_string();
         let open = json_value["abierto"].as_bool().unwrap();
-        // Deserializes all the fields in the Event structure
         let event = Event::deserialize(json_value).unwrap();
+
         Ok(EventOrganizerView { id, event, open })
     }
 }

@@ -10,6 +10,7 @@ use crate::{
     schemas::{
         event::{Event, EventFilter},
         event_organizer_view::EventOrganizerView,
+        inscription::Inscription,
         user::{Token, UserIn, UserOut},
     },
 };
@@ -64,7 +65,7 @@ impl RequestClient {
 
     pub async fn send_close_event_request(
         &self,
-        event_id: String,
+        event_id: &str,
         token: &str,
     ) -> Result<(), RequestClientError> {
         self.send_change_event_state_request(event_id, false, token)
@@ -73,7 +74,7 @@ impl RequestClient {
 
     pub async fn send_open_event_request(
         &self,
-        event_id: String,
+        event_id: &str,
         token: &str,
     ) -> Result<(), RequestClientError> {
         self.send_change_event_state_request(event_id, true, token)
@@ -82,7 +83,7 @@ impl RequestClient {
 
     async fn send_change_event_state_request(
         &self,
-        event_id: String,
+        event_id: &str,
         open: bool,
         token: &str,
     ) -> Result<(), RequestClientError> {
@@ -118,9 +119,23 @@ impl RequestClient {
             filter_query.push(("categoria", category));
         }
         // TODO: add palabrasClave query.
-
         let response = self
             .send_request_with_retry("evento", RequestMethod::Get(&filter_query), Some(token))
+            .await?;
+
+        Ok(serde_json::from_value(response)?)
+    }
+
+    pub async fn send_get_my_inscriptions_request(
+        &self,
+        token: &str,
+    ) -> Result<Vec<Inscription>, RequestClientError> {
+        let response = self
+            .send_request_with_retry(
+                "usuario/mis-inscripciones",
+                RequestMethod::Get(&[]),
+                Some(token),
+            )
             .await?;
 
         Ok(serde_json::from_value(response)?)
