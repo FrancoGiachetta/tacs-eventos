@@ -171,6 +171,21 @@ impl RequestClient {
         Ok(serde_json::from_value(response)?)
     }
 
+    pub async fn send_create_event_request(
+        &self,
+        event: &Event,
+        token: &str,
+    ) -> Result<(), RequestClientError> {
+        self.send_request_with_retry(
+            "evento",
+            RequestMethod::Post(serde_json::to_value(event)?),
+            Some(token),
+        )
+        .await?;
+
+        Ok(())
+    }
+
     async fn send_request_with_retry<'req>(
         &self,
         url: &str,
