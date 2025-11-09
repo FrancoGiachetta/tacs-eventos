@@ -63,6 +63,36 @@ impl RequestClient {
         Ok(serde_json::from_value(response)?)
     }
 
+    pub async fn send_get_pending_inscriptions_count_request(
+        &self,
+        token: &str,
+        event_id: &str,
+    ) -> Result<u64, RequestClientError> {
+        let response = self
+            .send_request_with_retry(
+                &format!("evento/{}/cantidadInscripcionesPendientes", event_id),
+                RequestMethod::Get(&[]),
+                Some(token),
+            )
+            .await?;
+        Ok(serde_json::from_value(response)?)
+    }
+
+    pub async fn send_get_confirmed_inscriptions_count_request(
+        &self,
+        token: &str,
+        event_id: &str,
+    ) -> Result<u64, RequestClientError> {
+        let response = self
+            .send_request_with_retry(
+                &format!("evento/{}/cantidadInscripcionesConfirmadas", event_id),
+                RequestMethod::Get(&[]),
+                Some(token),
+            )
+            .await?;
+        Ok(serde_json::from_value(response)?)
+    }
+
     pub async fn send_close_event_request(
         &self,
         event_id: &str,
@@ -123,6 +153,21 @@ impl RequestClient {
             .send_request_with_retry("evento", RequestMethod::Get(&filter_query), Some(token))
             .await?;
 
+        Ok(serde_json::from_value(response)?)
+    }
+
+    pub async fn send_get_event_request(
+        &self,
+        event_id: &str,
+        token: &str,
+    ) -> Result<Event, RequestClientError> {
+        let response = self
+            .send_request_with_retry(
+                &format!("evento/{}", event_id),
+                RequestMethod::Get(&[]),
+                Some(token),
+            )
+            .await?;
         Ok(serde_json::from_value(response)?)
     }
 
