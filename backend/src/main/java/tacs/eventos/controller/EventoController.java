@@ -356,6 +356,37 @@ public class EventoController {
                 }).toList());
     }
 
+    @GetMapping("/{eventoId}/cantidadInscripcionesPendientes")
+    @ApiResponse(responseCode = "200", description = "Cantidad de usuarios en waitlist para el evento")
+    public ResponseEntity<Long> getCantidadEnWaitlistDeEvento(@AuthenticationPrincipal Usuario usuario,
+            @PathVariable String eventoId) {
+        Evento evento = this.buscarEvento(eventoId);
+
+        Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
+
+        // Si el usuario no es el organizador, devolver 403.
+        if (!validador.validar()) {
+            throw new AccesoDenegadoHandler("El usuario no es organizador");
+        }
+
+        return ResponseEntity.ok(this.inscripcionesService.inscripcionesPendientes(evento).stream().count());
+    }
+
+    @GetMapping("/{eventoId}/cantidadInscripcionesConfirmadas")
+    @ApiResponse(responseCode = "200", description = "Cantidad de inscripciones confirmadas para el evento")
+    public ResponseEntity<Long> getCantidadConfirmadasDeEvento(@AuthenticationPrincipal Usuario usuario,
+            @PathVariable String eventoId) {
+        Evento evento = this.buscarEvento(eventoId);
+        Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
+
+        // Si el usuario no es el organizador, devolver 403.
+        if (!validador.validar()) {
+            throw new AccesoDenegadoHandler("El usuario no es organizador");
+        }
+
+        return ResponseEntity.ok(this.inscripcionesService.inscripcionesConfirmadas(evento).stream().count());
+    }
+
     /**
      * Actualiza un evento existente. Solo el organizador del evento o un admin pueden editar.
      *
