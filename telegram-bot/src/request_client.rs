@@ -2,7 +2,7 @@ use std::{env, time::Duration};
 
 use lazy_static::lazy_static;
 use reqwest::{Client, Response};
-use serde_json::Value;
+use serde_json::{Value, json};
 use tracing::info;
 
 use crate::{
@@ -119,7 +119,11 @@ impl RequestClient {
         if let Some(category) = filters.category {
             filter_query.push(("categoria", category));
         }
-        // TODO: add palabrasClave query.
+        if let Some(keywords) = filters.keywords {
+            let keywords = keywords.join("+");
+            filter_query.push(("palabrasClave", keywords));
+        }
+
         let response = self
             .send_request_with_retry("evento", RequestMethod::Get(&filter_query), Some(token))
             .await?;
@@ -232,6 +236,13 @@ impl RequestClient {
             Some(token),
         )
         .await?;
+
+        Ok(())
+    }
+
+    pub async fn send_logout_request(&self, token: &str) -> Result<(), RequestClientError> {
+        self.send_request_with_retry("auth/logout", RequestMethod::Post(Value::Null), Some(token))
+            .await?;
 
         Ok(())
     }

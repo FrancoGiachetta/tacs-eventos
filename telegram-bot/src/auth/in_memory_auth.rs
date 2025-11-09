@@ -98,6 +98,24 @@ impl Authenticator for InMemoryAuth {
         Ok(())
     }
 
+    fn remove_session(&self, chat_id: &ChatId) -> Result<(), AuthError> {
+        self.sessions
+            .write()
+            .map_err(|e| AuthError::SessionLockError(e.to_string()))?
+            .remove(chat_id);
+
+        Ok(())
+    }
+
+    async fn logout(&self, chat_id: &ChatId) -> Result<(), AuthError> {
+        let token = self.get_session_token(&chat_id)?;
+
+        self.request_client.send_logout_request(&token).await?;
+        self.remove_session(chat_id)?;
+
+        Ok(())
+    }
+
     fn get_session(&self, chat_id: &ChatId) -> Result<Session, AuthError> {
         let sessions = self
             .sessions

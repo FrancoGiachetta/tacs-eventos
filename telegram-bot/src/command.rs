@@ -27,6 +27,8 @@ pub enum Command {
     Help,
     #[command(description = "Resetear dialogo")]
     Reset,
+    #[command(description = "Cerrar Sesion")]
+    LogOut,
     #[command(
         description = "Listar los eventos disponibles",
         // Tell teloxide how to parse filters.
@@ -63,7 +65,8 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
                 )
                 .branch(dptree::case![Command::CreateEvent])
                 .endpoint(create_event::handle_create_event)
-                .branch(dptree::case![Command::Help].endpoint(handle_help_command)),
+                .branch(dptree::case![Command::Help].endpoint(handle_help_command))
+                .branch(dptree::case![Command::LogOut].endpoint(handle_logout)),
         )
 }
 
@@ -112,6 +115,19 @@ Elegí una opción:\n\n\
         )
         .await?;
     }
+
+    Ok(())
+}
+
+async fn handle_logout(ctl: GeneralController) -> BotResult<()> {
+    let chat_id = ctl.chat_id();
+
+    ctl.auth().logout(&chat_id).await?;
+
+    ctl.send_message("La sesion se cerro correctamente").await?;
+
+    ctl.update_dialogue_state(State::Registration(RegisterState::CheckUser))
+        .await?;
 
     Ok(())
 }
