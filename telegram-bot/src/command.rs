@@ -1,9 +1,9 @@
 use crate::dialogue::UseCase::EnterCommand;
 use crate::{
-    auth::{Authenticator, check_session},
+    auth::{check_session, Authenticator},
     bot::BotResult,
     controller::general_controller::GeneralController,
-    dialogue::{State, registration_dialogue::State as RegisterState},
+    dialogue::{registration_dialogue::State as RegisterState, State},
     error::BotError,
     schemas::event::EventFilter,
 };
@@ -61,8 +61,9 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
                     dptree::case![Command::MyInscriptions]
                         .endpoint(inscription::handle_my_inscriptions),
                 )
-                .branch(dptree::case![Command::CreateEvent])
-                .endpoint(create_event::handle_create_event)
+                .branch(
+                    dptree::case![Command::CreateEvent].endpoint(create_event::handle_create_event),
+                )
                 .branch(dptree::case![Command::Help].endpoint(handle_help_command)),
         )
 }
