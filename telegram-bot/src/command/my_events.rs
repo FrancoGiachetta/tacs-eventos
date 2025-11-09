@@ -1,6 +1,7 @@
 use tracing::info;
 
 use crate::callback::event_callback::CLOSE_EVENT_PREFIX;
+use crate::callback::inscription_callback::SEE_INSCRIPTIONS_PREFIX;
 use crate::controller::general_controller::GeneralController;
 use crate::error::request_client_error::handle_http_request_error;
 use crate::error::BotError;
@@ -24,11 +25,11 @@ pub async fn handle_my_events(controller: GeneralController) -> BotResult<()> {
             for event in events_list {
                 let pending_count = controller
                     .request_client()
-                    .send_get_pending_inscriptions_count_request(&token, &event.id)
+                    .send_get_pending_inscriptions_count_request(&token, &event.id())
                     .await?;
                 let confirmed_count = controller
                     .request_client()
-                    .send_get_confirmed_inscriptions_count_request(&token, &event.id)
+                    .send_get_confirmed_inscriptions_count_request(&token, &event.id())
                     .await?;
                 send_event_message_with_callback(
                     &controller,
@@ -59,8 +60,12 @@ async fn send_event_message_with_callback(
         pending_count, confirmed_count
     ));
     let callback = create_event_callback(event);
+    let see_inscriptions_button = InlineKeyboardButton::callback(
+        "Ver Inscripciones",
+        format!("{}{}", SEE_INSCRIPTIONS_PREFIX, event.id()),
+    );
     let keyboard = InlineKeyboardMarkup {
-        inline_keyboard: vec![vec![callback]],
+        inline_keyboard: vec![vec![callback, see_inscriptions_button]],
     };
     controller
         .send_message_with_callback(&text, keyboard)

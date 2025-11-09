@@ -1,4 +1,4 @@
-use std::{env, time::Duration};
+use std::{env, future::Future, time::Duration};
 
 use lazy_static::lazy_static;
 use reqwest::{Client, Response};
@@ -12,6 +12,7 @@ use crate::{
         event_organizer_view::EventOrganizerView,
         inscription::Inscription,
         user::{Token, UserIn, UserOut},
+        waitlist_inscription::WaitlistInscription,
     },
 };
 
@@ -234,6 +235,38 @@ impl RequestClient {
             .await?;
 
         Ok(serde_json::from_value(inscription)?)
+    }
+
+    pub async fn send_get_event_inscriptions_request(
+        &self,
+        token: &str,
+        event_id: &str,
+    ) -> Result<Vec<Inscription>, RequestClientError> {
+        let response = self
+            .send_request_with_retry(
+                &format!("evento/{}/inscripcion", event_id),
+                RequestMethod::Get(&[]),
+                Some(token),
+            )
+            .await?;
+
+        Ok(serde_json::from_value(response)?)
+    }
+
+    pub async fn send_get_event_waitlist_request(
+        &self,
+        token: &str,
+        event_id: &str,
+    ) -> Result<Vec<WaitlistInscription>, RequestClientError> {
+        let response = self
+            .send_request_with_retry(
+                &format!("evento/{}/waitlist", event_id),
+                RequestMethod::Get(&[]),
+                Some(token),
+            )
+            .await?;
+
+        Ok(serde_json::from_value(response)?)
     }
 
     pub async fn send_user_registration_request(
