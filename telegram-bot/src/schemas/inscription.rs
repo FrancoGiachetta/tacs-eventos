@@ -1,23 +1,26 @@
 use std::fmt::Display;
 
-use chrono::{DateTime, Utc};
+use chrono::NaiveDateTime;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub enum InscriptionState {
+    #[serde(rename = "CONFIRMADA")]
     Confirmed,
+    #[serde(rename = "CANCELADA")]
     Rejected,
+    #[serde(rename = "PENDIENTE")]
     Pending,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct Inscription {
     pub id: String,
     #[serde(rename = "estado")]
     pub state: InscriptionState,
     pub email: String,
     #[serde(rename = "fechaInscripcion")]
-    pub date: DateTime<Utc>,
+    pub date: NaiveDateTime,
     #[serde(rename = "eventoId")]
     pub event_id: String,
 }

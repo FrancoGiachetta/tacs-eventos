@@ -123,6 +123,7 @@ impl RequestClient {
             Some(token),
         )
         .await?;
+
         Ok(())
     }
 
@@ -183,7 +184,56 @@ impl RequestClient {
             )
             .await?;
 
-        Ok(serde_json::from_value(response)?)
+        Ok(dbg!(serde_json::from_value(response)?))
+    }
+
+    pub async fn send_enrolment_request(
+        &self,
+        token: &str,
+        event_id: &str,
+        user_id: &str,
+    ) -> Result<(), RequestClientError> {
+        self.send_request_with_retry(
+            &format!("evento/{event_id}/inscripcion/{user_id}"),
+            RequestMethod::Post(Value::Null),
+            Some(token),
+        )
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn send_cancel_inscription_request(
+        &self,
+        token: &str,
+        event_id: &str,
+        user_id: &str,
+    ) -> Result<(), RequestClientError> {
+        self.send_request_with_retry(
+            &format!("evento/{event_id}/inscripcion/{user_id}"),
+            RequestMethod::Delete(Value::Null),
+            Some(token),
+        )
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn send_get_inscription_request(
+        &self,
+        token: &str,
+        event_id: &str,
+        user_id: &str,
+    ) -> Result<Inscription, RequestClientError> {
+        let inscription = self
+            .send_request_with_retry(
+                &format!("evento/{event_id}/inscripcion/{user_id}"),
+                RequestMethod::Get(&[]),
+                Some(token),
+            )
+            .await?;
+
+        Ok(serde_json::from_value(inscription)?)
     }
 
     pub async fn send_user_registration_request(
@@ -214,6 +264,21 @@ impl RequestClient {
             .await?;
 
         Ok(serde_json::from_value(response)?)
+    }
+
+    pub async fn send_create_event_request(
+        &self,
+        event: &Event,
+        token: &str,
+    ) -> Result<(), RequestClientError> {
+        self.send_request_with_retry(
+            "evento",
+            RequestMethod::Post(serde_json::to_value(event)?),
+            Some(token),
+        )
+        .await?;
+
+        Ok(())
     }
 
     async fn send_request_with_retry<'req>(

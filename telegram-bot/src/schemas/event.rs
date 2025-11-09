@@ -1,8 +1,10 @@
 use std::{fmt::Display, str::FromStr};
 
 use chrono::{NaiveDate, NaiveDateTime};
-use serde::{Deserialize, de};
+use serde::{Deserialize, Serialize, Serializer, de};
 use serde_json::Value;
+
+use derive_builder::Builder;
 
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct EventFilter {
@@ -14,9 +16,11 @@ pub struct EventFilter {
     pub keywords: Option<Vec<String>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Builder)]
+#[builder(derive(Debug))]
 pub struct Event {
-    title: String,
+    pub id: String,
+    pub title: String,
     description: String,
     start_date_time: NaiveDateTime,
     duration_minutes: u32,
@@ -25,6 +29,7 @@ pub struct Event {
     price: f32,
     category: String,
     organizer: String,
+    pub is_open: bool,
 }
 
 // Defines how to format an Event struct.
@@ -52,6 +57,17 @@ impl Display for Event {
     }
 }
 
+// Implement serialization for an Event.
+impl Serialize for Event {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let json_value = serialize_event(self).map_err(serde::ser::Error::custom)?;
+        json_value.serialize(serializer)
+    }
+}
+
 // Implement deserialization for a Event.
 impl<'de> Deserialize<'de> for Event {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -63,9 +79,23 @@ impl<'de> Deserialize<'de> for Event {
     }
 }
 
+fn serialize_event(event: &Event) -> serde_json::Result<Value> {
+    Ok(serde_json::json!({
+        "titulo": event.title,
+        "descripcion": event.description,
+        "fechaHoraInicio": event.start_date_time.format("%Y-%m-%dT%H:%M:%S").to_string(),
+        "duracionMinutos": event.duration_minutes,
+        "ubicacion": event.location,
+        "cupoMaximo": event.max_capacity,
+        "precio": event.price,
+        "categoria": event.category,
+    }))
+}
+
 fn derialize_event(json_value: Value) -> serde_json::Result<Event> {
     // Unwrapig is safe here because we are guaranteed these values are set. If
-    // there whever any error, that would be due a bad parsing.
+    // there were any error, that would be duet to bad parsing.
+    let id = json_value["id"].as_str().unwrap().to_string();
     let title = json_value["titulo"].to_string();
     let description = json_value["descripcion"].to_string();
     let start_date_time = {
@@ -84,9 +114,11 @@ fn derialize_event(json_value: Value) -> serde_json::Result<Event> {
     let max_capacity = json_value["cupoMaximo"].to_string().parse::<u32>().unwrap();
     let price = json_value["precio"].to_string().parse::<f32>().unwrap();
     let category = json_value["categoria"].to_string();
-    let organizer = json_value["organizador"]["nombre"].to_string();
+    let organizer = json_value["organizador"]["email"].to_string();
+    let is_open = json_value["abierto"].as_bool().unwrap();
 
     Ok(Event {
+        id,
         title,
         description,
         start_date_time,
@@ -96,5 +128,6 @@ fn derialize_event(json_value: Value) -> serde_json::Result<Event> {
         price,
         category,
         organizer,
+        is_open,
     })
 }

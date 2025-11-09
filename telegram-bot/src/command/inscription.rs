@@ -1,8 +1,12 @@
+use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
 use tracing::info;
 
 use crate::{
-    bot::BotResult, controller::general_controller::GeneralController,
-    error::request_client_error::handle_http_request_error,
+    bot::BotResult,
+    callback::inscription_callback::INSCRIPTION_CANCEL_PREFIX,
+    controller::general_controller::GeneralController,
+    error::{BotError, request_client_error::handle_http_request_error},
+    schemas::inscription::{Inscription, InscriptionState},
 };
 
 pub async fn handle_my_inscriptions(ctl: GeneralController) -> BotResult<()> {
@@ -21,14 +25,38 @@ pub async fn handle_my_inscriptions(ctl: GeneralController) -> BotResult<()> {
             ).await?;
         }
         Ok(inscriptions_list) => {
-            ctl.send_message("<b>📅 Estos son los eventos disponibles</b>\n\n<i>Según los criterios de búsqueda que ingresaste:</i>\n\n").await?;
-
             for inscription in inscriptions_list {
-                ctl.send_message(&format!("📅 <b>Evento</b>\n\n{}", inscription))
-                    .await?;
+                send_inscription_message(&ctl, inscription).await?;
             }
         }
         Err(err) => handle_http_request_error(&ctl, err).await?,
+    }
+
+    Ok(())
+}
+
+async fn send_inscription_message(
+    ctl: &GeneralController,
+    inscription: Inscription,
+) -> BotResult<()> {
+    match inscription.state {
+        InscriptionState::Confirmed => {
+            let callback = InlineKeyboardButton::callback(
+                "Cancelar Inscripcion",
+                format!("{}{}", INSCRIPTION_CANCEL_PREFIX, inscription.event_id),
+            );
+            let keyboard = InlineKeyboardMarkup {
+                inline_keyboard: vec![vec![callback]],
+            };
+
+            ctl.send_message_with_callback(&format!("{inscription}"), keyboard)
+                .await
+                .map_err(BotError::from)?
+        }
+        _ => ctl
+            .send_message(&format!("{inscription}"))
+            .await
+            .map_err(BotError::from)?,
     }
 
     Ok(())

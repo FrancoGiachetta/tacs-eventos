@@ -1,8 +1,9 @@
 use teloxide::types::ChatId;
 
 use crate::{
-    controller::general_controller::GeneralController, error::auth_error::AuthError,
-    schemas::user::Token,
+    controller::general_controller::GeneralController,
+    error::auth_error::AuthError,
+    schemas::user::{Session, Token},
 };
 use async_trait::async_trait;
 
@@ -11,6 +12,7 @@ pub mod in_memory_auth;
 #[async_trait]
 pub trait Authenticator {
     fn validate_session(&self, chat_id: &ChatId) -> Result<bool, AuthError>;
+    fn get_session(&self, chat_id: &ChatId) -> Result<Session, AuthError>;
     async fn reset_token(&self, chat_id: &ChatId) -> Result<(), AuthError>;
     async fn new_session(
         &self,
