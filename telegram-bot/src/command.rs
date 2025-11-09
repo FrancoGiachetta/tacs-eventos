@@ -23,23 +23,30 @@ mod my_events;
 #[derive(BotCommands, Clone)]
 #[command(rename_rule = "lowercase")]
 pub enum Command {
-    #[command(description = "Mostrar mensaje de ayuda")]
+    #[command(description = "Mostrar mensaje de ayuda.")]
     Help,
-    #[command(description = "Resetear dialogo")]
+    #[command(description = "Resetear dialogo.")]
     Reset,
-    #[command(description = "Cerrar Sesion")]
+    #[command(description = "Cerrar Sesion.")]
     LogOut,
     #[command(
-        description = "Listar los eventos disponibles",
-        // Tell teloxide how to parse filters.
+        description = "
+            Listar los eventos disponibles. Acepta distintos filtros (opcionales):
+                - min_price=<monto_minimo>
+                - max_price=<monto_maximo>
+                - min_date=<fecha_minima>
+                - max_date=<fecha_maxima>
+                - category=<categoria>
+                - keywords=<palabra1,palabra2,...>
+        ",
         parse_with = parse_event_filters
     )]
     ListEvents(EventFilter),
-    #[command(description = "Listar los eventos organizados por usted")]
+    #[command(description = "Listar los eventos organizados por usted.")]
     MyEvents,
-    #[command(description = "Listar inscripciones activas")]
+    #[command(description = "Listar inscripciones activas.")]
     MyInscriptions,
-    #[command(description = "Crear un nuevo evento")]
+    #[command(description = "Crear un nuevo evento.")]
     CreateEvent,
 }
 
