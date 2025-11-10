@@ -2,7 +2,7 @@ use std::{env, time::Duration};
 
 use lazy_static::lazy_static;
 use reqwest::{Client, Response};
-use serde_json::{Value, json};
+use serde_json::Value;
 use tracing::info;
 
 use crate::{
@@ -29,7 +29,6 @@ pub struct RequestClient {
 pub enum RequestMethod<'req> {
     Get(&'req [(&'req str, String)]),
     Post(Value),
-    Put(Value),
     Patch(Value),
     Delete(Value),
 }
@@ -283,10 +282,6 @@ impl RequestClient {
             RequestMethod::Patch(body) => {
                 info!("Sending PATCH request to {url}");
                 self.client.patch(url).json(&body)
-            }
-            RequestMethod::Put(body) => {
-                info!("Sending PUT request to {url}");
-                self.client.put(url).json(&body)
             }
             RequestMethod::Delete(body) => {
                 info!("Sending DELETE request to {url}");

@@ -30,15 +30,7 @@ pub enum Command {
     #[command(description = "Cerrar Sesion.")]
     LogOut,
     #[command(
-        description = "
-            Listar los eventos disponibles. Acepta distintos filtros (opcionales):
-                - min_price=<monto_minimo>
-                - max_price=<monto_maximo>
-                - min_date=<fecha_minima>
-                - max_date=<fecha_maxima>
-                - category=<categoria>
-                - keywords=<palabra1,palabra2,...>
-        ",
+        description = "Listar los eventos disponibles.",
         parse_with = parse_event_filters
     )]
     ListEvents(EventFilter),
@@ -70,8 +62,9 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
                     dptree::case![Command::MyInscriptions]
                         .endpoint(inscription::handle_my_inscriptions),
                 )
-                .branch(dptree::case![Command::CreateEvent])
-                .endpoint(create_event::handle_create_event)
+                .branch(
+                    dptree::case![Command::CreateEvent].endpoint(create_event::handle_create_event),
+                )
                 .branch(dptree::case![Command::Help].endpoint(handle_help_command))
                 .branch(dptree::case![Command::LogOut].endpoint(handle_logout)),
         )
@@ -133,8 +126,7 @@ async fn handle_logout(ctl: GeneralController) -> BotResult<()> {
 
     ctl.send_message("La sesion se cerro correctamente").await?;
 
-    ctl.update_dialogue_state(State::Registration(RegisterState::CheckUser))
-        .await?;
+    ctl.update_dialogue_state(State::Start).await?;
 
     Ok(())
 }

@@ -1,3 +1,4 @@
+use crate::auth::check_session;
 use crate::bot::BotResult;
 use crate::controller::general_controller::GeneralController;
 use crate::dialogue::State;
@@ -25,38 +26,41 @@ pub enum EventCreationStep {
 
 pub fn schema() -> UpdateHandler<BotError> {
     Update::filter_message().branch(
-        case![State::Authenticated(usecase)].branch(
-            case![UseCase::EventCreation(step)]
-                .branch(case![EventCreationStep::EnterTitle].endpoint(handle_enter_title))
-                .branch(
-                    case![EventCreationStep::EnterDescription { event_builder }]
-                        .endpoint(handle_enter_description),
-                )
-                .branch(
-                    case![EventCreationStep::EnterDate { event_builder }]
-                        .endpoint(handle_enter_date),
-                )
-                .branch(
-                    case![EventCreationStep::EnterDuration { event_builder }]
-                        .endpoint(handle_enter_duration),
-                )
-                .branch(
-                    case![EventCreationStep::EnterLocation { event_builder }]
-                        .endpoint(handle_enter_location),
-                )
-                .branch(
-                    case![EventCreationStep::EnterMaxCapacity { event_builder }]
-                        .endpoint(handle_enter_max_capacity),
-                )
-                .branch(
-                    case![EventCreationStep::EnterPrice { event_builder }]
-                        .endpoint(handle_enter_price),
-                )
-                .branch(
-                    case![EventCreationStep::EnterCategory { event_builder }]
-                        .endpoint(handle_enter_category),
-                ),
-        ),
+        case![State::Authenticated(usecase)]
+            // Check if session is still valid. If not, retrieve new token.
+            .map_async(check_session)
+            .branch(
+                case![UseCase::EventCreation(step)]
+                    .branch(case![EventCreationStep::EnterTitle].endpoint(handle_enter_title))
+                    .branch(
+                        case![EventCreationStep::EnterDescription { event_builder }]
+                            .endpoint(handle_enter_description),
+                    )
+                    .branch(
+                        case![EventCreationStep::EnterDate { event_builder }]
+                            .endpoint(handle_enter_date),
+                    )
+                    .branch(
+                        case![EventCreationStep::EnterDuration { event_builder }]
+                            .endpoint(handle_enter_duration),
+                    )
+                    .branch(
+                        case![EventCreationStep::EnterLocation { event_builder }]
+                            .endpoint(handle_enter_location),
+                    )
+                    .branch(
+                        case![EventCreationStep::EnterMaxCapacity { event_builder }]
+                            .endpoint(handle_enter_max_capacity),
+                    )
+                    .branch(
+                        case![EventCreationStep::EnterPrice { event_builder }]
+                            .endpoint(handle_enter_price),
+                    )
+                    .branch(
+                        case![EventCreationStep::EnterCategory { event_builder }]
+                            .endpoint(handle_enter_category),
+                    ),
+            ),
     )
 }
 
