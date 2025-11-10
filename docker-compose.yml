@@ -46,7 +46,7 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: fveiga
+      MONGO_INITDB_ROOT_USERNAME: nraboy
       MONGO_INITDB_ROOT_PASSWORD: password1234
     restart: unless-stopped
     networks:
