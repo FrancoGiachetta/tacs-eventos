@@ -10,7 +10,6 @@ services:
     container_name: eventos-telegram-bot
     env_file: ./telegram-bot/.env
     environment:
-      - URL_BASE=http://eventos-backend:8080/api/v1
       - CLIENT_TIMEOUT_SECS=30
       - DEFAULT_MAX_RETRIES=3
     networks:

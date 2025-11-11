@@ -1,6 +1,7 @@
 use tracing::info;
 
 use crate::callback::event_callback::CLOSE_EVENT_PREFIX;
+use crate::callback::inscription_callback::SEE_INSCRIPTIONS_PREFIX;
 use crate::controller::general_controller::GeneralController;
 use crate::error::BotError;
 use crate::error::request_client_error::handle_http_request_error;
@@ -12,17 +13,31 @@ use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
 pub async fn handle_my_events(controller: GeneralController) -> BotResult<()> {
     info!("Listing my_events!");
 
+    let token = controller.auth().get_session_token(&controller.chat_id())?;
+
     match controller
         .request_client()
-        .send_get_my_events_list_request(
-            &controller.auth().get_session_token(&controller.chat_id())?,
-        )
+        .send_get_my_events_list_request(&token)
         .await
     {
         Ok(events_list) => {
             // Sends a message swowing each event
             for event in events_list {
-                send_event_message_with_callback(&controller, &event).await?;
+                let pending_count = controller
+                    .request_client()
+                    .send_get_pending_inscriptions_count_request(&token, &event.id())
+                    .await?;
+                let confirmed_count = controller
+                    .request_client()
+                    .send_get_confirmed_inscriptions_count_request(&token, &event.id())
+                    .await?;
+                send_event_message_with_callback(
+                    &controller,
+                    &event,
+                    pending_count,
+                    confirmed_count,
+                )
+                .await?;
             }
         }
         Err(err) => {
@@ -36,11 +51,21 @@ pub async fn handle_my_events(controller: GeneralController) -> BotResult<()> {
 async fn send_event_message_with_callback(
     controller: &GeneralController,
     event: &EventOrganizerView,
+    pending_count: u64,
+    confirmed_count: u64,
 ) -> BotResult<()> {
-    let text = format!("{event}");
+    let mut text = format!("{event}");
+    text.push_str(&format!(
+        "\n\n<b>✍️ Inscripciones pendientes:</b> {}\n<b>✅ Inscripciones confirmadas:</b> {}",
+        pending_count, confirmed_count
+    ));
     let callback = create_event_callback(event);
+    let see_inscriptions_button = InlineKeyboardButton::callback(
+        "Ver Inscripciones",
+        format!("{}{}", SEE_INSCRIPTIONS_PREFIX, event.id()),
+    );
     let keyboard = InlineKeyboardMarkup {
-        inline_keyboard: vec![vec![callback]],
+        inline_keyboard: vec![vec![callback, see_inscriptions_button]],
     };
     controller
         .send_message_with_callback(&text, keyboard)

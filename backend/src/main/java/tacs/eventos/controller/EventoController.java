@@ -348,12 +348,119 @@ public class EventoController {
                 .ok(this.inscripcionesService.inscripcionesPendientes(evento).stream().map((InscripcionEvento i) -> {
                     var usuarioResponse = new UsuarioResponse(i.getParticipante().getId(),
                             i.getParticipante().getEmail(), i.getParticipante().getRoles());
-                    return new InscripcionEnWaitlistResponse(usuarioResponse, i.getFechaHoraIngresoAWaitlist().orElse(
-                            null)); /*
-                                     * La fechaHora de ingreso a watilist no debería ser nunca null en este caso, porque
-                                     * estamos buscando las inscripciones pendientes, o sea, las que están en watilist
-                                     */
+                    return new InscripcionEnWaitlistResponse(i.getId(), usuarioResponse,
+                            i.getFechaHoraIngresoAWaitlist()
+                                    .orElse(null)); /*
+                                                     * La fechaHora de ingreso a watilist no debería ser nunca null en
+                                                     * este caso, porque estamos buscando las inscripciones pendientes,
+                                                     * o sea, las que están en watilist
+                                                     */
                 }).toList());
+    }
+
+    @GetMapping("/{eventoId}/cantidadInscripcionesPendientes")
+    @ApiResponse(responseCode = "200", description = "Cantidad de usuarios en waitlist para el evento")
+    public ResponseEntity<Long> getCantidadEnWaitlistDeEvento(@AuthenticationPrincipal Usuario usuario,
+            @PathVariable String eventoId) {
+        Evento evento = this.buscarEvento(eventoId);
+
+        Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
+
+        // Si el usuario no es el organizador, devolver 403.
+        if (!validador.validar()) {
+            throw new AccesoDenegadoHandler("El usuario no es organizador");
+        }
+
+        return ResponseEntity.ok(this.inscripcionesService.inscripcionesPendientes(evento).stream().count());
+    }
+
+    @GetMapping("/{eventoId}/cantidadInscripcionesConfirmadas")
+    @ApiResponse(responseCode = "200", description = "Cantidad de inscripciones confirmadas para el evento")
+    public ResponseEntity<Long> getCantidadConfirmadasDeEvento(@AuthenticationPrincipal Usuario usuario,
+            @PathVariable String eventoId) {
+        Evento evento = this.buscarEvento(eventoId);
+        Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
+
+        // Si el usuario no es el organizador, devolver 403.
+        if (!validador.validar()) {
+            throw new AccesoDenegadoHandler("El usuario no es organizador");
+        }
+
+        return ResponseEntity.ok(this.inscripcionesService.inscripcionesConfirmadas(evento).stream().count());
+    }
+
+    /**
+     * Actualiza un evento existente. Solo el organizador del evento o un admin pueden editar.
+     *
+     * @param usuario
+     *            usuario logueado
+     * @param eventoId
+     *            id del evento a actualizar
+     * @param dto
+     *            datos actualizados del evento
+     *
+     * @return ResponseEntity con el evento actualizado
+     */
+    @PutMapping("/{eventoId}")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Evento actualizado correctamente"),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado"),
+            @ApiResponse(responseCode = "404", description = "Evento no encontrado") })
+    public ResponseEntity<EventoResponse> actualizarEvento(@AuthenticationPrincipal Usuario usuario,
+            @PathVariable String eventoId, @Valid @RequestBody CreacionEventoRequest dto) {
+
+        Evento evento = this.buscarEvento(eventoId);
+
+        Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
+
+        // Si el usuario no es el organizador ni admin, devolver 403
+        if (!validador.validar()) {
+            throw new AccesoDenegadoHandler("No tiene permisos para editar este evento");
+        }
+
+        // Actualizar los campos del evento
+        evento.setTitulo(dto.getTitulo());
+        evento.setDescripcion(dto.getDescripcion());
+        evento.setFechaHoraInicio(dto.getFechaHoraInicio());
+        evento.setDuracionMinutos(dto.getDuracionMinutos());
+        evento.setUbicacion(dto.getUbicacion());
+        evento.setCupoMaximo(dto.getCupoMaximo());
+        evento.setPrecio(dto.getPrecio());
+        evento.setCategoria(dto.getCategoria());
+
+        Evento eventoActualizado = eventoService.actualizarEvento(evento);
+
+        return ResponseEntity.ok(modelMapper.map(eventoActualizado, EventoResponse.class));
+    }
+
+    /**
+     * Elimina un evento. Solo el organizador del evento o un admin pueden eliminarlo.
+     *
+     * @param usuario
+     *            usuario logueado
+     * @param eventoId
+     *            id del evento a eliminar
+     *
+     * @return ResponseEntity sin contenido
+     */
+    @DeleteMapping("/{eventoId}")
+    @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Evento eliminado correctamente"),
+            @ApiResponse(responseCode = "403", description = "Acceso denegado"),
+            @ApiResponse(responseCode = "404", description = "Evento no encontrado") })
+    public ResponseEntity<Void> eliminarEvento(@AuthenticationPrincipal Usuario usuario,
+            @PathVariable String eventoId) {
+
+        Evento evento = this.buscarEvento(eventoId);
+
+        Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
+
+        // Si el usuario no es el organizador ni admin, devolver 403
+        if (!validador.validar()) {
+            throw new AccesoDenegadoHandler("No tiene permisos para eliminar este evento");
+        }
+
+        eventoService.eliminarEvento(eventoId);
+
+        return ResponseEntity.noContent().build();
     }
 
     private Evento buscarEvento(String id) {

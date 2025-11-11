@@ -19,6 +19,7 @@ pub struct EventFilter {
 #[derive(Debug, Builder)]
 #[builder(derive(Debug))]
 pub struct Event {
+    #[builder(default = "String::new()")]
     pub id: String,
     pub title: String,
     description: String,
@@ -28,7 +29,9 @@ pub struct Event {
     max_capacity: u32,
     price: f32,
     category: String,
+    #[builder(default = "String::new()")]
     organizer: String,
+    #[builder(default = "true")]
     pub is_open: bool,
 }
 

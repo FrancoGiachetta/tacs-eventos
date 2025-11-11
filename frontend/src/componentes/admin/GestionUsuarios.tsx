@@ -125,7 +125,7 @@ const GestionUsuarios: React.FC = () => {
                     <thead>
                         <tr className="bg-gray-50">
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Email
+                                Usuario
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Rol Actual
@@ -142,8 +142,13 @@ const GestionUsuarios: React.FC = () => {
                         {usuarios.map((usuario) => (
                             <tr key={usuario.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-medium text-gray-900">
-                                        {usuario.email}
+                                    <div>
+                                        <div className="text-sm font-medium text-gray-900">
+                                            {usuario.email}
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                            ID: {usuario.id}
+                                        </div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
