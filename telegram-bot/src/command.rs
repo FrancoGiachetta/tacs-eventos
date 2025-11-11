@@ -1,9 +1,9 @@
 use crate::dialogue::UseCase::EnterCommand;
 use crate::{
-    auth::{check_session, Authenticator},
+    auth::{Authenticator, check_session},
     bot::BotResult,
     controller::general_controller::GeneralController,
-    dialogue::{registration_dialogue::State as RegisterState, State},
+    dialogue::{State, registration_dialogue::State as RegisterState},
     error::BotError,
     schemas::event::EventFilter,
 };
