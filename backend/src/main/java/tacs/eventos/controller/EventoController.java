@@ -348,12 +348,45 @@ public class EventoController {
                 .ok(this.inscripcionesService.inscripcionesPendientes(evento).stream().map((InscripcionEvento i) -> {
                     var usuarioResponse = new UsuarioResponse(i.getParticipante().getId(),
                             i.getParticipante().getEmail(), i.getParticipante().getRoles());
-                    return new InscripcionEnWaitlistResponse(usuarioResponse, i.getFechaHoraIngresoAWaitlist().orElse(
-                            null)); /*
-                                     * La fechaHora de ingreso a watilist no debería ser nunca null en este caso, porque
-                                     * estamos buscando las inscripciones pendientes, o sea, las que están en watilist
-                                     */
+                    return new InscripcionEnWaitlistResponse(i.getId(), usuarioResponse,
+                            i.getFechaHoraIngresoAWaitlist()
+                                    .orElse(null)); /*
+                                                     * La fechaHora de ingreso a watilist no debería ser nunca null en
+                                                     * este caso, porque estamos buscando las inscripciones pendientes,
+                                                     * o sea, las que están en watilist
+                                                     */
                 }).toList());
+    }
+
+    @GetMapping("/{eventoId}/cantidadInscripcionesPendientes")
+    @ApiResponse(responseCode = "200", description = "Cantidad de usuarios en waitlist para el evento")
+    public ResponseEntity<Long> getCantidadEnWaitlistDeEvento(@AuthenticationPrincipal Usuario usuario,
+            @PathVariable String eventoId) {
+        Evento evento = this.buscarEvento(eventoId);
+
+        Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
+
+        // Si el usuario no es el organizador, devolver 403.
+        if (!validador.validar()) {
+            throw new AccesoDenegadoHandler("El usuario no es organizador");
+        }
+
+        return ResponseEntity.ok(this.inscripcionesService.inscripcionesPendientes(evento).stream().count());
+    }
+
+    @GetMapping("/{eventoId}/cantidadInscripcionesConfirmadas")
+    @ApiResponse(responseCode = "200", description = "Cantidad de inscripciones confirmadas para el evento")
+    public ResponseEntity<Long> getCantidadConfirmadasDeEvento(@AuthenticationPrincipal Usuario usuario,
+            @PathVariable String eventoId) {
+        Evento evento = this.buscarEvento(eventoId);
+        Validador validador = new ValidadorAutorizacionUsuario(usuario, evento.getOrganizador());
+
+        // Si el usuario no es el organizador, devolver 403.
+        if (!validador.validar()) {
+            throw new AccesoDenegadoHandler("El usuario no es organizador");
+        }
+
+        return ResponseEntity.ok(this.inscripcionesService.inscripcionesConfirmadas(evento).stream().count());
     }
 
     /**

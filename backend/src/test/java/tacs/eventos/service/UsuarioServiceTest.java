@@ -10,11 +10,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import tacs.eventos.config.TestMongoConfiguration;
 import tacs.eventos.config.TestRedisConfiguration;
-import tacs.eventos.dto.EstadoInscripcionResponse;
 import tacs.eventos.dto.InscripcionResponse;
-import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.RolUsuario;
 import tacs.eventos.model.Usuario;
+import tacs.eventos.model.evento.Evento;
 import tacs.eventos.model.inscripcion.InscripcionEvento;
 import tacs.eventos.model.inscripcion.InscripcionFactory;
 import tacs.eventos.repository.inscripcion.InscripcionesRepository;
@@ -104,16 +103,18 @@ class UsuarioServiceTest {
         Evento evento2 = new Evento("Evento 2", "Desc 2", null, 120, "Ubicacion", 50, 1000, "Categoria");
         Evento evento3 = new Evento("Evento 3", "Desc 3", null, 120, "Ubicacion", 50, 1000, "Categoria");
 
-        List<InscripcionEvento> inscripciones = List.of(InscripcionFactory.confirmada(usuario, evento1),
-                InscripcionFactory.confirmada(usuario, evento2), InscripcionFactory.pendiente(usuario, evento3));
+        var inscripcionEvento1 = InscripcionFactory.confirmada(usuario, evento1);
+        var inscripcionEvento2 = InscripcionFactory.confirmada(usuario, evento2);
+        var inscripcionEvento3 = InscripcionFactory.pendiente(usuario, evento3);
+        List<InscripcionEvento> inscripciones = List.of(inscripcionEvento1, inscripcionEvento2, inscripcionEvento3);
 
         when(inscripcionesRepository.noCanceladasDeParticipante(usuario)).thenReturn(inscripciones);
 
         var result = usuarioService.obtenerInscripcionesNoCanceladas(usuario.getId());
 
-        var esperado = Set.of(new InscripcionResponse(evento1.getId(), EstadoInscripcionResponse.CONFIRMADA),
-                new InscripcionResponse(evento2.getId(), EstadoInscripcionResponse.CONFIRMADA),
-                new InscripcionResponse(evento3.getId(), EstadoInscripcionResponse.PENDIENTE));
+        var esperado = Set.of(InscripcionResponse.fromInscripcion(inscripcionEvento1),
+                InscripcionResponse.fromInscripcion(inscripcionEvento2),
+                InscripcionResponse.fromInscripcion(inscripcionEvento3));
         assertEquals(esperado, new HashSet<>(result));
     }
 }
