@@ -3,8 +3,25 @@ networks:
     driver: bridge
 
 services:
+  eventos-telegram-bot:
+    build:
+      context: ./telegram-bot
+      dockerfile: Dockerfile
+    container_name: eventos-telegram-bot
+    env_file: ./telegram-bot/.env
+    environment:
+      - CLIENT_TIMEOUT_SECS=30
+      - DEFAULT_MAX_RETRIES=3
+    networks:
+      - eventos-network
+    ports:
+      - "42068:443"
+    depends_on:
+      eventos-backend:
+        condition: service_healthy
+
   eventos-backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: eventos-backend
@@ -20,14 +37,14 @@ services:
       - mongodb
       - redis
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
 
   eventos-frontend:
-    build: 
+    build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: eventos-frontend
@@ -58,7 +75,7 @@ services:
   redis:
     image: redis:8.2
     container_name: eventos-redis
-    command: ["redis-server", "--save", "", "--appendonly", "no"] # No guardo nada en disco
+    command: [ "redis-server", "--save", "", "--appendonly", "no" ] # No guardo nada en disco
     ports:
       - "6379:6379"
     restart: unless-stopped
