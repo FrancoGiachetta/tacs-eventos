@@ -145,23 +145,25 @@ mvn net.revelc.code.formatter:formatter-maven-plugin:2.20.0:format
 npm run fmt
 ```
 
--Usuarios hardcodeados
+### Usuarios hardcodeados
+
 🔴 ADMIN
+
 Email: admin@eventos.com
 Password: admin123
 Permisos: Acceso completo al sistema + Panel de administración
 
 🔵 ORGANIZADOR (Ejemplo)
+
 Email: organizador@eventos.com  
 Password: org123
 Permisos: Crear y gestionar eventos
-```
-##CLOUD AWS-
+
+## CLOUD AWS
+
 La aplicacion se instala en EC2- AWS //atlas mongoDB
+
 URL:http://ec2-3-94-168-55.compute-1.amazonaws.com:3000/login
-
-
-
 
 ## Equipo
 
