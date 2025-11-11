@@ -10,3 +10,4 @@ Dockerfile
 .DS_Store
 *.iml
 .idea
+.env

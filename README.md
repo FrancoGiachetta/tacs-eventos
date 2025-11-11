@@ -89,6 +89,18 @@ cd backend
 mvn clean install
 ```
 
+### Variables de entorno
+Copiar `.env.example` a .env
+```env
+MONGODB_URI="mongodb://<user>:<pass>@<host>:<port>/<db>"
+REDIS_HOST="<redis-host>"
+REDIS_PORT="<redis-port>"
+
+# Los siguientes aplican cuando se setea el profile en 'docker'
+MONGODB_URI_DOCKER="mongodb://<user>:<pass>@<host>:<port>/<db>"
+REDIS_HOST_DOCKER="<redis-host>"
+```
+
 ### Ejecución
 
 Desde Powershell:
@@ -118,6 +130,13 @@ Una vez ejecutado el server, dirigirse a: http://localhost:8080/swagger
 ```shell
 cd frontend
 npm install // una sola vez
+```
+
+### Variables de entorno
+Copiar `.env.example` a .env
+
+```env
+VITE_BACKEND_BASE_URL="http://localhost:8080"
 ```
 
 ### Ejecución
