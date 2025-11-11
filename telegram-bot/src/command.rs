@@ -61,8 +61,9 @@ pub fn create_command_handler() -> UpdateHandler<BotError> {
                     dptree::case![Command::MyInscriptions]
                         .endpoint(inscription::handle_my_inscriptions),
                 )
-                .branch(dptree::case![Command::CreateEvent])
-                .endpoint(create_event::handle_create_event)
+                .branch(
+                    dptree::case![Command::CreateEvent].endpoint(create_event::handle_create_event),
+                )
                 .branch(dptree::case![Command::Help].endpoint(handle_help_command)),
         )
 }

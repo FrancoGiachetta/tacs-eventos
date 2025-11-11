@@ -1,4 +1,4 @@
-use std::{env, time::Duration};
+use std::{env, future::Future, time::Duration};
 
 use lazy_static::lazy_static;
 use reqwest::{Client, Response};
@@ -12,6 +12,7 @@ use crate::{
         event_organizer_view::EventOrganizerView,
         inscription::Inscription,
         user::{Token, UserIn, UserOut},
+        waitlist_inscription::WaitlistInscription,
     },
 };
 
@@ -59,6 +60,36 @@ impl RequestClient {
     ) -> Result<Vec<EventOrganizerView>, RequestClientError> {
         let response = self
             .send_request_with_retry("usuario/mis-eventos", RequestMethod::Get(&[]), Some(token))
+            .await?;
+        Ok(serde_json::from_value(response)?)
+    }
+
+    pub async fn send_get_pending_inscriptions_count_request(
+        &self,
+        token: &str,
+        event_id: &str,
+    ) -> Result<u64, RequestClientError> {
+        let response = self
+            .send_request_with_retry(
+                &format!("evento/{}/cantidadInscripcionesPendientes", event_id),
+                RequestMethod::Get(&[]),
+                Some(token),
+            )
+            .await?;
+        Ok(serde_json::from_value(response)?)
+    }
+
+    pub async fn send_get_confirmed_inscriptions_count_request(
+        &self,
+        token: &str,
+        event_id: &str,
+    ) -> Result<u64, RequestClientError> {
+        let response = self
+            .send_request_with_retry(
+                &format!("evento/{}/cantidadInscripcionesConfirmadas", event_id),
+                RequestMethod::Get(&[]),
+                Some(token),
+            )
             .await?;
         Ok(serde_json::from_value(response)?)
     }
@@ -127,6 +158,21 @@ impl RequestClient {
         Ok(serde_json::from_value(response)?)
     }
 
+    pub async fn send_get_event_request(
+        &self,
+        event_id: &str,
+        token: &str,
+    ) -> Result<Event, RequestClientError> {
+        let response = self
+            .send_request_with_retry(
+                &format!("evento/{}", event_id),
+                RequestMethod::Get(&[]),
+                Some(token),
+            )
+            .await?;
+        Ok(serde_json::from_value(response)?)
+    }
+
     pub async fn send_get_my_inscriptions_request(
         &self,
         token: &str,
@@ -189,6 +235,38 @@ impl RequestClient {
             .await?;
 
         Ok(serde_json::from_value(inscription)?)
+    }
+
+    pub async fn send_get_event_inscriptions_request(
+        &self,
+        token: &str,
+        event_id: &str,
+    ) -> Result<Vec<Inscription>, RequestClientError> {
+        let response = self
+            .send_request_with_retry(
+                &format!("evento/{}/inscripcion", event_id),
+                RequestMethod::Get(&[]),
+                Some(token),
+            )
+            .await?;
+
+        Ok(serde_json::from_value(response)?)
+    }
+
+    pub async fn send_get_event_waitlist_request(
+        &self,
+        token: &str,
+        event_id: &str,
+    ) -> Result<Vec<WaitlistInscription>, RequestClientError> {
+        let response = self
+            .send_request_with_retry(
+                &format!("evento/{}/waitlist", event_id),
+                RequestMethod::Get(&[]),
+                Some(token),
+            )
+            .await?;
+
+        Ok(serde_json::from_value(response)?)
     }
 
     pub async fn send_user_registration_request(

@@ -4,6 +4,8 @@ import api from '../../lib/api'
 import { type Evento } from '../../types/evento'
 import { type Inscripcion, type ItemWaitlist } from '../../types/inscripciones'
 import { formatDate } from '../../lib/utils'
+import { useAuth } from '../../contexts/AuthContext'
+import { esAdmin } from '../../types/usuario'
 
 type Tab = 'inscriptos' | 'waitlist'
 
@@ -299,7 +301,7 @@ function InscriptosTable({
             <table className="min-w-full text-sm">
                 <thead>
                     <tr className="bg-gray-100 text-gray-700">
-                        <th className="text-left px-3 py-2">Email</th>
+                        <th className="text-left px-3 py-2">Usuario</th>
                         <th className="text-left px-3 py-2">
                             Fecha de inscripción
                         </th>
@@ -309,7 +311,18 @@ function InscriptosTable({
                 <tbody>
                     {inscriptos.map((i) => (
                         <tr key={i.id} className="odd:bg-white even:bg-gray-50">
-                            <td className="px-3 py-2">{i.email ?? '—'}</td>
+                            <td className="px-3 py-2">
+                                <div>
+                                    <div className="font-medium">
+                                        {i.email ?? '—'}
+                                    </div>
+                                    {i.id && (
+                                        <div className="text-xs text-gray-500">
+                                            Inscripción ID: {i.id}
+                                        </div>
+                                    )}
+                                </div>
+                            </td>
                             <td className="px-3 py-2">
                                 {i.fechaInscripcion
                                     ? formatDate(new Date(i.fechaInscripcion), {
@@ -351,8 +364,10 @@ function WaitlistTable({ waitlist }: { waitlist: ItemWaitlist[] }) {
                 <thead>
                     <tr className="bg-gray-100 text-gray-700">
                         <th className="text-left px-3 py-2">Posición</th>
-                        <th className="text-left px-3 py-2">Nombre</th>
-                        <th className="text-left px-3 py-2">Fecha de alta</th>
+                        <th className="text-left px-3 py-2">Usuario</th>
+                        <th className="text-left px-3 py-2">
+                            Fecha de ingreso
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -362,6 +377,18 @@ function WaitlistTable({ waitlist }: { waitlist: ItemWaitlist[] }) {
                             className="odd:bg-white even:bg-gray-50"
                         >
                             <td className="px-3 py-2">{idx + 1}</td>
+                            <td className="px-3 py-2">
+                                <div>
+                                    <div className="font-medium">
+                                        {w.usuario.email}
+                                    </div>
+                                    {w.usuario.id && (
+                                        <div className="text-xs text-gray-500">
+                                            ID: {w.usuario.id}
+                                        </div>
+                                    )}
+                                </div>
+                            </td>
                             <td className="px-3 py-2">
                                 {w.fechaIngreso
                                     ? formatDate(new Date(w.fechaIngreso), {

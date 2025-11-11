@@ -339,8 +339,6 @@ async fn create_and_send_event(
     controller: &&GeneralController,
     event_builder: &mut EventBuilder,
 ) -> Result<String, BotError> {
-    // This field is set in the backend based on the token
-    event_builder.organizer("placeholder".to_string());
     let event = event_builder
         .build()
         .map_err(|e| BotError::CustomError(e.to_string()))?;
