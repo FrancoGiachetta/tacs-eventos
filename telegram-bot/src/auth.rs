@@ -13,6 +13,7 @@ pub mod in_memory_auth;
 pub trait Authenticator {
     fn validate_session(&self, chat_id: &ChatId) -> Result<bool, AuthError>;
     fn get_session(&self, chat_id: &ChatId) -> Result<Session, AuthError>;
+    fn remove_session(&self, chat_id: &ChatId) -> Result<(), AuthError>;
     async fn reset_token(&self, chat_id: &ChatId) -> Result<(), AuthError>;
     async fn new_session(
         &self,
@@ -20,6 +21,7 @@ pub trait Authenticator {
         password: String,
         token: Token,
     ) -> Result<(), AuthError>;
+    async fn logout(&self, chat_id: &ChatId) -> Result<(), AuthError>;
 }
 
 /// Checks wether the session associated to the current chat id is still valid.

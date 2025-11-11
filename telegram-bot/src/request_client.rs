@@ -30,7 +30,6 @@ pub struct RequestClient {
 pub enum RequestMethod<'req> {
     Get(&'req [(&'req str, String)]),
     Post(Value),
-    Put(Value),
     Patch(Value),
     Delete(Value),
 }
@@ -150,7 +149,11 @@ impl RequestClient {
         if let Some(category) = filters.category {
             filter_query.push(("categoria", category));
         }
-        // TODO: add palabrasClave query.
+        if let Some(keywords) = filters.keywords {
+            let keywords = keywords.join("+");
+            filter_query.push(("palabrasClave", keywords));
+        }
+
         let response = self
             .send_request_with_retry("evento", RequestMethod::Get(&filter_query), Some(token))
             .await?;
@@ -314,6 +317,13 @@ impl RequestClient {
         Ok(())
     }
 
+    pub async fn send_logout_request(&self, token: &str) -> Result<(), RequestClientError> {
+        self.send_request_with_retry("auth/logout", RequestMethod::Post(Value::Null), Some(token))
+            .await?;
+
+        Ok(())
+    }
+
     async fn send_request_with_retry<'req>(
         &self,
         url: &str,
@@ -350,10 +360,6 @@ impl RequestClient {
             RequestMethod::Patch(body) => {
                 info!("Sending PATCH request to {url}");
                 self.client.patch(url).json(&body)
-            }
-            RequestMethod::Put(body) => {
-                info!("Sending PUT request to {url}");
-                self.client.put(url).json(&body)
             }
             RequestMethod::Delete(body) => {
                 info!("Sending DELETE request to {url}");
